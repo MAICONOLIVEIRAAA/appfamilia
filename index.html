@@ -6,87 +6,33 @@
     <title>AppFamilia - Maicon</title>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
     <style>
         :root { --gold: #d4af37; --dark: #121212; --gray: #1e1e1e; --light-gray: #2c2c2c; --text: #e0e0e0; --red: #e74c3c; --green: #2ecc71; }
-        
-        /* Reset para Mobile */
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
-            background-color: var(--dark); 
-            color: var(--text); 
-            padding-bottom: 40px; /* Espaço para rolar até o final suavemente */
-        }
-
-        /* Container que simula a tela do app */
-        .app-container { 
-            display: flex; 
-            flex-direction: column; 
-            gap: 15px; 
-            padding: 15px; 
-            width: 100%; 
-            max-width: 500px; /* Mantém bonito se abrir no PC, mas perfeito no celular */
-            margin: 0 auto; 
-        }
-
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: var(--dark); color: var(--text); padding-bottom: 40px; }
+        .app-container { display: flex; flex-direction: column; gap: 15px; padding: 15px; width: 100%; max-width: 500px; margin: 0 auto; }
         h1 { text-align: center; color: var(--gold); margin: 10px 0; font-size: 1.8em; }
         h2 { font-size: 1.2em; color: var(--gold); margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 5px; }
-
-        /* Cartões de Rolagem */
-        .card { 
-            background: var(--gray); 
-            padding: 20px; 
-            border-radius: 12px; 
-            border-top: 3px solid var(--gold); 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3); 
-        }
-
-        /* Resumo de Saldo Mobile */
+        .card { background: var(--gray); padding: 20px; border-radius: 12px; border-top: 3px solid var(--gold); box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
         .balance-box { display: flex; justify-content: space-between; align-items: center; text-align: center; background: var(--light-gray); padding: 15px; border-radius: 10px; }
         .balance-item h3 { font-size: 0.8em; color: #aaa; font-weight: normal; margin-bottom: 5px; }
         .balance-item p { font-size: 1.1em; font-weight: bold; }
         .val-ganho { color: var(--green); }
         .val-gasto { color: var(--red); }
-        .val-saldo { font-size: 1.3em !important; } /* Destaca o saldo principal */
-
-        /* Formulários e Botões (Touch-friendly) */
+        .val-saldo { font-size: 1.3em !important; }
         .form-group { display: flex; flex-direction: column; gap: 12px; }
-        
-        /* Fonte 16px previne auto-zoom no iPhone/Android */
-        select, input, button { 
-            width: 100%; 
-            padding: 15px; 
-            border-radius: 8px; 
-            border: none; 
-            font-size: 16px; 
-            outline: none;
-        }
-        
+        select, input, button { width: 100%; padding: 15px; border-radius: 8px; border: none; font-size: 16px; outline: none; }
         input, select { background: var(--light-gray); color: white; border: 1px solid #444; }
         input:focus, select:focus { border-color: var(--gold); }
-        
         .btn { background: var(--gold); color: #000; font-weight: bold; cursor: pointer; transition: 0.2s; text-transform: uppercase; }
-        .btn:active { background: #f1c40f; transform: scale(0.98); } /* Efeito de clique no touch */
-
-        /* Lista de Tarefas */
+        .btn:active { background: #f1c40f; transform: scale(0.98); }
         .task-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
-        .task-item { 
-            background: var(--light-gray); 
-            padding: 15px; 
-            border-radius: 8px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center;
-            border-left: 4px solid var(--gold); 
-            font-size: 16px;
-        }
+        .task-item { background: var(--light-gray); padding: 15px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid var(--gold); font-size: 16px; }
         .task-delete { font-size: 1.2em; padding: 5px 10px; cursor: pointer; }
-
-        /* Gráfico Mobile */
         .chart-container { position: relative; height: 250px; width: 100%; margin-top: 15px; }
     </style>
 </head>
@@ -142,23 +88,26 @@
     </div>
 
     <script>
-        // CONFIGURAÇÃO FIREBASE DO MAICON
+        // === SUAS CHAVES OFICIAIS DO FIREBASE ===
         const firebaseConfig = {
-            apiKey: "AIzaSyAMxvTVuD11Rm_EfEpVVQ8kkaUApEEdHvg",
-            authDomain: "midias-sp.firebaseapp.com",
-            projectId: "midias-sp",
-            appId: "1:550605985336:web:c21f69ef4180e30275b8cd"
+            apiKey: "AIzaSyBGKDP5V75gMI7uO4gpZL6IpV3teP6J4ao",
+            authDomain: "appfamilia-5ebe4.firebaseapp.com",
+            databaseURL: "https://appfamilia-5ebe4-default-rtdb.firebaseio.com",
+            projectId: "appfamilia-5ebe4",
+            storageBucket: "appfamilia-5ebe4.firebasestorage.app",
+            messagingSenderId: "588166444818",
+            appId: "1:588166444818:web:4dcc01e0c6d1608cbc65cb"
         };
 
+        // Inicializa o app e conecta ao Realtime Database
         firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
+        const db = firebase.database();
 
-        // --- FUNÇÕES FINANCEIRAS ---
+        // --- LÓGICA DE FINANÇAS ---
         async function addFinance() {
             const type = document.getElementById('finType').value;
             const desc = document.getElementById('finDesc').value;
             const valInput = document.getElementById('finValue').value;
-            // Trata vírgula como ponto para o formato numérico
             const val = parseFloat(valInput.replace(',', '.'));
 
             if (!desc || !val) {
@@ -166,24 +115,23 @@
                 return;
             }
 
-            // Desativa o botão para evitar duplicação no celular
             const btn = document.querySelector('.card:nth-child(2) .btn');
             btn.innerText = "Salvando...";
             btn.disabled = true;
 
             try {
-                await db.collection("financas").add({
+                await db.ref("financas").push({
                     tipo: type,
                     descricao: desc,
                     valor: val,
-                    data: firebase.firestore.FieldValue.serverTimestamp()
+                    data: firebase.database.ServerValue.TIMESTAMP
                 });
 
                 document.getElementById('finDesc').value = '';
                 document.getElementById('finValue').value = '';
-                fetchFinance();
+                fetchFinance(); // Atualiza a tela
             } catch (error) {
-                alert("Erro ao salvar. Verifique o console.");
+                alert("Erro ao salvar: " + error.message);
             } finally {
                 btn.innerText = "Salvar Lançamento";
                 btn.disabled = false;
@@ -192,46 +140,48 @@
 
         let myChart;
         async function fetchFinance() {
-            const snap = await db.collection("financas").get();
-            let ganhos = 0, gastos = 0;
-            const categorias = { "Ganhos": 0, "Gastos": 0 };
+            try {
+                const snap = await db.ref("financas").once('value');
+                let ganhos = 0, gastos = 0;
+                let categorias = { "Ganhos": 0, "Gastos": 0 };
 
-            snap.forEach(doc => {
-                const d = doc.data();
-                if (d.tipo === 'ganho') {
-                    ganhos += d.valor;
-                    categorias["Ganhos"] += d.valor;
-                } else {
-                    gastos += d.valor;
-                    categorias["Gastos"] += d.valor;
-                }
-            });
+                snap.forEach(child => {
+                    const d = child.val();
+                    if (d.tipo === 'ganho') {
+                        ganhos += d.valor;
+                        categorias["Ganhos"] += d.valor;
+                    } else {
+                        gastos += d.valor;
+                        categorias["Gastos"] += d.valor;
+                    }
+                });
 
-            // Formatação de moeda BRL para tela do celular
-            const formataMoeda = (valor) => valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                const formataMoeda = (valor) => valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
-            document.getElementById('totalGanho').innerText = formataMoeda(ganhos);
-            document.getElementById('totalGasto').innerText = formataMoeda(gastos);
-            
-            const saldo = ganhos - gastos;
-            const saldoEl = document.getElementById('totalSaldo');
-            saldoEl.innerText = formataMoeda(saldo);
-            saldoEl.style.color = saldo >= 0 ? 'var(--green)' : 'var(--red)';
+                document.getElementById('totalGanho').innerText = formataMoeda(ganhos);
+                document.getElementById('totalGasto').innerText = formataMoeda(gastos);
+                
+                const saldo = ganhos - gastos;
+                const saldoEl = document.getElementById('totalSaldo');
+                saldoEl.innerText = formataMoeda(saldo);
+                saldoEl.style.color = saldo >= 0 ? 'var(--green)' : 'var(--red)';
 
-            renderChart(categorias);
+                renderChart(categorias);
+            } catch (error) {
+                console.error("Erro ao carregar finanças:", error);
+            }
         }
 
         function renderChart(cats) {
             const ctx = document.getElementById('financeChart').getContext('2d');
             if (myChart) myChart.destroy();
             
-            // Se estiver tudo zerado, mostra gráfico cinza
             if(cats.Ganhos === 0 && cats.Gastos === 0) {
                 cats = {"Sem dados": 1};
             }
 
             myChart = new Chart(ctx, {
-                type: 'doughnut', // Doughnut fica mais elegante no mobile
+                type: 'doughnut',
                 data: {
                     labels: Object.keys(cats),
                     datasets: [{ 
@@ -241,17 +191,14 @@
                     }]
                 },
                 options: { 
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { 
-                        legend: { position: 'bottom', labels: { color: '#fff', padding: 20 } } 
-                    },
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom', labels: { color: '#fff', padding: 20 } } },
                     cutout: '70%'
                 }
             });
         }
 
-        // --- FUNÇÕES DE TAREFAS ---
+        // --- LÓGICA DE TAREFAS ---
         async function addTask() {
             const val = document.getElementById('taskInput').value;
             if (!val) return;
@@ -259,31 +206,53 @@
             const btn = document.querySelector('.card:last-child .btn');
             btn.innerText = "Adicionando...";
             
-            await db.collection("tarefas").add({ texto: val, data: new Date() });
-            document.getElementById('taskInput').value = '';
-            btn.innerText = "Adicionar Tarefa";
-            fetchTasks();
+            try {
+                await db.ref("tarefas").push({ 
+                    texto: val, 
+                    data: firebase.database.ServerValue.TIMESTAMP 
+                });
+                document.getElementById('taskInput').value = '';
+                fetchTasks();
+            } catch(error) {
+                alert("Erro ao adicionar tarefa: " + error.message);
+            } finally {
+                btn.innerText = "Adicionar Tarefa";
+            }
         }
 
         async function fetchTasks() {
-            const snap = await db.collection("tarefas").orderBy("data", "desc").limit(10).get();
-            const list = document.getElementById('taskList');
-            list.innerHTML = '';
-            snap.forEach(doc => {
-                list.innerHTML += `
-                    <li class="task-item">
-                        <span>${doc.data().texto}</span>
-                        <span class="task-delete" onclick="deleteTask('${doc.id}')">✅</span>
-                    </li>`;
-            });
+            try {
+                const snap = await db.ref("tarefas").orderByChild("data").limitToLast(15).once('value');
+                const list = document.getElementById('taskList');
+                list.innerHTML = '';
+                
+                let tarefas = [];
+                snap.forEach(child => {
+                    tarefas.push({ id: child.key, ...child.val() });
+                });
+                
+                tarefas.reverse().forEach(t => {
+                    list.innerHTML += `
+                        <li class="task-item">
+                            <span>${t.texto}</span>
+                            <span class="task-delete" onclick="deleteTask('${t.id}')">✅</span>
+                        </li>`;
+                });
+            } catch (error) {
+                console.error("Erro ao carregar tarefas:", error);
+            }
         }
 
         async function deleteTask(id) {
-            await db.collection("tarefas").doc(id).delete();
-            fetchTasks();
+            try {
+                await db.ref("tarefas").child(id).remove();
+                fetchTasks();
+            } catch (error) {
+                console.error("Erro ao deletar tarefa:", error);
+            }
         }
 
-        // Inicia o app carregando as funções
+        // Inicializa as consultas ao carregar a página
         window.onload = () => { fetchFinance(); fetchTasks(); };
     </script>
 </body>
