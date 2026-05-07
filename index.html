@@ -3,202 +3,230 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AppFamilia Nu</title>
+    <title>Brim Dev - AppFamilia</title>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
     <style>
-        :root { 
-            --nu-purple: #820ad1; 
-            --nu-dark-purple: #6a08aa;
-            --bg-gray: #f5f5f5; 
-            --card-white: #ffffff;
-            --text-black: #111111;
-            --text-gray: #767676;
-            --green: #2ecc71;
-            --red: #e74c3c;
+        :root {
+            --bg-dark: #000000;
+            --card-bg: #1c1c1e;
+            --text-main: #ffffff;
+            --text-secondary: #8e8e93;
+            --accent-blue: #0a84ff;
+            --accent-green: #30d158;
+            --accent-orange: #ff9f0a;
+            --accent-pink: #ff375f;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         
         body { 
-            font-family: 'Graphik', 'Inter', -apple-system, sans-serif; 
-            background-color: var(--bg-gray); 
-            color: var(--text-black); 
-            padding-bottom: 120px; 
-            padding-top: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif; 
+            background-color: var(--bg-dark); 
+            color: var(--text-main); 
+            padding: 20px;
+            padding-bottom: 100px;
         }
 
-        .app-container { padding: 20px; width: 100%; max-width: 500px; margin: 0 auto; }
-
-        /* HEADER ESTILO NU */
-        .nu-header {
+        /* HEADER */
+        .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 30px;
+            padding-top: 10px;
+        }
+        .header h1 { font-size: 24px; font-weight: 600; }
+        .header .settings-icon { font-size: 20px; opacity: 0.7; }
+
+        /* WIDGET PRINCIPAL (RING CHART) */
+        .main-widget {
+            position: relative;
+            background: radial-gradient(circle at center, #1c1c1e 0%, #000 100%);
+            border-radius: 35px;
+            padding: 40px 20px;
+            text-align: center;
+            margin-bottom: 25px;
+            border: 1px solid #2c2c2e;
+        }
+        .ring-container { width: 220px; height: 220px; margin: 0 auto; position: relative; }
+        .balance-info {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .balance-info h2 { font-size: 32px; font-weight: 700; }
+        .balance-info p { color: var(--text-secondary); font-size: 14px; }
+
+        .stats-row {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 30px;
+            border-top: 1px solid #2c2c2e;
+            padding-top: 20px;
+        }
+        .stat-item p { font-size: 12px; color: var(--text-secondary); margin-bottom: 5px; }
+        .stat-item span { font-weight: 600; font-size: 16px; }
+
+        /* GRID DE INSIGHTS */
+        .insights-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .insight-card {
+            background: var(--card-bg);
+            border-radius: 24px;
             padding: 20px;
-            background: var(--nu-purple);
-            color: white;
-            border-radius: 0 0 24px 24px;
-            margin-top: -20px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            height: 160px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
-        .nu-header h1 { font-size: 1.2em; font-weight: 600; }
+        .insight-card h3 { font-size: 12px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
+        .insight-value { font-size: 22px; font-weight: 700; margin-top: 5px; }
 
-        /* CARDS ESTILO NUBANK */
-        .card { 
-            background: var(--card-white); 
-            padding: 24px; 
-            border-radius: 24px; 
-            margin-bottom: 16px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            border: 1px solid #eee;
-            transition: 0.3s;
+        /* TRANSAÇÕES RECENTES */
+        .section-title { font-size: 18px; font-weight: 600; margin-bottom: 15px; display: flex; justify-content: space-between; }
+        .section-title span { color: var(--accent-blue); font-size: 14px; }
+
+        .transaction-list { display: flex; flex-direction: column; gap: 12px; }
+        .transaction-item {
+            background: #1c1c1e;
+            padding: 15px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
-        .card h2 { font-size: 1.1em; color: var(--text-gray); margin-bottom: 15px; font-weight: 500; }
+        .icon-box { width: 40px; height: 40px; background: #2c2c2e; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-right: 15px; }
+        .tx-info b { font-size: 15px; display: block; }
+        .tx-info small { color: var(--text-secondary); font-size: 12px; }
+        .tx-amount { font-weight: 700; font-size: 15px; }
 
-        /* SALDO EM DESTAQUE */
-        .balance-value { font-size: 1.8em; font-weight: 700; color: var(--text-black); margin: 10px 0; }
-        .nu-label { color: var(--nu-purple); font-weight: 600; font-size: 0.9em; }
-
-        /* INPUTS MODERNOS */
-        .form-group { display: flex; flex-direction: column; gap: 15px; }
-        input, select { 
-            width: 100%; 
-            padding: 16px; 
-            border-radius: 12px; 
-            border: none; 
-            background: #f0f0f0; 
-            font-size: 16px; 
-            color: var(--text-black);
-            outline: none;
-        }
-        input:focus { background: #e8e8e8; border-bottom: 2px solid var(--nu-purple); }
-
-        /* BOTÃO ROXO */
-        .btn-nu { 
-            background: var(--nu-purple); 
-            color: white; 
-            font-weight: 600; 
-            padding: 18px; 
-            border-radius: 30px; 
-            border: none; 
-            text-transform: none; 
-            font-size: 1.1em;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(130, 10, 209, 0.2);
-        }
-        .btn-nu:active { background: var(--nu-dark-purple); transform: scale(0.98); }
-
-        /* LISTAS LIMPAS */
-        .item-list { list-style: none; }
-        .list-item { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            padding: 15px 0; 
-            border-bottom: 1px solid #f0f0f0; 
-        }
-        .list-item:last-child { border-bottom: none; }
-        .item-info b { font-size: 1em; color: var(--text-black); }
-        .item-info p { font-size: 0.85em; color: var(--text-gray); }
-
-        /* MENU INFERIOR NU */
-        .bottom-nav { 
-            position: fixed; 
-            bottom: 0; 
-            left: 0; 
-            width: 100%; 
-            background: white; 
-            display: flex; 
-            justify-content: space-around; 
-            padding: 15px 0 30px 0; 
-            border-top: 1px solid #eee;
+        /* MENU INFERIOR */
+        .nav-bar {
+            position: fixed;
+            bottom: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            background: rgba(28, 28, 30, 0.8);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(255,255,255,0.1);
             z-index: 1000;
         }
-        .nav-item { color: #ccc; text-align: center; font-size: 0.75em; width: 25%; font-weight: 500; }
-        .nav-item.active { color: var(--nu-purple); }
-        .nav-item span { display: block; font-size: 24px; margin-bottom: 4px; }
+        .nav-btn { color: var(--text-secondary); font-size: 22px; cursor: pointer; }
+        .nav-btn.active { color: var(--text-main); }
+        .add-btn { background: white; color: black; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; margin-top: -40px; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
 
-        /* VIEW SYSTEM */
+        /* MODAL DE LANÇAMENTO */
+        #modalLancamento {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 2000;
+            padding: 40px 20px;
+        }
+        .modal-content { background: #1c1c1e; border-radius: 30px; padding: 30px; }
+        input, select { width: 100%; padding: 15px; border-radius: 12px; border: none; background: #2c2c2e; color: white; margin-bottom: 15px; font-size: 16px; }
+        .btn-save { background: var(--accent-blue); color: white; padding: 18px; border-radius: 15px; border: none; width: 100%; font-weight: bold; font-size: 16px; }
+
         .view { display: none; }
-        .view.active { display: block; animation: fadeIn 0.4s; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        
-        .chart-container { height: 250px; width: 100%; margin-top: 10px; }
+        .view.active { display: block; }
     </style>
 </head>
 <body>
 
-    <header class="nu-header">
-        <h1>Olá, Pablo</h1>
-        <div style="background: rgba(255,255,255,0.2); padding: 10px; border-radius: 50%;">👤</div>
-    </header>
+    <div class="header">
+        <h1 id="monthYear">February 2026</h1>
+        <div class="settings-icon">⚙️</div>
+    </div>
 
-    <div class="app-container">
-        
-        <div id="viewHome" class="view active">
-            <div class="card" onclick="navTab('viewExtrato', document.querySelectorAll('.nav-item')[2])">
-                <p class="nu-label">Conta</p>
-                <p class="balance-value" id="resumoSaldo">R$ 0,00</p>
-                <p style="font-size: 0.85em; color: var(--text-gray);">Saldo disponível</p>
+    <div id="viewHome" class="view active">
+        <div class="main-widget">
+            <div class="ring-container">
+                <canvas id="balanceRing"></canvas>
+                <div class="balance-info">
+                    <h2 id="totalSaldo">0 €</h2>
+                    <p>left to spend</p>
+                </div>
             </div>
-
-            <div class="card">
-                <p class="nu-label">Meus Gastos</p>
-                <div class="chart-container"><canvas id="monthlyChart"></canvas></div>
+            <div class="stats-row">
+                <div class="stat-item"><p>Budget ></p><span id="budgetVal">5.000 €</span></div>
+                <div class="stat-item"><p>Allocated ></p><span id="allocatedVal">0 €</span></div>
+                <div class="stat-item"><p>Available ></p><span id="availableVal">0 €</span></div>
             </div>
         </div>
 
-        <div id="viewLancamento" class="view">
-            <div class="card">
-                <h2>O que deseja fazer?</h2>
-                <div class="form-group">
-                    <select id="finType">
-                        <option value="gasto">Pagar Conta (Saída)</option>
-                        <option value="ganho">Receber Valor (Entrada)</option>
-                    </select>
-                    <input type="text" id="finDesc" placeholder="Descrição (ex: Mercado)">
-                    <input type="number" id="finValue" placeholder="Valor R$" inputmode="decimal">
-                    <button class="btn-nu" onclick="addFinance()">Confirmar</button>
+        <div class="insights-grid">
+            <div class="insight-card">
+                <h3>Trend</h3>
+                <div class="insight-value">+99 % 📈</div>
+                <small style="color: var(--accent-green)">Increasing</small>
+            </div>
+            <div class="insight-card">
+                <h3>Top Spending</h3>
+                <div class="insight-value" id="topSpend">0 €</div>
+                <small id="topCat">Housing</small>
+            </div>
+            <div class="insight-card">
+                <h3>Planned</h3>
+                <div class="insight-value">280 €</div>
+                <small>3 expenses</small>
+            </div>
+            <div class="insight-card">
+                <h3>Saving Rate</h3>
+                <div class="insight-value">20 %</div>
+                <div style="width: 100%; height: 4px; background: #333; border-radius: 2px; margin-top: 10px;">
+                    <div style="width: 20%; height: 100%; background: var(--accent-blue); border-radius: 2px;"></div>
                 </div>
             </div>
         </div>
 
-        <div id="viewExtrato" class="view">
-            <div class="card">
-                <h2>Histórico</h2>
-                <ul id="finList" class="item-list"></ul>
-            </div>
+        <div class="section-title">
+            Recent Transactions
+            <span>View all</span>
         </div>
+        <div class="transaction-list" id="recentList">
+            </div>
+    </div>
 
-        <div id="viewTarefas" class="view">
-            <div class="card">
-                <h2>Lembretes</h2>
-                <div class="form-group">
-                    <input type="text" id="taskInput" placeholder="O que lembrar?">
-                    <input type="time" id="taskTime">
-                    <button class="btn-nu" onclick="addTask()">Salvar Lembrete</button>
-                </div>
-            </div>
-            <div class="card">
-                <ul id="taskList" class="item-list"></ul>
-            </div>
+    <nav class="nav-bar">
+        <div class="nav-btn active">🏠</div>
+        <div class="nav-btn">📊</div>
+        <div class="add-btn" onclick="openModal()">+</div>
+        <div class="nav-btn">🎯</div>
+        <div class="nav-btn">👤</div>
+    </nav>
+
+    <div id="modalLancamento">
+        <div class="modal-content">
+            <h2 style="margin-bottom: 20px;">Novo Registro</h2>
+            <select id="finType">
+                <option value="gasto">🔴 Saída / Gasto</option>
+                <option value="ganho">🟢 Entrada / Salário</option>
+            </select>
+            <input type="text" id="finDesc" placeholder="Descrição (Ex: Café, Aluguel)">
+            <input type="number" id="finValue" placeholder="Valor (€)" inputmode="decimal">
+            <button class="btn-save" onclick="addFinance()">Salvar Registro</button>
+            <button onclick="closeModal()" style="background:none; border:none; color:var(--text-secondary); width:100%; margin-top:15px;">Cancelar</button>
         </div>
     </div>
 
-    <nav class="bottom-nav">
-        <div class="nav-item active" onclick="navTab('viewHome', this)"><span>🏠</span>Início</div>
-        <div class="nav-item" onclick="navTab('viewLancamento', this)"><span>💸</span>Lançar</div>
-        <div class="nav-item" onclick="navTab('viewExtrato', this)"><span>📊</span>Extrato</div>
-        <div class="nav-item" onclick="navTab('viewTarefas', this)"><span>⏰</span>Agenda</div>
-    </nav>
-
     <script>
-        // CONFIG FIREBASE (O SEU)
+        // CONFIG FIREBASE (Sua configuração mantida)
         const firebaseConfig = {
             apiKey: "AIzaSyBGKDP5V75gMI7uO4gpZL6IpV3teP6J4ao",
             authDomain: "appfamilia-5ebe4.firebaseapp.com",
@@ -211,89 +239,81 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        function navTab(viewId, element) {
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            element.classList.add('active');
-            document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
-            document.getElementById(viewId).classList.add('active');
-            if(viewId === 'viewHome' || viewId === 'viewExtrato') fetchFinance();
-            if(viewId === 'viewTarefas') fetchTasks();
-        }
+        function openModal() { document.getElementById('modalLancamento').style.display = 'block'; }
+        function closeModal() { document.getElementById('modalLancamento').style.display = 'none'; }
 
         async function addFinance() {
             const type = document.getElementById('finType').value;
             const desc = document.getElementById('finDesc').value;
             const val = parseFloat(document.getElementById('finValue').value) || 0;
-            if(!desc || val <= 0) return alert("Preencha os dados!");
+            if(!desc || val <= 0) return alert("Preencha corretamente!");
 
             await db.ref("financas").push({
                 tipo: type, descricao: desc, valor: val,
-                mesCriacao: new Date().toISOString().substring(0, 7),
-                data: firebase.database.ServerValue.TIMESTAMP
+                data: firebase.database.ServerValue.TIMESTAMP,
+                mes: new Date().toISOString().substring(0, 7)
             });
-            alert("Lançado!");
-            document.getElementById('finDesc').value = '';
-            document.getElementById('finValue').value = '';
-            navTab('viewHome', document.querySelectorAll('.nav-item')[0]);
+            closeModal();
+            fetchData();
         }
 
-        let monthlyChart;
-        async function fetchFinance() {
-            const currentMonth = new Date().toISOString().substring(0, 7);
-            const snap = await db.ref("financas").once('value');
+        let ringChart;
+        function renderRing(allocated, budget) {
+            const ctx = document.getElementById('balanceRing').getContext('2d');
+            if(ringChart) ringChart.destroy();
+            const percent = (allocated / budget) * 100;
+            
+            ringChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    datasets: [{
+                        data: [allocated, budget - allocated],
+                        backgroundColor: ['#0a84ff', '#1c1c1e'],
+                        borderWidth: 0,
+                        borderRadius: 20
+                    }]
+                },
+                options: {
+                    cutout: '85%',
+                    responsive: true,
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        async function fetchData() {
+            const snap = await db.ref("financas").orderByChild("data").limitToLast(10).once('value');
             let gan = 0, gas = 0;
-            const list = document.getElementById('finList'); 
-            if(list) list.innerHTML = '';
+            const list = document.getElementById('recentList');
+            list.innerHTML = '';
 
             snap.forEach(c => {
                 const f = c.val();
-                if(f.mesCriacao === currentMonth || !f.mesCriacao) {
-                    if(f.tipo === 'ganho') gan += f.valor; else gas += f.valor;
-                    if(list) {
-                        list.innerHTML = `
-                        <li class="list-item">
-                            <div class="item-info"><b>${f.descricao}</b><p>${f.tipo==='ganho'?'Recebido':'Pago'}</p></div>
-                            <b style="color:${f.tipo==='ganho'?'var(--green)':'var(--text-black)'}">R$ ${f.valor.toFixed(2)}</b>
-                        </li>` + list.innerHTML;
-                    }
-                }
+                if(f.tipo === 'ganho') gan += f.valor; else gas += f.valor;
+
+                list.innerHTML = `
+                <div class="transaction-item">
+                    <div style="display: flex; align-items: center;">
+                        <div class="icon-box">${f.tipo === 'ganho' ? '💰' : '🛒'}</div>
+                        <div class="tx-info">
+                            <b>${f.descricao}</b>
+                            <small>${new Date(f.data).toLocaleDateString()}</small>
+                        </div>
+                    </div>
+                    <div class="tx-amount" style="color: ${f.tipo === 'ganho' ? 'var(--accent-green)' : 'white'}">
+                        ${f.tipo === 'ganho' ? '+' : '-'}${f.valor} €
+                    </div>
+                </div>` + list.innerHTML;
             });
 
-            document.getElementById('resumoSaldo').innerText = `R$ ${(gan - gas).toFixed(2)}`;
-            renderChart(gan, gas);
+            const budget = 5000;
+            document.getElementById('totalSaldo').innerText = `${budget - gas} €`;
+            document.getElementById('allocatedVal').innerText = `${gas} €`;
+            document.getElementById('availableVal').innerText = `${budget - gas} €`;
+            renderRing(gas, budget);
         }
 
-        function renderChart(gan, gas) {
-            const ctx = document.getElementById('monthlyChart').getContext('2d');
-            if(monthlyChart) monthlyChart.destroy();
-            monthlyChart = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Entradas', 'Saídas'],
-                    datasets: [{ data: [gan, gas], backgroundColor: ['#2ecc71', '#820ad1'], borderWidth: 0 }]
-                },
-                options: { responsive: true, maintainAspectRatio: false, cutout: '80%', plugins: { legend: { position: 'bottom' } } }
-            });
-        }
-
-        async function addTask() {
-            const txt = document.getElementById('taskInput').value;
-            const time = document.getElementById('taskTime').value;
-            if(!txt) return;
-            await db.ref("tarefas").push({ texto: txt, hora: time });
-            document.getElementById('taskInput').value = '';
-            fetchTasks();
-        }
-
-        async function fetchTasks() {
-            const list = document.getElementById('taskList'); list.innerHTML = '';
-            const snap = await db.ref("tarefas").once('value');
-            snap.forEach(c => {
-                list.innerHTML = `<li class="list-item"><b>${c.val().hora || ''} ${c.val().texto}</b><span onclick="db.ref('tarefas').child('${c.key}').remove(); fetchTasks();">✅</span></li>` + list.innerHTML;
-            });
-        }
-
-        window.onload = () => { fetchFinance(); fetchTasks(); };
+        window.onload = fetchData;
     </script>
 </body>
 </html>
