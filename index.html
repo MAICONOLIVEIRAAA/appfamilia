@@ -3,68 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AppFamilia Pro</title>
+    <title>AppFamilia Pro v2</title>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
 
     <style>
-        :root { --gold: #d4af37; --dark: #121212; --gray: #1e1e1e; --light-gray: #2c2c2c; --text: #e0e0e0; --red: #ff5252; --green: #4caf50; --blue: #3498db; }
+        :root { --gold: #d4af37; --dark: #121212; --gray: rgba(30, 30, 30, 0.9); --light-gray: rgba(44, 44, 44, 0.9); --text: #e0e0e0; --red: #ff5252; --green: #4caf50; --blue: #3498db; }
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         
         body { 
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
             background-color: var(--dark); color: var(--text); padding-bottom: 90px; padding-top: 60px;
+            overflow-x: hidden;
+        }
+
+        /* Container do Fundo Dinâmico - Fica atrás de tudo */
+        #particles-js {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1; /* Essencial para ficar no fundo */
+            background-color: var(--dark);
         }
 
         .app-header {
             position: fixed; top: 0; left: 0; width: 100%;
-            background: rgba(18, 18, 18, 0.85); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            background: rgba(18, 18, 18, 0.9); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
             padding: 15px; text-align: center; z-index: 1000; border-bottom: 1px solid rgba(255,255,255,0.05);
         }
-        .app-header h1 { font-size: 1.3em; color: var(--gold); letter-spacing: 1px; margin: 0; }
+        .app-header h1 { font-size: 1.3em; color: var(--gold); letter-spacing: 1px; margin: 0; text-transform: uppercase;}
 
         .bottom-nav {
-            position: fixed; bottom: 0; left: 0; width: 100%; background: var(--gray);
+            position: fixed; bottom: 0; left: 0; width: 100%; 
+            background: rgba(30, 30, 30, 0.95); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
             display: flex; justify-content: space-around; align-items: center;
             padding: 10px 0 calc(10px + env(safe-area-inset-bottom));
             border-top: 1px solid rgba(255,255,255,0.05); z-index: 1000;
         }
-        .nav-item { display: flex; flex-direction: column; align-items: center; color: #777; font-size: 0.7em; gap: 4px; width: 20%; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: #777; font-size: 0.7em; gap: 4px; width: 20%; cursor: pointer;}
         .nav-item.active { color: var(--gold); font-weight: bold; }
         .nav-item .icon { font-size: 1.5em; }
 
-        .app-container { padding: 15px; width: 100%; max-width: 600px; margin: 0 auto; }
+        .app-container { padding: 15px; width: 100%; max-width: 600px; margin: 0 auto; position: relative; z-index: 1; }
         .view { display: none; flex-direction: column; gap: 20px; animation: fadeIn 0.4s ease; }
         .view.active { display: flex; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
-        .card { background: var(--gray); padding: 20px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.03); margin-bottom: 10px;}
+        /* Cartões levemente transparentes para o fundo aparecer */
+        .card { 
+            background: var(--gray); padding: 20px; border-radius: 16px; 
+            border: 1px solid rgba(255,255,255,0.03); margin-bottom: 10px;
+            backdrop-filter: blur(5px); /* Efeito de vidro */
+        }
         .form-group { display: flex; flex-direction: column; gap: 12px; }
         label { font-size: 0.8em; color: var(--gold); font-weight: bold; margin-bottom: -8px; }
-        select, input { width: 100%; padding: 15px; border-radius: 12px; border: 1px solid #333; font-size: 16px; background: #222; color: white; outline: none; }
-        .btn { background: var(--gold); color: #000; font-weight: bold; padding: 16px; border-radius: 12px; border: none; text-transform: uppercase; }
+        select, input { width: 100%; padding: 15px; border-radius: 12px; border: 1px solid #333; font-size: 16px; background: rgba(34, 34, 34, 0.8); color: white; outline: none; }
+        .btn { background: var(--gold); color: #000; font-weight: bold; padding: 16px; border-radius: 12px; border: none; text-transform: uppercase; letter-spacing: 1px;}
+        .btn:active { transform: scale(0.98); opacity: 0.9;}
 
-        .balance-box { display: flex; justify-content: space-between; align-items: center; background: #1e1e1e; padding: 15px; border-radius: 16px; border-left: 4px solid var(--gold); }
-        .balance-item h3 { font-size: 0.7em; color: #aaa; margin-bottom: 5px; }
+        .balance-box { display: flex; justify-content: space-between; align-items: center; background: rgba(30, 30, 30, 0.9); padding: 15px; border-radius: 16px; border-left: 4px solid var(--gold); backdrop-filter: blur(5px);}
+        .balance-item h3 { font-size: 0.7em; color: #aaa; margin-bottom: 5px; text-transform: uppercase;}
         .balance-item p { font-size: 1em; font-weight: bold; }
 
         .item-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
-        .list-item { background: #222; padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid var(--gold); }
+        .list-item { background: rgba(34, 34, 34, 0.8); padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid var(--gold); backdrop-filter: blur(2px);}
         .registro-info b { display: block; font-size: 15px; color: white; }
         .registro-data { font-size: 12px; color: #888; }
         
         .chart-container { position: relative; height: 300px; width: 100%; margin-top: 10px; }
+        .list-item i { font-style: normal; color: #555; padding-left: 10px; cursor: pointer;}
     </style>
 </head>
 <body>
 
-    <header class="app-header"><h1>AppFamilia</h1></header>
+    <div id="particles-js"></div>
+
+    <header class="app-header"><h1>AppFamilia Pro</h1></header>
 
     <div class="app-container">
         <div id="viewHome" class="view active">
-            <div class="balance-box">
+            <div class="balance-box card">
                 <div class="balance-item"><h3>Mês Atual</h3><p id="resumoGanho" style="color:var(--green)">R$ 0</p></div>
                 <div class="balance-item"><h3>Saldo</h3><p id="resumoSaldo">R$ 0</p></div>
                 <div class="balance-item"><h3>Gastos</h3><p id="resumoGasto" style="color:var(--red)">R$ 0</p></div>
@@ -106,12 +126,11 @@
 
         <div id="viewAnual" class="view">
             <div class="card">
-                <h2>Planejamento Anual 2026</h2>
+                <h2>Planejamento 2026</h2>
                 <div class="chart-container">
                     <canvas id="annualChart"></canvas>
                 </div>
             </div>
-            <div id="annualSummaryList"></div>
         </div>
 
         <div id="viewTarefas" class="view">
@@ -135,6 +154,7 @@
     </nav>
 
     <script>
+        // CHAVES OFICIAIS DO MAICON - MANTIDAS
         const firebaseConfig = {
             apiKey: "AIzaSyBGKDP5V75gMI7uO4gpZL6IpV3teP6J4ao",
             authDomain: "appfamilia-5ebe4.firebaseapp.com",
@@ -148,6 +168,32 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
+        // INICIALIZAÇÃO DO FUNDO DINÂMICO (Interativo)
+        particlesJS('particles-js', {
+            "particles": {
+                "number": { "value": 50, "density": { "enable": true, "value_area": 800 } },
+                "color": { "value": "#d4af37" }, // Dourado do Tema
+                "shape": { "type": "circle" },
+                "opacity": { "value": 0.3, "random": true },
+                "size": { "value": 3, "random": true },
+                "line_linked": { "enable": true, "distance": 150, "color": "#d4af37", "opacity": 0.2, "width": 1 },
+                "move": { "enable": true, "speed": 1.5, "direction": "none", "random": true, "straight": false, "out_mode": "out", "bounce": false, }
+            },
+            "interactivity": {
+                "detect_on": "window",
+                "events": {
+                    "onhover": { "enable": true, "mode": "grab" }, // Gruda no mouse/dedo
+                    "onclick": { "enable": true, "mode": "push" }, // Adiciona partículas ao clicar
+                    "resize": true
+                },
+                "modes": {
+                    "grab": { "distance": 140, "line_linked": { "opacity": 0.5 } },
+                    "push": { "particles_nb": 3 }
+                }
+            },
+            "retina_detect": true
+        });
+
         function navTab(viewId, element) {
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
             element.classList.add('active');
@@ -157,94 +203,78 @@
             if(viewId === 'viewHome') fetchMonthly();
             if(viewId === 'viewAnual') fetchAnnual();
             if(viewId === 'viewTarefas') fetchTasks();
+            window.scrollTo(0,0);
         }
 
         function toggleEndDate(val) {
             document.getElementById('divEndDate').style.display = (val === 'fixo') ? 'flex' : 'none';
         }
 
-        // --- ADICIONAR FINANÇA ---
         async function addFinance() {
             const type = document.getElementById('finType').value;
             const desc = document.getElementById('finDesc').value;
             const val = parseFloat(document.getElementById('finValue').value.replace(',', '.'));
             const freq = document.getElementById('finFreq').value;
-            const end = document.getElementById('finEndDate').value; // Formato YYYY-MM
-
-            if (!desc || !val) return alert("Preencha tudo.");
-
+            const end = document.getElementById('finEndDate').value;
+            if (!desc || !val) return alert("Preencha descrição e valor.");
             await db.ref("financas").push({
-                tipo: type,
-                descricao: desc,
-                valor: val,
-                frequencia: freq,
+                tipo: type, descricao: desc, valor: val, frequencia: freq,
                 dataTermino: freq === 'fixo' ? end : '',
                 dataCriacao: firebase.database.ServerValue.TIMESTAMP,
-                mesCriacao: new Date().toISOString().substring(0, 7) // Guarda o mês inicial
+                mesCriacao: new Date().toISOString().substring(0, 7)
             });
-
             alert("Sucesso!");
             navTab('viewHome', document.querySelector('.nav-item'));
         }
 
-        // --- VISÃO MENSAL ---
         async function fetchMonthly() {
             const currentMonth = new Date().toISOString().substring(0, 7);
             const snap = await db.ref("financas").once('value');
             let ganhos = 0, gastos = 0;
             const list = document.getElementById('finList');
             list.innerHTML = '';
-
             snap.forEach(c => {
                 const f = c.val();
                 let mostrar = false;
-
-                // Lógica de exibição: se for deste mês OU se for fixo e estiver no prazo
                 if (f.frequencia === 'mes' && f.mesCriacao === currentMonth) mostrar = true;
                 if (f.frequencia === 'fixo') {
                     if (!f.dataTermino || f.dataTermino >= currentMonth) mostrar = true;
                 }
-
                 if (mostrar) {
                     if (f.tipo === 'ganho') ganhos += f.valor; else gastos += f.valor;
                     list.innerHTML += `<li class="list-item" style="border-left-color:${f.tipo==='ganho'?'var(--green)':'var(--red)'}">
                         <div class="registro-info"><b>${f.descricao}</b><span class="registro-data">${f.frequencia==='fixo'?'Recorrente':'Mensal'}</span></div>
-                        <b>R$ ${f.valor.toFixed(2)}</b>
+                        <div style="display:flex; align-items:center;"><b>R$ ${f.valor.toFixed(2)}</b><i onclick="deleteRegistro('${c.key}')">🗑️</i></div>
                     </li>`;
                 }
             });
-
             document.getElementById('resumoGanho').innerText = `R$ ${ganhos.toFixed(2)}`;
             document.getElementById('resumoGasto').innerText = `R$ ${gastos.toFixed(2)}`;
             document.getElementById('resumoSaldo').innerText = `R$ ${(ganhos-gastos).toFixed(2)}`;
         }
 
-        // --- VISÃO ANUAL (ESTRATÉGICO) ---
+        async function deleteRegistro(id) { if(confirm("Apagar?")) { await db.ref("financas").child(id).remove(); fetchMonthly(); } }
+
         let annualChart;
         async function fetchAnnual() {
             const snap = await db.ref("financas").once('value');
             const meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
             const ganhoAnual = new Array(12).fill(0);
             const gastoAnual = new Array(12).fill(0);
-
             snap.forEach(c => {
                 const f = c.val();
                 for (let i = 0; i < 12; i++) {
                     const mesLoop = `2026-${(i + 1).toString().padStart(2, '0')}`;
-                    
                     let ativo = false;
                     if (f.frequencia === 'mes' && f.mesCriacao === mesLoop) ativo = true;
                     if (f.frequencia === 'fixo') {
-                        // Começa no mês de criação e vai até a data de término (se houver)
                         if (f.mesCriacao <= mesLoop && (!f.dataTermino || f.dataTermino >= mesLoop)) ativo = true;
                     }
-
                     if (ativo) {
                         if (f.tipo === 'ganho') ganhoAnual[i] += f.valor; else gastoAnual[i] += f.valor;
                     }
                 }
             });
-
             const ctx = document.getElementById('annualChart').getContext('2d');
             if (annualChart) annualChart.destroy();
             annualChart = new Chart(ctx, {
@@ -256,16 +286,15 @@
                         { label: 'Saídas', data: gastoAnual, backgroundColor: '#ff5252' }
                     ]
                 },
-                options: { responsive: true, maintainAspectRatio: false, scales: { y: { ticks: { color: '#888' } }, x: { ticks: { color: '#888' } } } }
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { ticks: { color: '#aaa' } }, x: { ticks: { color: '#aaa' } } }, plugins: { legend: { labels: { color: '#fff' } } } }
             });
         }
 
-        // --- TAREFAS ---
         async function fetchTasks() {
             const snap = await db.ref("tarefas").once('value');
             const list = document.getElementById('taskList'); list.innerHTML = '';
             snap.forEach(c => {
-                list.innerHTML += `<li class="list-item"><b>${c.val().hora} - ${c.val().texto}</b><span onclick="db.ref('tarefas').child('${c.key}').remove(); fetchTasks();">✅</span></li>`;
+                list.innerHTML += `<li class="list-item"><b>${c.val().hora || '--:--'} - ${c.val().texto}</b><i onclick="db.ref('tarefas').child('${c.key}').remove(); fetchTasks();">✅</i></li>`;
             });
         }
 
@@ -274,7 +303,7 @@
             const h = document.getElementById('taskTime').value;
             if(!t) return;
             await db.ref("tarefas").push({ texto: t, hora: h });
-            document.getElementById('taskInput').value = ''; fetchTasks();
+            document.getElementById('taskInput').value = ''; document.getElementById('taskTime').value = ''; fetchTasks();
         }
 
         window.onload = () => { fetchMonthly(); };
