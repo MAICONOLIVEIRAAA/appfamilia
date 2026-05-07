@@ -24,8 +24,8 @@
         h2 { font-size: 1.2em; color: var(--gold); margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 5px; }
         
         /* Menu Home */
-        .menu-grid { display: flex; flex-direction: column; gap: 15px; margin-top: 30px; }
-        .btn-menu { background: var(--gray); border: 2px solid var(--gold); color: var(--gold); padding: 25px; border-radius: 15px; font-size: 1.1em; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; text-decoration: none; }
+        .menu-grid { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; }
+        .btn-menu { background: var(--gray); border: 2px solid var(--gold); color: var(--gold); padding: 20px; border-radius: 12px; font-size: 1.1em; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
         .btn-menu:active { background: var(--gold); color: var(--dark); transform: scale(0.96); }
         
         .btn-back { background: transparent; color: var(--text); border: none; font-size: 1em; padding: 10px 0; cursor: pointer; display: flex; align-items: center; gap: 5px; }
@@ -40,16 +40,24 @@
         .form-group { display: flex; flex-direction: column; gap: 10px; }
         select, input, button { width: 100%; padding: 14px; border-radius: 8px; border: none; font-size: 16px; outline: none; }
         input, select { background: var(--light-gray); color: white; border: 1px solid #444; }
+        select { font-weight: bold; }
         .btn { background: var(--gold); color: #000; font-weight: bold; cursor: pointer; text-transform: uppercase; }
 
-        /* Lista Finanças e Tarefas */
+        /* Lista Registros/Extrato */
         .item-list { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
-        .list-item { background: var(--light-gray); padding: 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 14px; }
+        .list-item { background: var(--light-gray); padding: 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 14px; border-left: 4px solid #555; }
+        .item-ganho { border-left-color: var(--green); }
+        .item-gasto { border-left-color: var(--red); }
+        
+        .registro-info { display: flex; flex-direction: column; gap: 3px; }
+        .registro-data { font-size: 0.75em; color: #aaa; }
+        
         .tag { font-size: 10px; padding: 2px 6px; border-radius: 4px; margin-left: 5px; text-transform: uppercase; font-weight: bold; }
         .tag-fixo { background: var(--blue); color: white; }
         .tag-mes { background: #666; color: white; }
         
         .chart-container { position: relative; height: 200px; width: 100%; margin-top: 10px; }
+        .delete-btn { font-size: 1.2em; padding-left: 10px; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -59,48 +67,59 @@
         <div id="viewHome" class="view active">
             <h1>AppFamilia 🏠</h1>
             <div class="menu-grid">
-                <button class="btn-menu" onclick="navigateTo('viewFinancas')">💰 Finanças</button>
-                <button class="btn-menu" onclick="navigateTo('viewTarefas')">📝 Tarefas</button>
+                <button class="btn-menu" onclick="navigateTo('viewLancamento')">➕ Lançar Valor</button>
+                <button class="btn-menu" onclick="navigateTo('viewExtrato')">📊 Registros e Saldo</button>
+                <button class="btn-menu" onclick="navigateTo('viewTarefas')">📝 Lembretes & Tarefas</button>
             </div>
         </div>
 
-        <div id="viewFinancas" class="view">
-            <button class="btn-back" onclick="navigateTo('viewHome')">⬅ Voltar</button>
+        <div id="viewLancamento" class="view">
+            <button class="btn-back" onclick="navigateTo('viewHome')">⬅ Voltar ao Início</button>
+            
+            <div class="card">
+                <h2>O que você deseja registrar?</h2>
+                <div class="form-group">
+                    <select id="finType" style="font-size: 1.1em; text-align: center;">
+                        <option value="gasto">🔴 CADASTRAR GASTO</option>
+                        <option value="ganho">🟢 CADASTRAR SALÁRIO / GANHO</option>
+                    </select>
+                    
+                    <select id="finFreq">
+                        <option value="mes">📅 Lançamento do Mês (Variável)</option>
+                        <option value="fixo">📌 Lançamento Fixo (Recorrente)</option>
+                    </select>
+                    
+                    <input type="text" id="finDesc" placeholder="Descrição (Ex: Salário, Aluguel, Mercado)">
+                    <input type="number" id="finValue" placeholder="Valor (R$)" inputmode="decimal">
+                    <button class="btn" onclick="addFinance()">Salvar Registro</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="viewExtrato" class="view">
+            <button class="btn-back" onclick="navigateTo('viewHome')">⬅ Voltar ao Início</button>
             
             <div class="balance-box">
-                <div class="balance-item"><h3>Ganhos</h3><p id="totalGanho" style="color:var(--green)">R$ 0</p></div>
-                <div class="balance-item"><h3>Saldo</h3><p id="totalSaldo">R$ 0</p></div>
+                <div class="balance-item"><h3>Salários/Ganhos</h3><p id="totalGanho" style="color:var(--green)">R$ 0</p></div>
+                <div class="balance-item"><h3>Saldo Atual</h3><p id="totalSaldo">R$ 0</p></div>
                 <div class="balance-item"><h3>Gastos</h3><p id="totalGasto" style="color:var(--red)">R$ 0</p></div>
             </div>
 
-            <div class="card">
-                <h2>Lançar Finanças</h2>
-                <div class="form-group">
-                    <select id="finType">
-                        <option value="ganho">🟢 Ganho (Entrada)</option>
-                        <option value="gasto">🔴 Gasto (Saída)</option>
-                    </select>
-                    <select id="finFreq">
-                        <option value="mes">📅 Gasto do Mês</option>
-                        <option value="fixo">📌 Gasto Fixo</option>
-                    </select>
-                    <input type="text" id="finDesc" placeholder="Descrição (Ex: Aluguel, Uber)">
-                    <input type="number" id="finValue" placeholder="Valor (R$)" inputmode="decimal">
-                    <button class="btn" onclick="addFinance()">Salvar</button>
-                </div>
-            </div>
-
-            <div class="card">
-                <h2>Histórico Recente</h2>
-                <ul id="finList" class="item-list"></ul>
+            <div class="card" style="padding: 10px;">
                 <div class="chart-container">
                     <canvas id="financeChart"></canvas>
                 </div>
             </div>
+
+            <div class="card">
+                <h2>Meu Extrato</h2>
+                <ul id="finList" class="item-list">
+                    </ul>
+            </div>
         </div>
 
         <div id="viewTarefas" class="view">
-            <button class="btn-back" onclick="navigateTo('viewHome')">⬅ Voltar</button>
+            <button class="btn-back" onclick="navigateTo('viewHome')">⬅ Voltar ao Início</button>
             <div class="card">
                 <h2>Lembretes & Tarefas</h2>
                 <div class="form-group" style="margin-bottom: 15px;">
@@ -114,6 +133,7 @@
     </div>
 
     <script>
+        // CHAVES OFICIAIS DO MAICON - PRONTAS PARA USO
         const firebaseConfig = {
             apiKey: "AIzaSyBGKDP5V75gMI7uO4gpZL6IpV3teP6J4ao",
             authDomain: "appfamilia-5ebe4.firebaseapp.com",
@@ -127,76 +147,132 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
+        // Navegação entre as telas
         function navigateTo(viewId) {
             document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
             document.getElementById(viewId).classList.add('active');
-            if(viewId === 'viewFinancas') fetchFinance();
+            
+            if(viewId === 'viewExtrato') fetchFinance();
             if(viewId === 'viewTarefas') fetchTasks();
         }
 
-        // --- FINANÇAS ---
+        // --- CADASTRAR REGISTRO ---
         async function addFinance() {
             const type = document.getElementById('finType').value;
             const freq = document.getElementById('finFreq').value;
             const desc = document.getElementById('finDesc').value;
-            const val = parseFloat(document.getElementById('finValue').value.replace(',', '.'));
+            const valInput = document.getElementById('finValue').value;
+            const val = parseFloat(valInput.replace(',', '.'));
 
-            if (!desc || !val) return alert("Preencha tudo!");
+            if (!desc || !val) return alert("Preencha a descrição e o valor!");
 
-            await db.ref("financas").push({
-                tipo: type,
-                frequencia: freq,
-                descricao: desc,
-                valor: val,
-                data: firebase.database.ServerValue.TIMESTAMP
-            });
+            const btn = document.querySelector('#viewLancamento .btn');
+            btn.innerText = "Salvando...";
+            btn.disabled = true;
 
-            document.getElementById('finDesc').value = '';
-            document.getElementById('finValue').value = '';
-            fetchFinance();
+            try {
+                await db.ref("financas").push({
+                    tipo: type,
+                    frequencia: freq,
+                    descricao: desc,
+                    valor: val,
+                    data: firebase.database.ServerValue.TIMESTAMP
+                });
+
+                document.getElementById('finDesc').value = '';
+                document.getElementById('finValue').value = '';
+                
+                alert("Registro salvo com sucesso!");
+                navigateTo('viewExtrato'); // Redireciona para ver o extrato logo após salvar
+            } catch (error) {
+                alert("Erro: " + error.message);
+            } finally {
+                btn.innerText = "Salvar Registro";
+                btn.disabled = false;
+            }
         }
 
+        // --- CARREGAR EXTRATO E GRÁFICO ---
         let myChart;
         async function fetchFinance() {
-            const snap = await db.ref("financas").limitToLast(20).once('value');
-            let ganhos = 0, gastos = 0;
-            const listEl = document.getElementById('finList');
-            listEl.innerHTML = '';
-            
-            let dataArr = [];
-            snap.forEach(child => {
-                const d = child.val();
-                if (d.tipo === 'ganho') ganhos += d.valor; else gastos += d.valor;
+            try {
+                const snap = await db.ref("financas").orderByChild("data").once('value');
+                let ganhos = 0, gastos = 0;
+                const listEl = document.getElementById('finList');
+                listEl.innerHTML = '';
                 
-                // Adiciona na lista visual
-                const tagClass = d.frequencia === 'fixo' ? 'tag-fixo' : 'tag-mes';
-                const tagText = d.frequencia === 'fixo' ? 'FIXO' : 'MÊS';
-                listEl.innerHTML = `<li class="list-item">
-                    <span>${d.descricao} <span class="tag ${tagClass}">${tagText}</span></span>
-                    <b style="color:${d.tipo==='ganho'?'var(--green)':'var(--red)'}">R$ ${d.valor.toFixed(2)}</b>
-                </li>` + listEl.innerHTML;
-            });
+                let registros = [];
+                
+                snap.forEach(child => {
+                    const d = child.val();
+                    registros.push({ id: child.key, ...d });
+                    if (d.tipo === 'ganho') ganhos += d.valor; else gastos += d.valor;
+                });
 
-            const saldo = ganhos - gastos;
-            document.getElementById('totalGanho').innerText = `R$ ${ganhos.toFixed(2)}`;
-            document.getElementById('totalGasto').innerText = `R$ ${gastos.toFixed(2)}`;
-            const saldoEl = document.getElementById('totalSaldo');
-            saldoEl.innerText = `R$ ${saldo.toFixed(2)}`;
-            saldoEl.style.color = saldo >= 0 ? 'var(--green)' : 'var(--red)';
+                // Inverte a lista para o mais recente aparecer no topo
+                registros.reverse().forEach(d => {
+                    const isGanho = d.tipo === 'ganho';
+                    const classeBorda = isGanho ? 'item-ganho' : 'item-gasto';
+                    const corValor = isGanho ? 'var(--green)' : 'var(--red)';
+                    const tagClass = d.frequencia === 'fixo' ? 'tag-fixo' : 'tag-mes';
+                    const tagText = d.frequencia === 'fixo' ? 'FIXO' : 'MÊS';
+                    
+                    // Formata a data (Ex: 07/05/2026)
+                    const dataObj = new Date(d.data);
+                    const dataFormatada = dataObj.toLocaleDateString('pt-BR') + ' às ' + dataObj.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
 
-            renderChart(ganhos, gastos);
+                    listEl.innerHTML += `
+                    <li class="list-item ${classeBorda}">
+                        <div class="registro-info">
+                            <span><b>${d.descricao}</b> <span class="tag ${tagClass}">${tagText}</span></span>
+                            <span class="registro-data">${dataFormatada}</span>
+                        </div>
+                        <div style="display: flex; align-items: center;">
+                            <b style="color:${corValor}">R$ ${d.valor.toFixed(2)}</b>
+                            <span class="delete-btn" onclick="deleteRegistro('${d.id}')">🗑️</span>
+                        </div>
+                    </li>`;
+                });
+
+                if (registros.length === 0) {
+                    listEl.innerHTML = '<p style="text-align:center; color:#888;">Nenhum registro encontrado.</p>';
+                }
+
+                // Atualiza o painel
+                const saldo = ganhos - gastos;
+                document.getElementById('totalGanho').innerText = `R$ ${ganhos.toFixed(2)}`;
+                document.getElementById('totalGasto').innerText = `R$ ${gastos.toFixed(2)}`;
+                const saldoEl = document.getElementById('totalSaldo');
+                saldoEl.innerText = `R$ ${saldo.toFixed(2)}`;
+                saldoEl.style.color = saldo >= 0 ? 'var(--green)' : 'var(--red)';
+
+                renderChart(ganhos, gastos);
+            } catch (error) {
+                console.error("Erro ao puxar registros:", error);
+            }
+        }
+
+        // --- APAGAR REGISTRO ---
+        async function deleteRegistro(id) {
+            if(confirm("Tem certeza que deseja apagar este registro?")) {
+                await db.ref("financas").child(id).remove();
+                fetchFinance();
+            }
         }
 
         function renderChart(ganhos, gastos) {
             const ctx = document.getElementById('financeChart').getContext('2d');
             if (myChart) myChart.destroy();
+            
+            if (ganhos === 0 && gastos === 0) { ganhos = 1; gastos = 1; } // Evita gráfico quebrado se zerado
+
             myChart = new Chart(ctx, {
-                type: 'doughnut',
+                type: 'pie',
                 data: {
-                    labels: ['Ganhos', 'Gastos'],
+                    labels: ['Salários/Ganhos', 'Gastos'],
                     datasets: [{ data: [ganhos, gastos], backgroundColor: ['#2ecc71', '#e74c3c'], borderWidth: 0 }]
                 },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, cutout: '80%' }
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: {color: '#fff'} } } }
             });
         }
 
@@ -210,14 +286,17 @@
         }
 
         async function fetchTasks() {
-            const snap = await db.ref("tarefas").limitToLast(10).once('value');
+            const snap = await db.ref("tarefas").limitToLast(15).once('value');
             const list = document.getElementById('taskList');
             list.innerHTML = '';
-            snap.forEach(child => {
-                list.innerHTML = `<li class="list-item">
-                    <span>${child.val().texto}</span>
-                    <span onclick="deleteTask('${child.key}')" style="cursor:pointer">✅</span>
-                </li>` + list.innerHTML;
+            let tarefas = [];
+            snap.forEach(child => { tarefas.push({ id: child.key, ...child.val() }); });
+            
+            tarefas.reverse().forEach(t => {
+                list.innerHTML += `<li class="list-item">
+                    <span>${t.texto}</span>
+                    <span onclick="deleteTask('${t.id}')" style="cursor:pointer; padding: 5px;">✅</span>
+                </li>`;
             });
         }
 
