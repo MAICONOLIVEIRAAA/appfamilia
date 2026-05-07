@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AppFamilia - Maicon</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <style>
+        :root { --gold: #d4af37; --dark: #1a1a1a; --gray: #2d2d2d; --text: #e0e0e0; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: var(--dark); color: var(--text); padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .container { width: 95%; max-width: 900px; background: var(--gray); padding: 20px; border-radius: 15px; border-top: 5px solid var(--gold); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        h1, h2 { text-align: center; color: var(--gold); margin-bottom: 20px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        
+        /* Seção Financeira */
+        .card { background: #333; padding: 15px; border-radius: 10px; }
+        canvas { max-height: 250px; }
+
+        /* Seção de Tarefas */
+        .task-list { list-style: none; padding: 0; }
+        .task-item { background: #444; margin: 5px 0; padding: 10px; border-radius: 5px; display: flex; justify-content: space-between; border-left: 3px solid var(--gold); }
+        input, button { padding: 10px; border-radius: 5px; border: none; }
+        input { width: 70%; background: #eee; }
+        .btn { background: var(--gold); color: var(--dark); font-weight: bold; cursor: pointer; }
+
+        @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>AppFamilia 🏠</h1>
+        
+        <div class="grid">
+            <div class="card">
+                <h2>Meus Gastos</h2>
+                <canvas id="financeChart"></canvas>
+                <button class="btn" style="width: 100%; margin-top: 10px;" onclick="fetchFinance()">Atualizar Gráfico</button>
+            </div>
+
+            <div class="card">
+                <h2>Lembretes & Tarefas</h2>
+                <div style="display: flex; gap: 5px; margin-bottom: 15px;">
+                    <input type="text" id="taskInput" placeholder="Nova tarefa...">
+                    <button class="btn" onclick="addTask()">ADD</button>
+                </div>
+                <ul id="taskList" class="task-list">
+                    </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // CONFIGURAÇÃO FIREBASE (Substitua pelos seus dados do console)
+        const firebaseConfig = {
+            apiKey: "SUA_API_KEY",
+            projectId: "SEU_PROJETO_ID",
+            appId: "SEU_APP_ID"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // --- LÓGICA FINANCEIRA ---
+        let myChart;
+        async function fetchFinance() {
+            const snap = await db.collection("gastos").get();
+            const categorias = {};
+            snap.forEach(doc => {
+                const d = doc.data();
+                categorias[d.categoria] = (categorias[d.categoria] || 0) + d.valor;
+            });
+            renderChart(Object.keys(categorias), Object.values(categorias));
+        }
+
+        function renderChart(labels, data) {
+            const ctx = document.getElementById('financeChart').getContext('2d');
+            if (myChart) myChart.destroy();
+            myChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{ data: data, backgroundColor: ['#d4af37', '#f1c40f', '#7f8c8d', '#e67e22'] }]
+                },
+                options: { plugins: { legend: { labels: { color: '#fff' } } } }
+            });
+        }
+
+        // --- LÓGICA DE TAREFAS ---
+        async function addTask() {
+            const val = document.getElementById('taskInput').value;
+            if (!val) return;
+            await db.collection("tarefas").add({ texto: val, data: new Date() });
+            document.getElementById('taskInput').value = '';
+            fetchTasks();
+        }
+
+        async function fetchTasks() {
+            const snap = await db.collection("tarefas").orderBy("data", "desc").limit(5).get();
+            const list = document.getElementById('taskList');
+            list.innerHTML = '';
+            snap.forEach(doc => {
+                list.innerHTML += `<li class="task-item">${doc.data().texto} <span onclick="deleteTask('${doc.id}')" style="cursor:pointer">❌</span></li>`;
+            });
+        }
+
+        async function deleteTask(id) {
+            await db.collection("tarefas").doc(id).delete();
+            fetchTasks();
+        }
+
+        // Inicia o app
+        fetchFinance();
+        fetchTasks();
+    </script>
+</body>
+</html>
