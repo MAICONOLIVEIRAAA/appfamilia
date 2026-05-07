@@ -6,173 +6,182 @@
     <title>AppFamilia - Maicon</title>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
     <style>
-        :root { --gold: #d4af37; --dark: #1a1a1a; --gray: #2d2d2d; --text: #e0e0e0; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--dark); color: var(--text); padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        .container { width: 95%; max-width: 900px; background: var(--gray); padding: 20px; border-radius: 15px; border-top: 5px solid var(--gold); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        :root { --gold: #d4af37; --dark: #1a1a1a; --gray: #2d2d2d; --text: #e0e0e0; --red: #e74c3c; --green: #2ecc71; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: var(--dark); color: var(--text); padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .container { width: 95%; max-width: 1000px; background: var(--gray); padding: 20px; border-radius: 15px; border-top: 5px solid var(--gold); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         h1, h2 { text-align: center; color: var(--gold); margin-bottom: 20px; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         
-        /* Seção Financeira */
-        .card { background: #333; padding: 15px; border-radius: 10px; }
-        canvas { max-height: 250px; }
-
-        /* Seção de Tarefas */
-        .task-list { list-style: none; padding: 0; }
-        .task-item { background: #444; margin: 5px 0; padding: 10px; border-radius: 5px; display: flex; justify-content: space-between; border-left: 3px solid var(--gold); }
-        input, button { padding: 10px; border-radius: 5px; border: none; }
-        input { width: 70%; background: #eee; color: #1a1a1a; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .card { background: #333; padding: 20px; border-radius: 10px; box-shadow: inset 0 0 10px rgba(0,0,0,0.2); }
+        
+        /* Formulário de Finanças */
+        .form-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; }
+        select, input, button { padding: 12px; border-radius: 5px; border: none; font-size: 16px; }
+        input, select { background: #444; color: white; border: 1px solid #555; }
         .btn { background: var(--gold); color: var(--dark); font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .btn:hover { background-color: #f1c40f; }
+        .btn:hover { background: #f1c40f; transform: translateY(-2px); }
+        
+        /* Resumo de Saldo */
+        .balance-box { display: flex; justify-content: space-around; margin-bottom: 20px; text-align: center; }
+        .balance-item h3 { margin: 5px 0; font-size: 0.9em; color: #bbb; }
+        .balance-item p { font-size: 1.4em; font-weight: bold; margin: 0; }
+        .val-ganho { color: var(--green); }
+        .val-gasto { color: var(--red); }
 
-        @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
+        .task-item { background: #444; margin: 8px 0; padding: 12px; border-radius: 5px; display: flex; justify-content: space-between; border-left: 4px solid var(--gold); }
+        
+        @media (max-width: 800px) { .grid { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>AppFamilia 🏠</h1>
+        <h1>AppFamilia 🏠 <small style="font-size: 0.4em; color: #888;">v2.0</small></h1>
+
+        <div class="balance-box card">
+            <div class="balance-item">
+                <h3>Ganhos</h3>
+                <p id="totalGanho" class="val-ganho">R$ 0,00</p>
+            </div>
+            <div class="balance-item">
+                <h3>Gastos</h3>
+                <p id="totalGasto" class="val-gasto">R$ 0,00</p>
+            </div>
+            <div class="balance-item">
+                <h3>Saldo</h3>
+                <p id="totalSaldo">R$ 0,00</p>
+            </div>
+        </div>
         
         <div class="grid">
             <div class="card">
-                <h2>Meus Gastos</h2>
+                <h2>Lançar Finanças</h2>
+                <div class="form-group">
+                    <select id="finType">
+                        <option value="ganho">🟢 Ganho (Entrada)</option>
+                        <option value="gasto">🔴 Gasto (Saída)</option>
+                    </select>
+                    <input type="text" id="finDesc" placeholder="Descrição (Ex: Salário, Aluguel)">
+                    <input type="number" id="finValue" placeholder="Valor (R$)">
+                    <button class="btn" onclick="addFinance()">Cadastrar Lançamento</button>
+                </div>
+                <hr style="border: 0.5px solid #444; margin: 20px 0;">
                 <canvas id="financeChart"></canvas>
-                <button class="btn" style="width: 100%; margin-top: 10px;" onclick="fetchFinance()">Atualizar Gráfico</button>
             </div>
 
             <div class="card">
                 <h2>Lembretes & Tarefas</h2>
-                <div style="display: flex; gap: 5px; margin-bottom: 15px;">
-                    <input type="text" id="taskInput" placeholder="Nova tarefa...">
-                    <button class="btn" onclick="addTask()">ADD</button>
+                <div class="form-group">
+                    <div style="display: flex; gap: 5px;">
+                        <input type="text" id="taskInput" placeholder="O que precisa ser feito?" style="flex-grow: 1;">
+                        <button class="btn" onclick="addTask()">ADD</button>
+                    </div>
                 </div>
-                <ul id="taskList" class="task-list">
-                    </ul>
+                <ul id="taskList" style="list-style: none; padding: 0;"></ul>
             </div>
         </div>
     </div>
 
     <script>
-        // SUA CONFIGURAÇÃO DO FIREBASE (Extraída do console)
         const firebaseConfig = {
             apiKey: "AIzaSyAMxvTVuD11Rm_EfEpVVQ8kkaUApEEdHvg",
             authDomain: "midias-sp.firebaseapp.com",
-            databaseURL: "https://midias-sp-default-rtdb.firebaseio.com",
             projectId: "midias-sp",
-            storageBucket: "midias-sp.firebasestorage.app",
-            messagingSenderId: "550605985336",
-            appId: "1:550605985336:web:c21f69ef4180e30275b8cd",
-            measurementId: "G-ZX2KVESYXT"
+            appId: "1:550605985336:web:c21f69ef4180e30275b8cd"
         };
 
-        // Inicializa o Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // ==========================================
-        // LÓGICA FINANCEIRA
-        // ==========================================
-        let myChart;
-        async function fetchFinance() {
-            try {
-                const snap = await db.collection("gastos").get();
-                const categorias = {};
-                snap.forEach(doc => {
-                    const d = doc.data();
-                    // Garante que se a categoria não existir, vai para 'Outros'
-                    const cat = d.categoria || 'Outros'; 
-                    categorias[cat] = (categorias[cat] || 0) + (d.valor || 0);
-                });
-                renderChart(Object.keys(categorias), Object.values(categorias));
-            } catch (error) {
-                console.error("Erro ao buscar gastos:", error);
-            }
+        // --- FUNÇÕES FINANCEIRAS ---
+        async function addFinance() {
+            const type = document.getElementById('finType').value;
+            const desc = document.getElementById('finDesc').value;
+            const val = parseFloat(document.getElementById('finValue').value);
+
+            if (!desc || !val) return alert("Preencha todos os campos!");
+
+            await db.collection("financas").add({
+                tipo: type,
+                descricao: desc,
+                valor: val,
+                data: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+            document.getElementById('finDesc').value = '';
+            document.getElementById('finValue').value = '';
+            fetchFinance();
         }
 
-        function renderChart(labels, data) {
+        let myChart;
+        async function fetchFinance() {
+            const snap = await db.collection("financas").get();
+            let ganhos = 0, gastos = 0;
+            const categorias = { "Ganhos": 0, "Gastos": 0 };
+
+            snap.forEach(doc => {
+                const d = doc.data();
+                if (d.tipo === 'ganho') {
+                    ganhos += d.valor;
+                    categorias["Ganhos"] += d.valor;
+                } else {
+                    gastos += d.valor;
+                    categorias["Gastos"] += d.valor;
+                }
+            });
+
+            // Atualiza Painel de Saldo
+            document.getElementById('totalGanho').innerText = `R$ ${ganhos.toFixed(2)}`;
+            document.getElementById('totalGasto').innerText = `R$ ${gastos.toFixed(2)}`;
+            const saldo = ganhos - gastos;
+            const saldoEl = document.getElementById('totalSaldo');
+            saldoEl.innerText = `R$ ${saldo.toFixed(2)}`;
+            saldoEl.style.color = saldo >= 0 ? 'var(--green)' : 'var(--red)';
+
+            renderChart(categorias);
+        }
+
+        function renderChart(cats) {
             const ctx = document.getElementById('financeChart').getContext('2d');
             if (myChart) myChart.destroy();
-            
-            // Se não houver dados, mostra um gráfico vazio
-            if(data.length === 0) {
-                labels = ['Sem dados'];
-                data = [1];
-            }
-
             myChart = new Chart(ctx, {
-                type: 'doughnut',
+                type: 'pie',
                 data: {
-                    labels: labels,
-                    datasets: [{ 
-                        data: data, 
-                        backgroundColor: ['#d4af37', '#f1c40f', '#7f8c8d', '#e67e22', '#3498db'] 
-                    }]
+                    labels: Object.keys(cats),
+                    datasets: [{ data: Object.values(cats), backgroundColor: ['#2ecc71', '#e74c3c'] }]
                 },
-                options: { 
-                    plugins: { 
-                        legend: { labels: { color: '#fff' } } 
-                    } 
-                }
+                options: { plugins: { legend: { labels: { color: '#fff' } } } }
             });
         }
 
-        // ==========================================
-        // LÓGICA DE TAREFAS
-        // ==========================================
+        // --- FUNÇÕES DE TAREFAS ---
         async function addTask() {
             const val = document.getElementById('taskInput').value;
             if (!val) return;
-            
-            try {
-                await db.collection("tarefas").add({ 
-                    texto: val, 
-                    data: firebase.firestore.FieldValue.serverTimestamp() 
-                });
-                document.getElementById('taskInput').value = '';
-                fetchTasks();
-            } catch (error) {
-                console.error("Erro ao adicionar tarefa:", error);
-                alert("Erro ao adicionar. Verifique as permissões do banco.");
-            }
+            await db.collection("tarefas").add({ texto: val, data: new Date() });
+            document.getElementById('taskInput').value = '';
+            fetchTasks();
         }
 
         async function fetchTasks() {
-            try {
-                const snap = await db.collection("tarefas").orderBy("data", "desc").limit(10).get();
-                const list = document.getElementById('taskList');
-                list.innerHTML = '';
-                
-                if (snap.empty) {
-                    list.innerHTML = '<li class="task-item" style="justify-content: center; color: #888;">Nenhuma tarefa pendente</li>';
-                    return;
-                }
-
-                snap.forEach(doc => {
-                    list.innerHTML += `<li class="task-item">${doc.data().texto} <span onclick="deleteTask('${doc.id}')" style="cursor:pointer" title="Concluir tarefa">✅</span></li>`;
-                });
-            } catch (error) {
-                console.error("Erro ao buscar tarefas:", error);
-            }
+            const snap = await db.collection("tarefas").orderBy("data", "desc").limit(8).get();
+            const list = document.getElementById('taskList');
+            list.innerHTML = '';
+            snap.forEach(doc => {
+                list.innerHTML += `<li class="task-item">${doc.data().texto} <span onclick="deleteTask('${doc.id}')" style="cursor:pointer">✅</span></li>`;
+            });
         }
 
         async function deleteTask(id) {
-            try {
-                await db.collection("tarefas").doc(id).delete();
-                fetchTasks();
-            } catch (error) {
-                console.error("Erro ao deletar tarefa:", error);
-            }
+            await db.collection("tarefas").doc(id).delete();
+            fetchTasks();
         }
 
-        // Inicia o app carregando as funções
-        window.onload = () => {
-            fetchFinance();
-            fetchTasks();
-        };
+        window.onload = () => { fetchFinance(); fetchTasks(); };
     </script>
 </body>
 </html>
