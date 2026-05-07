@@ -6,17 +6,32 @@
     <title>AppFamilia - Maicon</title>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
     <style>
         :root { --gold: #d4af37; --dark: #121212; --gray: #1e1e1e; --light-gray: #2c2c2c; --text: #e0e0e0; --red: #e74c3c; --green: #2ecc71; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: var(--dark); color: var(--text); padding-bottom: 40px; }
-        .app-container { display: flex; flex-direction: column; gap: 15px; padding: 15px; width: 100%; max-width: 500px; margin: 0 auto; }
-        h1 { text-align: center; color: var(--gold); margin: 10px 0; font-size: 1.8em; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: var(--dark); color: var(--text); }
+        .app-container { padding: 20px; width: 100%; max-width: 500px; margin: 0 auto; min-height: 100vh; }
+        
+        /* Sistema de Telas */
+        .view { display: none; flex-direction: column; gap: 15px; animation: fadeIn 0.3s ease-in-out; }
+        .view.active { display: flex; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        h1 { text-align: center; color: var(--gold); margin: 20px 0; font-size: 2.2em; }
         h2 { font-size: 1.2em; color: var(--gold); margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 5px; }
+        
+        /* Botões Menu Home */
+        .menu-grid { display: flex; flex-direction: column; gap: 15px; margin-top: 30px; }
+        .btn-menu { background: var(--gray); border: 2px solid var(--gold); color: var(--gold); padding: 30px 20px; border-radius: 15px; font-size: 1.2em; font-weight: bold; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .btn-menu:active { background: var(--gold); color: var(--dark); transform: scale(0.96); }
+        
+        /* Botão Voltar */
+        .btn-back { background: transparent; color: var(--text); border: none; font-size: 1em; text-align: left; padding: 10px 0; cursor: pointer; margin-bottom: 10px; display: flex; align-items: center; gap: 5px; }
+
+        /* Cartões e Elementos */
         .card { background: var(--gray); padding: 20px; border-radius: 12px; border-top: 3px solid var(--gold); box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
         .balance-box { display: flex; justify-content: space-between; align-items: center; text-align: center; background: var(--light-gray); padding: 15px; border-radius: 10px; }
         .balance-item h3 { font-size: 0.8em; color: #aaa; font-weight: normal; margin-bottom: 5px; }
@@ -39,52 +54,70 @@
 <body>
 
     <div class="app-container">
-        <h1>AppFamilia</h1>
-
-        <div class="balance-box">
-            <div class="balance-item">
-                <h3>Ganhos</h3>
-                <p id="totalGanho" class="val-ganho">R$ 0</p>
-            </div>
-            <div class="balance-item">
-                <h3>Saldo Atual</h3>
-                <p id="totalSaldo" class="val-saldo">R$ 0</p>
-            </div>
-            <div class="balance-item">
-                <h3>Gastos</h3>
-                <p id="totalGasto" class="val-gasto">R$ 0</p>
+        
+        <div id="viewHome" class="view active">
+            <h1>AppFamilia 🏠</h1>
+            <p style="text-align: center; color: #aaa;">Bem-vindo, Maicon!</p>
+            
+            <div class="menu-grid">
+                <button class="btn-menu" onclick="navigateTo('viewFinancas')">💰 Gestão Financeira</button>
+                <button class="btn-menu" onclick="navigateTo('viewTarefas')">📝 Lembretes & Tarefas</button>
             </div>
         </div>
 
-        <div class="card">
-            <h2>Lançar Finanças</h2>
-            <div class="form-group">
-                <select id="finType">
-                    <option value="ganho">🟢 Nova Entrada (Ganho)</option>
-                    <option value="gasto">🔴 Nova Saída (Gasto)</option>
-                </select>
-                <input type="text" id="finDesc" placeholder="Descrição (Ex: Luz, Salário)">
-                <input type="number" id="finValue" placeholder="Valor (R$)" inputmode="decimal">
-                <button class="btn" onclick="addFinance()">Salvar Lançamento</button>
+        <div id="viewFinancas" class="view">
+            <button class="btn-back" onclick="navigateTo('viewHome')">⬅ Voltar ao Início</button>
+            
+            <div class="balance-box">
+                <div class="balance-item">
+                    <h3>Ganhos</h3>
+                    <p id="totalGanho" class="val-ganho">R$ 0</p>
+                </div>
+                <div class="balance-item">
+                    <h3>Saldo Atual</h3>
+                    <p id="totalSaldo" class="val-saldo">R$ 0</p>
+                </div>
+                <div class="balance-item">
+                    <h3>Gastos</h3>
+                    <p id="totalGasto" class="val-gasto">R$ 0</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Lançar Finanças</h2>
+                <div class="form-group">
+                    <select id="finType">
+                        <option value="ganho">🟢 Nova Entrada (Ganho)</option>
+                        <option value="gasto">🔴 Nova Saída (Gasto)</option>
+                    </select>
+                    <input type="text" id="finDesc" placeholder="Descrição (Ex: Luz, Salário)">
+                    <input type="number" id="finValue" placeholder="Valor (R$)" inputmode="decimal">
+                    <button class="btn" onclick="addFinance()">Salvar Lançamento</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Visão Geral</h2>
+                <div class="chart-container">
+                    <canvas id="financeChart"></canvas>
+                </div>
             </div>
         </div>
 
-        <div class="card">
-            <h2>Visão Geral</h2>
-            <div class="chart-container">
-                <canvas id="financeChart"></canvas>
+        <div id="viewTarefas" class="view">
+            <button class="btn-back" onclick="navigateTo('viewHome')">⬅ Voltar ao Início</button>
+            
+            <div class="card">
+                <h2>Lembretes & Tarefas</h2>
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <input type="text" id="taskInput" placeholder="O que precisa ser feito?">
+                    <button class="btn" onclick="addTask()">Adicionar Tarefa</button>
+                </div>
+                <ul id="taskList" class="task-list">
+                    </ul>
             </div>
         </div>
 
-        <div class="card">
-            <h2>Lembretes & Tarefas</h2>
-            <div class="form-group" style="margin-bottom: 15px;">
-                <input type="text" id="taskInput" placeholder="O que precisa ser feito?">
-                <button class="btn" onclick="addTask()">Adicionar Tarefa</button>
-            </div>
-            <ul id="taskList" class="task-list">
-                </ul>
-        </div>
     </div>
 
     <script>
@@ -99,9 +132,21 @@
             appId: "1:588166444818:web:4dcc01e0c6d1608cbc65cb"
         };
 
-        // Inicializa o app e conecta ao Realtime Database
+        // Inicializa o app
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
+
+        // --- SISTEMA DE NAVEGAÇÃO ---
+        function navigateTo(viewId) {
+            // Esconde todas as telas
+            document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+            // Mostra a tela selecionada
+            document.getElementById(viewId).classList.add('active');
+
+            // Atualiza os dados quando entra na tela específica
+            if(viewId === 'viewFinancas') fetchFinance();
+            if(viewId === 'viewTarefas') fetchTasks();
+        }
 
         // --- LÓGICA DE FINANÇAS ---
         async function addFinance() {
@@ -115,7 +160,7 @@
                 return;
             }
 
-            const btn = document.querySelector('.card:nth-child(2) .btn');
+            const btn = document.querySelector('#viewFinancas .btn');
             btn.innerText = "Salvando...";
             btn.disabled = true;
 
@@ -129,7 +174,7 @@
 
                 document.getElementById('finDesc').value = '';
                 document.getElementById('finValue').value = '';
-                fetchFinance(); // Atualiza a tela
+                fetchFinance();
             } catch (error) {
                 alert("Erro ao salvar: " + error.message);
             } finally {
@@ -203,7 +248,7 @@
             const val = document.getElementById('taskInput').value;
             if (!val) return;
             
-            const btn = document.querySelector('.card:last-child .btn');
+            const btn = document.querySelector('#viewTarefas .btn');
             btn.innerText = "Adicionando...";
             
             try {
@@ -243,16 +288,7 @@
             }
         }
 
-        async function deleteTask(id) {
-            try {
-                await db.ref("tarefas").child(id).remove();
-                fetchTasks();
-            } catch (error) {
-                console.error("Erro ao deletar tarefa:", error);
-            }
-        }
-
-        // Inicializa as consultas ao carregar a página
+        // Carrega dados iniciais escondidos
         window.onload = () => { fetchFinance(); fetchTasks(); };
     </script>
 </body>
