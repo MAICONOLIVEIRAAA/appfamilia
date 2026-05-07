@@ -211,13 +211,22 @@
 
             snap.forEach(c => {
                 const f = c.val();
-                let ativo = (f.frequencia === 'mes' && f.mesCriacao === currentMonth) || 
+                let ativo = false;
+                
+                // FALLBACK DE COMPATIBILIDADE (Para os dados antigos aparecerem)
+                if (!f.frequencia) {
+                    ativo = true; 
+                } else {
+                    ativo = (f.frequencia === 'mes' && f.mesCriacao === currentMonth) || 
                             (f.frequencia === 'fixo' && f.mesCriacao <= currentMonth && (!f.dataTermino || f.dataTermino >= currentMonth));
+                }
 
                 if (ativo) {
                     if (f.tipo === 'ganho') gan += f.valor; else gas += f.valor;
+                    const freqTexto = !f.frequencia ? 'Registro Antigo' : (f.frequencia === 'fixo' ? 'Fixo/Parcelado' : 'Apenas este mês');
+                    
                     list.innerHTML += `<li class="list-item" style="border-left-color:${f.tipo==='ganho'?'var(--green)':'var(--red)'}">
-                        <div class="registro-info"><b>${f.descricao}</b><span class="registro-data">${f.frequencia==='fixo'?'Recorrente':'Apenas no mês'}</span></div>
+                        <div class="registro-info"><b>${f.descricao}</b><span class="registro-data">${freqTexto}</span></div>
                         <div style="display:flex;align-items:center;"><b style="font-size:1.1em;">R$ ${f.valor.toFixed(2)}</b><div class="action-icon" onclick="deleteFin('${c.key}')">🗑️</div></div>
                     </li>`;
                 }
@@ -244,11 +253,27 @@
             const snap = await db.ref("financas").once('value');
             const meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
             const ganAnual = new Array(12).fill(0); const gasAnual = new Array(12).fill(0);
+            
             snap.forEach(c => {
                 const f = c.val();
+                
+                // Tenta pegar o mês real para dados velhos e novos
+                let mesCriacaoReal = f.mesCriacao;
+                if (!mesCriacaoReal && f.data) {
+                    mesCriacaoReal = new Date(f.data).toISOString().substring(0, 7);
+                }
+
                 for (let i = 0; i < 12; i++) {
                     const mesLoop = `2026-${(i + 1).toString().padStart(2, '0')}`;
-                    if ((f.frequencia === 'mes' && f.mesCriacao === mesLoop) || (f.frequencia === 'fixo' && f.mesCriacao <= mesLoop && (!f.dataTermino || f.dataTermino >= mesLoop))) {
+                    let ativo = false;
+                    
+                    if (!f.frequencia) {
+                        if (mesCriacaoReal === mesLoop) ativo = true; // Joga o dado velho no mês que foi criado
+                    } else if ((f.frequencia === 'mes' && f.mesCriacao === mesLoop) || (f.frequencia === 'fixo' && f.mesCriacao <= mesLoop && (!f.dataTermino || f.dataTermino >= mesLoop))) {
+                        ativo = true;
+                    }
+
+                    if (ativo) {
                         if (f.tipo === 'ganho') ganAnual[i] += f.valor; else gasAnual[i] += f.valor;
                     }
                 }
@@ -281,9 +306,14 @@
             const snap = await db.ref("tarefas").once('value');
             const list = document.getElementById('taskList'); list.innerHTML = '';
             const diasNome = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+            
             snap.forEach(c => {
-                const t = c.val(); const dTxt = t.dias.map(d => diasNome[d]).join(', ');
-                list.innerHTML = `<li class="list-item"><div><b>${t.texto}</b><br><small style="font-size: 0.9em; color:#bbb;">⏰ ${t.hora} (${dTxt})</small></div><div class="action-icon" onclick="deleteTask('${c.key}')" style="background:rgba(76, 175, 80, 0.2);">✅</div></li>` + list.innerHTML;
+                const t = c.val(); 
+                // FALLBACK DE COMPATIBILIDADE (Evita erro em lembretes antigos sem dias)
+                const dTxt = t.dias ? t.dias.map(d => diasNome[d]).join(', ') : 'Antigo/Sem Repetição';
+                const horaFixa = t.hora ? t.hora : '--:--';
+
+                list.innerHTML = `<li class="list-item"><div><b>${t.texto}</b><br><small style="font-size: 0.9em; color:#bbb;">⏰ ${horaFixa} (${dTxt})</small></div><div class="action-icon" onclick="deleteTask('${c.key}')" style="background:rgba(76, 175, 80, 0.2);">✅</div></li>` + list.innerHTML;
             });
         }
 
