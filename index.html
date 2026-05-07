@@ -4,13 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AppFamilia - Maicon</title>
+    
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
     <style>
         :root { --gold: #d4af37; --dark: #1a1a1a; --gray: #2d2d2d; --text: #e0e0e0; }
-        body { font-family: 'Segoe UI', sans-serif; background-color: var(--dark); color: var(--text); padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--dark); color: var(--text); padding: 20px; display: flex; flex-direction: column; align-items: center; }
         .container { width: 95%; max-width: 900px; background: var(--gray); padding: 20px; border-radius: 15px; border-top: 5px solid var(--gold); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         h1, h2 { text-align: center; color: var(--gold); margin-bottom: 20px; }
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
@@ -23,8 +25,9 @@
         .task-list { list-style: none; padding: 0; }
         .task-item { background: #444; margin: 5px 0; padding: 10px; border-radius: 5px; display: flex; justify-content: space-between; border-left: 3px solid var(--gold); }
         input, button { padding: 10px; border-radius: 5px; border: none; }
-        input { width: 70%; background: #eee; }
-        .btn { background: var(--gold); color: var(--dark); font-weight: bold; cursor: pointer; }
+        input { width: 70%; background: #eee; color: #1a1a1a; }
+        .btn { background: var(--gold); color: var(--dark); font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn:hover { background-color: #f1c40f; }
 
         @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
     </style>
@@ -54,66 +57,122 @@
     </div>
 
     <script>
-        // CONFIGURAÇÃO FIREBASE (Substitua pelos seus dados do console)
+        // SUA CONFIGURAÇÃO DO FIREBASE (Extraída do console)
         const firebaseConfig = {
-            apiKey: "SUA_API_KEY",
-            projectId: "SEU_PROJETO_ID",
-            appId: "SEU_APP_ID"
+            apiKey: "AIzaSyAMxvTVuD11Rm_EfEpVVQ8kkaUApEEdHvg",
+            authDomain: "midias-sp.firebaseapp.com",
+            databaseURL: "https://midias-sp-default-rtdb.firebaseio.com",
+            projectId: "midias-sp",
+            storageBucket: "midias-sp.firebasestorage.app",
+            messagingSenderId: "550605985336",
+            appId: "1:550605985336:web:c21f69ef4180e30275b8cd",
+            measurementId: "G-ZX2KVESYXT"
         };
+
+        // Inicializa o Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // --- LÓGICA FINANCEIRA ---
+        // ==========================================
+        // LÓGICA FINANCEIRA
+        // ==========================================
         let myChart;
         async function fetchFinance() {
-            const snap = await db.collection("gastos").get();
-            const categorias = {};
-            snap.forEach(doc => {
-                const d = doc.data();
-                categorias[d.categoria] = (categorias[d.categoria] || 0) + d.valor;
-            });
-            renderChart(Object.keys(categorias), Object.values(categorias));
+            try {
+                const snap = await db.collection("gastos").get();
+                const categorias = {};
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    // Garante que se a categoria não existir, vai para 'Outros'
+                    const cat = d.categoria || 'Outros'; 
+                    categorias[cat] = (categorias[cat] || 0) + (d.valor || 0);
+                });
+                renderChart(Object.keys(categorias), Object.values(categorias));
+            } catch (error) {
+                console.error("Erro ao buscar gastos:", error);
+            }
         }
 
         function renderChart(labels, data) {
             const ctx = document.getElementById('financeChart').getContext('2d');
             if (myChart) myChart.destroy();
+            
+            // Se não houver dados, mostra um gráfico vazio
+            if(data.length === 0) {
+                labels = ['Sem dados'];
+                data = [1];
+            }
+
             myChart = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
                     labels: labels,
-                    datasets: [{ data: data, backgroundColor: ['#d4af37', '#f1c40f', '#7f8c8d', '#e67e22'] }]
+                    datasets: [{ 
+                        data: data, 
+                        backgroundColor: ['#d4af37', '#f1c40f', '#7f8c8d', '#e67e22', '#3498db'] 
+                    }]
                 },
-                options: { plugins: { legend: { labels: { color: '#fff' } } } }
+                options: { 
+                    plugins: { 
+                        legend: { labels: { color: '#fff' } } 
+                    } 
+                }
             });
         }
 
-        // --- LÓGICA DE TAREFAS ---
+        // ==========================================
+        // LÓGICA DE TAREFAS
+        // ==========================================
         async function addTask() {
             const val = document.getElementById('taskInput').value;
             if (!val) return;
-            await db.collection("tarefas").add({ texto: val, data: new Date() });
-            document.getElementById('taskInput').value = '';
-            fetchTasks();
+            
+            try {
+                await db.collection("tarefas").add({ 
+                    texto: val, 
+                    data: firebase.firestore.FieldValue.serverTimestamp() 
+                });
+                document.getElementById('taskInput').value = '';
+                fetchTasks();
+            } catch (error) {
+                console.error("Erro ao adicionar tarefa:", error);
+                alert("Erro ao adicionar. Verifique as permissões do banco.");
+            }
         }
 
         async function fetchTasks() {
-            const snap = await db.collection("tarefas").orderBy("data", "desc").limit(5).get();
-            const list = document.getElementById('taskList');
-            list.innerHTML = '';
-            snap.forEach(doc => {
-                list.innerHTML += `<li class="task-item">${doc.data().texto} <span onclick="deleteTask('${doc.id}')" style="cursor:pointer">❌</span></li>`;
-            });
+            try {
+                const snap = await db.collection("tarefas").orderBy("data", "desc").limit(10).get();
+                const list = document.getElementById('taskList');
+                list.innerHTML = '';
+                
+                if (snap.empty) {
+                    list.innerHTML = '<li class="task-item" style="justify-content: center; color: #888;">Nenhuma tarefa pendente</li>';
+                    return;
+                }
+
+                snap.forEach(doc => {
+                    list.innerHTML += `<li class="task-item">${doc.data().texto} <span onclick="deleteTask('${doc.id}')" style="cursor:pointer" title="Concluir tarefa">✅</span></li>`;
+                });
+            } catch (error) {
+                console.error("Erro ao buscar tarefas:", error);
+            }
         }
 
         async function deleteTask(id) {
-            await db.collection("tarefas").doc(id).delete();
-            fetchTasks();
+            try {
+                await db.collection("tarefas").doc(id).delete();
+                fetchTasks();
+            } catch (error) {
+                console.error("Erro ao deletar tarefa:", error);
+            }
         }
 
-        // Inicia o app
-        fetchFinance();
-        fetchTasks();
+        // Inicia o app carregando as funções
+        window.onload = () => {
+            fetchFinance();
+            fetchTasks();
+        };
     </script>
 </body>
 </html>
