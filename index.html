@@ -15,185 +15,86 @@
         
         body { 
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
-            background-color: var(--dark); 
-            color: var(--text); 
-            /* Espaço no fundo para não esconder conteúdo atrás do menu inferior */
-            padding-bottom: 90px; 
-            padding-top: 60px;
+            background-color: var(--dark); color: var(--text); padding-bottom: 90px; padding-top: 60px;
         }
 
-        /* Cabeçalho Estilo Nativo */
         .app-header {
             position: fixed; top: 0; left: 0; width: 100%;
             background: rgba(18, 18, 18, 0.85); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-            padding: 15px; text-align: center; z-index: 1000;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding: 15px; text-align: center; z-index: 1000; border-bottom: 1px solid rgba(255,255,255,0.05);
         }
         .app-header h1 { font-size: 1.3em; color: var(--gold); letter-spacing: 1px; margin: 0; }
 
-        /* Menu Inferior Fixo */
         .bottom-nav {
-            position: fixed; bottom: 0; left: 0; width: 100%;
-            background: var(--gray);
+            position: fixed; bottom: 0; left: 0; width: 100%; background: var(--gray);
             display: flex; justify-content: space-around; align-items: center;
             padding: 10px 0 calc(10px + env(safe-area-inset-bottom));
-            border-top: 1px solid rgba(255,255,255,0.05);
-            z-index: 1000; box-shadow: 0 -5px 20px rgba(0,0,0,0.5);
+            border-top: 1px solid rgba(255,255,255,0.05); z-index: 1000;
         }
-        .nav-item {
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            color: #777; font-size: 0.75em; gap: 4px; width: 25%;
-            transition: 0.3s ease;
-        }
-        .nav-item span.icon { font-size: 1.6em; margin-bottom: 2px; filter: grayscale(100%) opacity(0.6); transition: 0.3s; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: #777; font-size: 0.75em; gap: 4px; width: 25%; }
         .nav-item.active { color: var(--gold); font-weight: bold; }
-        .nav-item.active span.icon { filter: grayscale(0%) opacity(1); transform: translateY(-2px); }
+        .nav-item .icon { font-size: 1.6em; }
 
-        /* Container de Conteúdo */
         .app-container { padding: 15px; width: 100%; max-width: 600px; margin: 0 auto; }
-        
         .view { display: none; flex-direction: column; gap: 20px; animation: fadeIn 0.4s ease; }
         .view.active { display: flex; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Cartões Mobile Modernos */
-        .card { 
-            background: var(--gray); padding: 20px; border-radius: 16px; 
-            box-shadow: 0 8px 16px rgba(0,0,0,0.2); 
-            border: 1px solid rgba(255,255,255,0.03);
-        }
-        h2 { font-size: 1.1em; color: white; margin-bottom: 15px; font-weight: 600; }
+        .card { background: var(--gray); padding: 20px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.03); }
+        .form-group { display: flex; flex-direction: column; gap: 12px; }
+        select, input { width: 100%; padding: 15px; border-radius: 12px; border: 1px solid #333; font-size: 16px; background: #222; color: white; outline: none; }
+        .btn { background: var(--gold); color: #000; font-weight: bold; padding: 16px; border-radius: 12px; border: none; text-transform: uppercase; letter-spacing: 1px; }
 
-        /* Painel de Saldo */
-        .balance-box { display: flex; justify-content: space-between; align-items: center; background: linear-gradient(145deg, #1e1e1e, #2a2a2a); padding: 20px 15px; border-radius: 16px; text-align: center; border-left: 4px solid var(--gold); }
-        .balance-item h3 { font-size: 0.7em; color: #aaa; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px; }
-        .balance-item p { font-size: 1.1em; font-weight: bold; }
-        .val-principal { font-size: 1.4em !important; color: white; }
-
-        /* Formulários Aprimorados */
-        .form-group { display: flex; flex-direction: column; gap: 15px; }
-        select, input { 
-            width: 100%; padding: 16px; border-radius: 12px; border: 1px solid #333; 
-            font-size: 16px; background: #222; color: white; outline: none; transition: 0.3s;
-        }
-        input:focus, select:focus { border-color: var(--gold); background: #2a2a2a; }
-        
-        .btn { 
-            background: var(--gold); color: #000; font-weight: bold; font-size: 16px; 
-            padding: 16px; border-radius: 12px; border: none; cursor: pointer; text-transform: uppercase; letter-spacing: 1px;
-        }
-        .btn:active { opacity: 0.8; transform: scale(0.98); }
-
-        /* Listas */
         .item-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
-        .list-item { 
-            background: #222; padding: 15px; border-radius: 12px; 
-            display: flex; justify-content: space-between; align-items: center; 
-            border-left: 4px solid #555;
-        }
-        .item-ganho { border-left-color: var(--green); }
-        .item-gasto { border-left-color: var(--red); }
-        
-        .registro-info { display: flex; flex-direction: column; gap: 4px; }
-        .registro-info b { font-size: 15px; color: white; }
+        .list-item { background: #222; padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid var(--gold); }
+        .registro-info b { display: block; font-size: 15px; color: white; }
         .registro-data { font-size: 12px; color: #888; }
+        .tag-recorrente { font-size: 9px; background: rgba(212, 175, 55, 0.2); color: var(--gold); padding: 2px 6px; border-radius: 4px; margin-left: 5px; border: 1px solid var(--gold); }
         
-        .tag { font-size: 9px; padding: 3px 6px; border-radius: 6px; margin-left: 6px; text-transform: uppercase; font-weight: bold; letter-spacing: 0.5px; }
-        .tag-fixo { background: rgba(52, 152, 219, 0.2); color: var(--blue); border: 1px solid var(--blue); }
-        .tag-mes { background: rgba(255, 255, 255, 0.1); color: #ccc; border: 1px solid #666; }
-        
-        .chart-container { position: relative; height: 220px; width: 100%; margin-top: 15px; }
-        .delete-btn { font-size: 1.3em; padding: 10px; cursor: pointer; background: rgba(255,0,0,0.1); border-radius: 50%; margin-left: 10px; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; }
-        .check-btn { font-size: 1.3em; padding: 10px; cursor: pointer; background: rgba(76, 175, 80, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; }
-
+        .delete-btn { font-size: 1.3em; background: rgba(255,0,0,0.1); border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
 
-    <header class="app-header">
-        <h1>AppFamilia</h1>
-    </header>
+    <header class="app-header"><h1>AppFamilia</h1></header>
 
     <div class="app-container">
-        
-        <div id="viewHome" class="view active">
-            <div class="balance-box">
-                <div class="balance-item"><h3>Entradas</h3><p id="homeGanho" style="color:var(--green)">R$ 0</p></div>
-                <div class="balance-item"><h3>Saldo</h3><p id="homeSaldo" class="val-principal">R$ 0</p></div>
-                <div class="balance-item"><h3>Saídas</h3><p id="homeGasto" style="color:var(--red)">R$ 0</p></div>
-            </div>
-
-            <div class="card" style="padding: 10px 20px;">
-                <h2 style="margin-top:10px; text-align:center;">Visão Geral</h2>
-                <div class="chart-container"><canvas id="financeChart"></canvas></div>
-            </div>
-            
-            <button class="btn" style="background: #333; color: white;" onclick="requestNotificationPermission()">🔔 Ativar Notificações</button>
-        </div>
-
         <div id="viewLancamento" class="view">
             <div class="card">
-                <h2>Novo Lançamento</h2>
+                <h2>Lançar Finanças</h2>
                 <div class="form-group">
-                    <select id="finType" style="border-left: 4px solid var(--red);">
-                        <option value="gasto">🔴 SAÍDA (Gasto)</option>
-                        <option value="ganho">🟢 ENTRADA (Salário/Ganho)</option>
-                    </select>
-                    
-                    <select id="finFreq">
-                        <option value="mes">📅 Variável (Apenas este mês)</option>
-                        <option value="fixo">📌 Fixo (Recorrente)</option>
-                    </select>
-                    
-                    <input type="text" id="finDesc" placeholder="Nome do lançamento (Ex: Mercado)">
+                    <select id="finType"><option value="gasto">🔴 Saída</option><option value="ganho">🟢 Entrada</option></select>
+                    <input type="text" id="finDesc" placeholder="Descrição">
                     <input type="number" id="finValue" placeholder="Valor (R$)" inputmode="decimal">
                     <button class="btn" onclick="addFinance()">Registrar</button>
                 </div>
             </div>
         </div>
 
-        <div id="viewExtrato" class="view">
-            <div class="card" style="background: transparent; box-shadow: none; border: none; padding: 0;">
-                <h2 style="padding-left: 5px;">Movimentações</h2>
-                <ul id="finList" class="item-list"></ul>
-            </div>
-        </div>
-
-        <div id="viewTarefas" class="view">
+        <div id="viewTarefas" class="view active">
             <div class="card">
                 <h2>Novo Lembrete</h2>
                 <div class="form-group">
-                    <input type="text" id="taskInput" placeholder="O que eu preciso lembrar?">
+                    <input type="text" id="taskInput" placeholder="O que lembrar?">
                     <input type="time" id="taskTime">
+                    <select id="taskFreq">
+                        <option value="uma_vez">🔔 Uma vez</option>
+                        <option value="diario">🔁 Diário</option>
+                    </select>
                     <button class="btn" onclick="addTask()">Salvar Lembrete</button>
                 </div>
             </div>
             
-            <div class="card" style="background: transparent; box-shadow: none; border: none; padding: 0; margin-top: 10px;">
-                <h2 style="padding-left: 5px;">Próximas Tarefas</h2>
+            <div class="card" style="background:transparent; border:none;">
+                <h2>Meus Lembretes</h2>
                 <ul id="taskList" class="item-list"></ul>
             </div>
         </div>
-
     </div>
 
     <nav class="bottom-nav">
-        <div class="nav-item active" onclick="navTab('viewHome', this)">
-            <span class="icon">🏠</span>
-            <span>Início</span>
-        </div>
-        <div class="nav-item" onclick="navTab('viewLancamento', this)">
-            <span class="icon">➕</span>
-            <span>Lançar</span>
-        </div>
-        <div class="nav-item" onclick="navTab('viewExtrato', this)">
-            <span class="icon">🧾</span>
-            <span>Extrato</span>
-        </div>
-        <div class="nav-item" onclick="navTab('viewTarefas', this)">
-            <span class="icon">📝</span>
-            <span>Tarefas</span>
-        </div>
+        <div class="nav-item" onclick="navTab('viewLancamento', this)"><span class="icon">➕</span><span>Lançar</span></div>
+        <div class="nav-item active" onclick="navTab('viewTarefas', this)"><span class="icon">📝</span><span>Tarefas</span></div>
     </nav>
 
     <script>
@@ -210,162 +111,89 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // Lógica visual do select para mudar a cor da borda baseado no tipo
-        document.getElementById('finType').addEventListener('change', function() {
-            this.style.borderLeft = this.value === 'gasto' ? '4px solid var(--red)' : '4px solid var(--green)';
-        });
-
-        // --- NAVEGAÇÃO DE TABS ---
         function navTab(viewId, element) {
-            // Remove active de todos os ícones
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
             element.classList.add('active');
-
-            // Troca a tela
             document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
             document.getElementById(viewId).classList.add('active');
-
-            // Atualiza dados
-            if(viewId === 'viewExtrato' || viewId === 'viewHome') fetchFinance();
             if(viewId === 'viewTarefas') fetchTasks();
-            window.scrollTo(0,0);
         }
 
-        // --- NOTIFICAÇÕES ---
-        function requestNotificationPermission() {
-            Notification.requestPermission().then(permission => {
-                if (permission === "granted") alert("As notificações estão ativadas!");
-            });
-        }
-
+        // --- LÓGICA DE NOTIFICAÇÃO RECORRENTE ---
         function showNotification(msg) {
             if (Notification.permission === "granted") {
                 new Notification("Lembrete AppFamilia", { body: msg });
+            } else {
+                alert("LEMBRETE: " + msg);
             }
         }
 
         setInterval(() => {
             const agora = new Date();
+            const hojeStr = agora.toISOString().split('T')[0]; // Formato YYYY-MM-DD
             const horaAtual = agora.getHours().toString().padStart(2, '0') + ":" + agora.getMinutes().toString().padStart(2, '0');
+
             db.ref("tarefas").once('value', snap => {
                 snap.forEach(child => {
                     const t = child.val();
-                    if (t.hora === horaAtual && !t.notificado) {
-                        showNotification(t.texto);
-                        db.ref("tarefas").child(child.key).update({ notificado: true });
+                    if (t.hora === horaAtual) {
+                        // Se for diário e ainda não notificou HOJE
+                        if (t.frequencia === 'diario' && t.ultimaNotificacao !== hojeStr) {
+                            showNotification(t.texto);
+                            db.ref("tarefas").child(child.key).update({ ultimaNotificacao: hojeStr });
+                        } 
+                        // Se for uma vez e ainda não notificou NUNCA
+                        else if (t.frequencia === 'uma_vez' && !t.notificado) {
+                            showNotification(t.texto);
+                            db.ref("tarefas").child(child.key).update({ notificado: true });
+                        }
                     }
                 });
             });
         }, 60000);
 
-        // --- FINANÇAS ---
-        async function addFinance() {
-            const type = document.getElementById('finType').value;
-            const freq = document.getElementById('finFreq').value;
-            const desc = document.getElementById('finDesc').value;
-            const val = parseFloat(document.getElementById('finValue').value.replace(',', '.'));
-            
-            if (!desc || !val) return alert("Preencha o nome e o valor.");
-
-            const btn = document.querySelector('#viewLancamento .btn');
-            btn.innerText = "Registrando..."; btn.disabled = true;
-
-            await db.ref("financas").push({ tipo: type, frequencia: freq, descricao: desc, valor: val, data: firebase.database.ServerValue.TIMESTAMP });
-            
-            document.getElementById('finDesc').value = ''; document.getElementById('finValue').value = '';
-            btn.innerText = "Registrar"; btn.disabled = false;
-            
-            // Navega para o extrato automaticamente
-            navTab('viewExtrato', document.querySelectorAll('.nav-item')[2]);
-        }
-
-        let myChart;
-        async function fetchFinance() {
-            const snap = await db.ref("financas").orderByChild("data").once('value');
-            let ganhos = 0, gastos = 0;
-            const listEl = document.getElementById('finList');
-            listEl.innerHTML = '';
-            let regs = [];
-            
-            snap.forEach(c => { regs.push({id: c.key, ...c.val()}); if(c.val().tipo === 'ganho') ganhos += c.val().valor; else gastos += c.val().valor; });
-            
-            regs.reverse().forEach(d => {
-                const tag = `<span class="tag ${d.frequencia === 'fixo' ? 'tag-fixo' : 'tag-mes'}">${d.frequencia === 'fixo' ? 'FIXO' : 'MÊS'}</span>`;
-                listEl.innerHTML += `
-                <li class="list-item ${d.tipo==='ganho'?'item-ganho':'item-gasto'}">
-                    <div class="registro-info">
-                        <div><b>${d.descricao}</b> ${tag}</div>
-                        <span class="registro-data">${new Date(d.data).toLocaleDateString('pt-BR')}</span>
-                    </div>
-                    <div style="display:flex;align-items:center;">
-                        <b style="color:${d.tipo==='ganho'?'var(--green)':'var(--text)'}; font-size: 1.1em;">R$ ${d.valor.toFixed(2)}</b>
-                        <div class="delete-btn" onclick="deleteRegistro('${d.id}')">🗑️</div>
-                    </div>
-                </li>`;
-            });
-
-            if(regs.length === 0) listEl.innerHTML = '<p style="text-align:center; color:#666; margin-top:20px;">Nenhum registro ainda.</p>';
-
-            // Atualiza Home
-            const formatMoney = (val) => `R$ ${val.toFixed(2)}`;
-            document.getElementById('homeGanho').innerText = formatMoney(ganhos);
-            document.getElementById('homeGasto').innerText = formatMoney(gastos);
-            
-            const saldo = ganhos - gastos;
-            const elSaldo = document.getElementById('homeSaldo');
-            elSaldo.innerText = formatMoney(saldo);
-            elSaldo.style.color = saldo >= 0 ? 'white' : 'var(--red)';
-
-            renderChart(ganhos, gastos);
-        }
-
-        function renderChart(gan, gas) {
-            const ctx = document.getElementById('financeChart').getContext('2d');
-            if (myChart) myChart.destroy();
-            if (gan === 0 && gas === 0) { gan = 1; gas = 1; }
-            myChart = new Chart(ctx, { 
-                type: 'doughnut', 
-                data: { labels: ['Entradas', 'Saídas'], datasets: [{ data: [gan, gas], backgroundColor: ['#4caf50', '#ff5252'], borderWidth: 0 }] }, 
-                options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { position: 'right', labels: {color: '#ccc', font: {size: 13}} } } } 
-            });
-        }
-
-        async function deleteRegistro(id) { if(confirm("Apagar este registro?")) { await db.ref("financas").child(id).remove(); fetchFinance(); } }
-
         // --- TAREFAS ---
         async function addTask() {
             const val = document.getElementById('taskInput').value;
             const time = document.getElementById('taskTime').value;
-            if (!val) return;
-            await db.ref("tarefas").push({ texto: val, hora: time, notificado: false, data: firebase.database.ServerValue.TIMESTAMP });
+            const freq = document.getElementById('taskFreq').value;
+            if (!val || !time) return alert("Preencha descrição e hora.");
+
+            await db.ref("tarefas").push({ 
+                texto: val, 
+                hora: time, 
+                frequencia: freq,
+                notificado: false, 
+                ultimaNotificacao: "",
+                dataCriacao: firebase.database.ServerValue.TIMESTAMP 
+            });
+
             document.getElementById('taskInput').value = '';
-            document.getElementById('taskTime').value = '';
             fetchTasks();
+            if (Notification.permission !== "granted") Notification.requestPermission();
         }
 
         async function fetchTasks() {
-            const snap = await db.ref("tarefas").orderByChild("data").once('value');
+            const snap = await db.ref("tarefas").once('value');
             const list = document.getElementById('taskList');
             list.innerHTML = '';
-            let tasks = [];
-            snap.forEach(c => { tasks.push({id: c.key, ...c.val()}); });
-            
-            tasks.reverse().forEach(t => {
-                const horaFormatada = t.hora ? t.hora : 'Sem hora';
-                list.innerHTML += `
-                <li class="list-item" style="border-left: 4px solid var(--gold);">
+            snap.forEach(c => {
+                const t = c.val();
+                const badge = t.frequencia === 'diario' ? '<span class="tag-recorrente">DIÁRIO</span>' : '';
+                list.innerHTML = `
+                <li class="list-item">
                     <div class="registro-info">
-                        <b>${t.texto}</b>
-                        <span class="registro-data">⏰ ${horaFormatada}</span>
+                        <b>${t.texto} ${badge}</b>
+                        <span class="registro-data">⏰ ${t.hora}</span>
                     </div>
-                    <div class="check-btn" onclick="deleteTask('${t.id}')">✅</div>
-                </li>`;
+                    <div class="delete-btn" onclick="deleteTask('${c.key}')">✅</div>
+                </li>` + list.innerHTML;
             });
         }
 
         async function deleteTask(id) { await db.ref("tarefas").child(id).remove(); fetchTasks(); }
 
-        window.onload = () => { fetchFinance(); fetchTasks(); };
+        window.onload = () => { fetchTasks(); };
     </script>
 </body>
 </html>
