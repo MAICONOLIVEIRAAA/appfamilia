@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>AppFamilia - Maicon</title>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -10,83 +10,139 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
     <style>
-        :root { --gold: #d4af37; --dark: #1a1a1a; --gray: #2d2d2d; --text: #e0e0e0; --red: #e74c3c; --green: #2ecc71; }
-        body { font-family: 'Segoe UI', sans-serif; background-color: var(--dark); color: var(--text); padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        .container { width: 95%; max-width: 1000px; background: var(--gray); padding: 20px; border-radius: 15px; border-top: 5px solid var(--gold); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        h1, h2 { text-align: center; color: var(--gold); margin-bottom: 20px; }
+        :root { --gold: #d4af37; --dark: #121212; --gray: #1e1e1e; --light-gray: #2c2c2c; --text: #e0e0e0; --red: #e74c3c; --green: #2ecc71; }
         
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .card { background: #333; padding: 20px; border-radius: 10px; box-shadow: inset 0 0 10px rgba(0,0,0,0.2); }
+        /* Reset para Mobile */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         
-        /* Formulário de Finanças */
-        .form-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; }
-        select, input, button { padding: 12px; border-radius: 5px; border: none; font-size: 16px; }
-        input, select { background: #444; color: white; border: 1px solid #555; }
-        .btn { background: var(--gold); color: var(--dark); font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .btn:hover { background: #f1c40f; transform: translateY(-2px); }
-        
-        /* Resumo de Saldo */
-        .balance-box { display: flex; justify-content: space-around; margin-bottom: 20px; text-align: center; }
-        .balance-item h3 { margin: 5px 0; font-size: 0.9em; color: #bbb; }
-        .balance-item p { font-size: 1.4em; font-weight: bold; margin: 0; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            background-color: var(--dark); 
+            color: var(--text); 
+            padding-bottom: 40px; /* Espaço para rolar até o final suavemente */
+        }
+
+        /* Container que simula a tela do app */
+        .app-container { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 15px; 
+            padding: 15px; 
+            width: 100%; 
+            max-width: 500px; /* Mantém bonito se abrir no PC, mas perfeito no celular */
+            margin: 0 auto; 
+        }
+
+        h1 { text-align: center; color: var(--gold); margin: 10px 0; font-size: 1.8em; }
+        h2 { font-size: 1.2em; color: var(--gold); margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 5px; }
+
+        /* Cartões de Rolagem */
+        .card { 
+            background: var(--gray); 
+            padding: 20px; 
+            border-radius: 12px; 
+            border-top: 3px solid var(--gold); 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3); 
+        }
+
+        /* Resumo de Saldo Mobile */
+        .balance-box { display: flex; justify-content: space-between; align-items: center; text-align: center; background: var(--light-gray); padding: 15px; border-radius: 10px; }
+        .balance-item h3 { font-size: 0.8em; color: #aaa; font-weight: normal; margin-bottom: 5px; }
+        .balance-item p { font-size: 1.1em; font-weight: bold; }
         .val-ganho { color: var(--green); }
         .val-gasto { color: var(--red); }
+        .val-saldo { font-size: 1.3em !important; } /* Destaca o saldo principal */
 
-        .task-item { background: #444; margin: 8px 0; padding: 12px; border-radius: 5px; display: flex; justify-content: space-between; border-left: 4px solid var(--gold); }
+        /* Formulários e Botões (Touch-friendly) */
+        .form-group { display: flex; flex-direction: column; gap: 12px; }
         
-        @media (max-width: 800px) { .grid { grid-template-columns: 1fr; } }
+        /* Fonte 16px previne auto-zoom no iPhone/Android */
+        select, input, button { 
+            width: 100%; 
+            padding: 15px; 
+            border-radius: 8px; 
+            border: none; 
+            font-size: 16px; 
+            outline: none;
+        }
+        
+        input, select { background: var(--light-gray); color: white; border: 1px solid #444; }
+        input:focus, select:focus { border-color: var(--gold); }
+        
+        .btn { background: var(--gold); color: #000; font-weight: bold; cursor: pointer; transition: 0.2s; text-transform: uppercase; }
+        .btn:active { background: #f1c40f; transform: scale(0.98); } /* Efeito de clique no touch */
+
+        /* Lista de Tarefas */
+        .task-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+        .task-item { 
+            background: var(--light-gray); 
+            padding: 15px; 
+            border-radius: 8px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            border-left: 4px solid var(--gold); 
+            font-size: 16px;
+        }
+        .task-delete { font-size: 1.2em; padding: 5px 10px; cursor: pointer; }
+
+        /* Gráfico Mobile */
+        .chart-container { position: relative; height: 250px; width: 100%; margin-top: 15px; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>AppFamilia 🏠 <small style="font-size: 0.4em; color: #888;">v2.0</small></h1>
+    <div class="app-container">
+        <h1>AppFamilia</h1>
 
-        <div class="balance-box card">
+        <div class="balance-box">
             <div class="balance-item">
                 <h3>Ganhos</h3>
-                <p id="totalGanho" class="val-ganho">R$ 0,00</p>
+                <p id="totalGanho" class="val-ganho">R$ 0</p>
+            </div>
+            <div class="balance-item">
+                <h3>Saldo Atual</h3>
+                <p id="totalSaldo" class="val-saldo">R$ 0</p>
             </div>
             <div class="balance-item">
                 <h3>Gastos</h3>
-                <p id="totalGasto" class="val-gasto">R$ 0,00</p>
-            </div>
-            <div class="balance-item">
-                <h3>Saldo</h3>
-                <p id="totalSaldo">R$ 0,00</p>
+                <p id="totalGasto" class="val-gasto">R$ 0</p>
             </div>
         </div>
-        
-        <div class="grid">
-            <div class="card">
-                <h2>Lançar Finanças</h2>
-                <div class="form-group">
-                    <select id="finType">
-                        <option value="ganho">🟢 Ganho (Entrada)</option>
-                        <option value="gasto">🔴 Gasto (Saída)</option>
-                    </select>
-                    <input type="text" id="finDesc" placeholder="Descrição (Ex: Salário, Aluguel)">
-                    <input type="number" id="finValue" placeholder="Valor (R$)">
-                    <button class="btn" onclick="addFinance()">Cadastrar Lançamento</button>
-                </div>
-                <hr style="border: 0.5px solid #444; margin: 20px 0;">
+
+        <div class="card">
+            <h2>Lançar Finanças</h2>
+            <div class="form-group">
+                <select id="finType">
+                    <option value="ganho">🟢 Nova Entrada (Ganho)</option>
+                    <option value="gasto">🔴 Nova Saída (Gasto)</option>
+                </select>
+                <input type="text" id="finDesc" placeholder="Descrição (Ex: Luz, Salário)">
+                <input type="number" id="finValue" placeholder="Valor (R$)" inputmode="decimal">
+                <button class="btn" onclick="addFinance()">Salvar Lançamento</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Visão Geral</h2>
+            <div class="chart-container">
                 <canvas id="financeChart"></canvas>
             </div>
+        </div>
 
-            <div class="card">
-                <h2>Lembretes & Tarefas</h2>
-                <div class="form-group">
-                    <div style="display: flex; gap: 5px;">
-                        <input type="text" id="taskInput" placeholder="O que precisa ser feito?" style="flex-grow: 1;">
-                        <button class="btn" onclick="addTask()">ADD</button>
-                    </div>
-                </div>
-                <ul id="taskList" style="list-style: none; padding: 0;"></ul>
+        <div class="card">
+            <h2>Lembretes & Tarefas</h2>
+            <div class="form-group" style="margin-bottom: 15px;">
+                <input type="text" id="taskInput" placeholder="O que precisa ser feito?">
+                <button class="btn" onclick="addTask()">Adicionar Tarefa</button>
             </div>
+            <ul id="taskList" class="task-list">
+                </ul>
         </div>
     </div>
 
     <script>
+        // CONFIGURAÇÃO FIREBASE DO MAICON
         const firebaseConfig = {
             apiKey: "AIzaSyAMxvTVuD11Rm_EfEpVVQ8kkaUApEEdHvg",
             authDomain: "midias-sp.firebaseapp.com",
@@ -101,20 +157,37 @@
         async function addFinance() {
             const type = document.getElementById('finType').value;
             const desc = document.getElementById('finDesc').value;
-            const val = parseFloat(document.getElementById('finValue').value);
+            const valInput = document.getElementById('finValue').value;
+            // Trata vírgula como ponto para o formato numérico
+            const val = parseFloat(valInput.replace(',', '.'));
 
-            if (!desc || !val) return alert("Preencha todos os campos!");
+            if (!desc || !val) {
+                alert("Preencha a descrição e o valor!");
+                return;
+            }
 
-            await db.collection("financas").add({
-                tipo: type,
-                descricao: desc,
-                valor: val,
-                data: firebase.firestore.FieldValue.serverTimestamp()
-            });
+            // Desativa o botão para evitar duplicação no celular
+            const btn = document.querySelector('.card:nth-child(2) .btn');
+            btn.innerText = "Salvando...";
+            btn.disabled = true;
 
-            document.getElementById('finDesc').value = '';
-            document.getElementById('finValue').value = '';
-            fetchFinance();
+            try {
+                await db.collection("financas").add({
+                    tipo: type,
+                    descricao: desc,
+                    valor: val,
+                    data: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                document.getElementById('finDesc').value = '';
+                document.getElementById('finValue').value = '';
+                fetchFinance();
+            } catch (error) {
+                alert("Erro ao salvar. Verifique o console.");
+            } finally {
+                btn.innerText = "Salvar Lançamento";
+                btn.disabled = false;
+            }
         }
 
         let myChart;
@@ -134,12 +207,15 @@
                 }
             });
 
-            // Atualiza Painel de Saldo
-            document.getElementById('totalGanho').innerText = `R$ ${ganhos.toFixed(2)}`;
-            document.getElementById('totalGasto').innerText = `R$ ${gastos.toFixed(2)}`;
+            // Formatação de moeda BRL para tela do celular
+            const formataMoeda = (valor) => valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+            document.getElementById('totalGanho').innerText = formataMoeda(ganhos);
+            document.getElementById('totalGasto').innerText = formataMoeda(gastos);
+            
             const saldo = ganhos - gastos;
             const saldoEl = document.getElementById('totalSaldo');
-            saldoEl.innerText = `R$ ${saldo.toFixed(2)}`;
+            saldoEl.innerText = formataMoeda(saldo);
             saldoEl.style.color = saldo >= 0 ? 'var(--green)' : 'var(--red)';
 
             renderChart(categorias);
@@ -148,13 +224,30 @@
         function renderChart(cats) {
             const ctx = document.getElementById('financeChart').getContext('2d');
             if (myChart) myChart.destroy();
+            
+            // Se estiver tudo zerado, mostra gráfico cinza
+            if(cats.Ganhos === 0 && cats.Gastos === 0) {
+                cats = {"Sem dados": 1};
+            }
+
             myChart = new Chart(ctx, {
-                type: 'pie',
+                type: 'doughnut', // Doughnut fica mais elegante no mobile
                 data: {
                     labels: Object.keys(cats),
-                    datasets: [{ data: Object.values(cats), backgroundColor: ['#2ecc71', '#e74c3c'] }]
+                    datasets: [{ 
+                        data: Object.values(cats), 
+                        backgroundColor: cats["Sem dados"] ? ['#555'] : ['#2ecc71', '#e74c3c'],
+                        borderWidth: 0
+                    }]
                 },
-                options: { plugins: { legend: { labels: { color: '#fff' } } } }
+                options: { 
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { 
+                        legend: { position: 'bottom', labels: { color: '#fff', padding: 20 } } 
+                    },
+                    cutout: '70%'
+                }
             });
         }
 
@@ -162,17 +255,26 @@
         async function addTask() {
             const val = document.getElementById('taskInput').value;
             if (!val) return;
+            
+            const btn = document.querySelector('.card:last-child .btn');
+            btn.innerText = "Adicionando...";
+            
             await db.collection("tarefas").add({ texto: val, data: new Date() });
             document.getElementById('taskInput').value = '';
+            btn.innerText = "Adicionar Tarefa";
             fetchTasks();
         }
 
         async function fetchTasks() {
-            const snap = await db.collection("tarefas").orderBy("data", "desc").limit(8).get();
+            const snap = await db.collection("tarefas").orderBy("data", "desc").limit(10).get();
             const list = document.getElementById('taskList');
             list.innerHTML = '';
             snap.forEach(doc => {
-                list.innerHTML += `<li class="task-item">${doc.data().texto} <span onclick="deleteTask('${doc.id}')" style="cursor:pointer">✅</span></li>`;
+                list.innerHTML += `
+                    <li class="task-item">
+                        <span>${doc.data().texto}</span>
+                        <span class="task-delete" onclick="deleteTask('${doc.id}')">✅</span>
+                    </li>`;
             });
         }
 
@@ -181,6 +283,7 @@
             fetchTasks();
         }
 
+        // Inicia o app carregando as funções
         window.onload = () => { fetchFinance(); fetchTasks(); };
     </script>
 </body>
