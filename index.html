@@ -14,42 +14,55 @@
         :root { --gold: #d4af37; --dark: #121212; --gray: rgba(30, 30, 30, 0.9); --text: #e0e0e0; --red: #ff5252; --green: #4caf50; --blue: #3498db; }
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         
-        body { font-family: -apple-system, system-ui, sans-serif; background-color: var(--dark); color: var(--text); padding-bottom: 90px; padding-top: 60px; overflow-x: hidden; }
+        body { font-family: -apple-system, system-ui, sans-serif; background-color: var(--dark); color: var(--text); padding-bottom: 110px; padding-top: 80px; overflow-x: hidden; }
         #particles-js { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
 
-        .app-header { position: fixed; top: 0; left: 0; width: 100%; background: rgba(18, 18, 18, 0.9); backdrop-filter: blur(10px); padding: 15px; text-align: center; z-index: 1000; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .app-header h1 { font-size: 1.2em; color: var(--gold); text-transform: uppercase; letter-spacing: 2px; }
+        /* CABEÇALHO MAIOR */
+        .app-header { position: fixed; top: 0; left: 0; width: 100%; background: rgba(18, 18, 18, 0.9); backdrop-filter: blur(10px); padding: 20px; text-align: center; z-index: 1000; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .app-header h1 { font-size: 1.5em; color: var(--gold); text-transform: uppercase; letter-spacing: 2px; }
 
         .app-container { padding: 15px; width: 100%; max-width: 600px; margin: 0 auto; }
-        .view { display: none; flex-direction: column; gap: 15px; }
+        .view { display: none; flex-direction: column; gap: 20px; }
         .view.active { display: flex; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .card { background: var(--gray); padding: 20px; border-radius: 16px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.05); }
-        .balance-box { display: flex; justify-content: space-between; align-items: center; text-align: center; gap: 5px; }
-        .balance-item h3 { font-size: 0.65em; color: #aaa; text-transform: uppercase; margin-bottom: 5px; }
-        .balance-item p { font-size: 0.95em; font-weight: bold; }
-
-        .form-group { display: flex; flex-direction: column; gap: 10px; }
-        label { font-size: 0.75em; color: var(--gold); font-weight: bold; margin-bottom: -5px; }
-        input, select, button { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid #333; font-size: 16px; background: rgba(0,0,0,0.3); color: white; outline: none; }
-        .btn { background: var(--gold); color: #000; font-weight: bold; border: none; text-transform: uppercase; cursor: pointer; }
+        /* CARTÕES COM MAIS RESPIRO */
+        .card { background: var(--gray); padding: 25px 20px; border-radius: 20px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.05); }
+        .card h2 { font-size: 1.4em; margin-bottom: 15px; }
         
-        .days-selector { display: flex; justify-content: space-between; gap: 5px; margin: 5px 0; }
-        .day-btn { flex: 1; padding: 10px 0; border-radius: 8px; border: 1px solid #444; background: #222; color: #777; font-size: 12px; font-weight: bold; cursor: pointer; text-align: center; }
+        .balance-box { display: flex; justify-content: space-between; align-items: center; text-align: center; gap: 10px; }
+        .balance-item h3 { font-size: 0.8em; color: #aaa; text-transform: uppercase; margin-bottom: 8px; }
+        .balance-item p { font-size: 1.2em; font-weight: bold; }
+
+        /* INPUTS E BOTÕES ROBUSTOS PARA TELA GRANDE */
+        .form-group { display: flex; flex-direction: column; gap: 15px; }
+        label { font-size: 0.9em; color: var(--gold); font-weight: bold; margin-bottom: -5px; margin-top: 5px; }
+        input, select, button { width: 100%; padding: 18px; border-radius: 14px; border: 1px solid #444; font-size: 1.1em; background: rgba(0,0,0,0.4); color: white; outline: none; }
+        input:focus, select:focus { border-color: var(--gold); background: rgba(0,0,0,0.6); }
+        .btn { background: var(--gold); color: #000; font-weight: bold; border: none; text-transform: uppercase; cursor: pointer; font-size: 1.1em; letter-spacing: 1px; margin-top: 10px; }
+        .btn:active { transform: scale(0.98); }
+        
+        /* SELETOR DE DIAS GIGANTE */
+        .days-selector { display: flex; justify-content: space-between; gap: 8px; margin: 10px 0; }
+        .day-btn { flex: 1; padding: 15px 0; border-radius: 12px; border: 1px solid #555; background: #222; color: #888; font-size: 1.1em; font-weight: bold; cursor: pointer; text-align: center; transition: 0.2s; }
         .day-btn.active { background: var(--gold); color: black; border-color: var(--gold); }
 
-        .item-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
-        .list-item { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid var(--gold); }
-        .registro-info b { font-size: 15px; color: white; display: block; }
-        .registro-data { font-size: 11px; color: #888; }
+        /* LISTAS REDIMENSIONADAS */
+        .item-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+        .list-item { background: rgba(255,255,255,0.05); padding: 18px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid var(--gold); }
+        .registro-info b { font-size: 1.1em; color: white; display: block; margin-bottom: 4px; }
+        .registro-data { font-size: 0.85em; color: #999; }
 
-        .chart-container { position: relative; height: 250px; width: 100%; margin-top: 10px; }
+        .chart-container { position: relative; height: 280px; width: 100%; margin-top: 15px; }
         
-        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(30, 30, 30, 0.95); display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid rgba(255,255,255,0.1); z-index: 1000; }
-        .nav-item { color: #777; font-size: 10px; text-align: center; cursor: pointer; width: 25%; }
-        .nav-item.active { color: var(--gold); font-weight: bold; }
-        .nav-item span { display: block; font-size: 20px; margin-bottom: 3px; }
+        /* MENU INFERIOR ALTO E CONFORTÁVEL */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(20, 20, 20, 0.98); display: flex; justify-content: space-around; padding: 15px 0 calc(15px + env(safe-area-inset-bottom)); border-top: 1px solid rgba(255,255,255,0.1); z-index: 1000; }
+        .nav-item { color: #666; font-size: 0.85em; text-align: center; cursor: pointer; width: 25%; font-weight: 500; transition: 0.2s; }
+        .nav-item.active { color: var(--gold); font-weight: bold; transform: translateY(-2px); }
+        .nav-item span { display: block; font-size: 1.8em; margin-bottom: 6px; }
+        
+        /* ÍCONES DE AÇÃO MAIORES */
+        .action-icon { font-size: 1.5em; padding: 10px; cursor: pointer; background: rgba(255,255,255,0.05); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-left: 10px; width: 45px; height: 45px; }
     </style>
 </head>
 <body>
@@ -62,14 +75,14 @@
         <div id="viewHome" class="view active">
             <div class="card balance-box">
                 <div class="balance-item"><h3>Ganhos</h3><p id="resumoGanho" style="color:var(--green)">R$ 0</p></div>
-                <div class="balance-item"><h3>Saldo</h3><p id="resumoSaldo">R$ 0</p></div>
+                <div class="balance-item"><h3>Saldo</h3><p id="resumoSaldo" style="font-size: 1.4em;">R$ 0</p></div>
                 <div class="balance-item"><h3>Gastos</h3><p id="resumoGasto" style="color:var(--red)">R$ 0</p></div>
             </div>
             <div class="card">
                 <div class="chart-container"><canvas id="monthlyChart"></canvas></div>
             </div>
             <div class="card">
-                <h2>Registos do Mês</h2>
+                <h2>Registros do Mês</h2>
                 <ul id="finList" class="item-list" style="margin-top:10px;"></ul>
             </div>
         </div>
@@ -78,21 +91,26 @@
             <div class="card">
                 <h2>Novo Lançamento</h2>
                 <div class="form-group">
-                    <label>Tipo</label>
-                    <select id="finType"><option value="gasto">🔴 Saída / Dívida</option><option value="ganho">🟢 Entrada / Salário</option></select>
+                    <label>Tipo de Movimentação</label>
+                    <select id="finType"><option value="gasto">🔴 Saída / Gasto</option><option value="ganho">🟢 Entrada / Salário</option></select>
+                    
                     <label>Descrição</label>
                     <input type="text" id="finDesc" placeholder="Ex: Aluguel, Mercado">
-                    <label>Valor</label>
+                    
+                    <label>Valor (R$)</label>
                     <input type="number" id="finValue" placeholder="0.00" inputmode="decimal">
+                    
                     <label>Frequência</label>
                     <select id="finFreq" onchange="document.getElementById('divEndDate').style.display = (this.value === 'fixo') ? 'flex' : 'none';">
                         <option value="mes">📅 Apenas este mês</option>
                         <option value="fixo">📌 Fixo / Parcelado</option>
                     </select>
+                    
                     <div id="divEndDate" style="display:none; flex-direction: column; gap:10px;">
-                        <label>Válido até (Mês Final)</label>
+                        <label>Válido até (Mês da última parcela)</label>
                         <input type="month" id="finEndDate">
                     </div>
+                    
                     <button class="btn" onclick="addFinance()">Gravar Finança</button>
                 </div>
             </div>
@@ -100,8 +118,8 @@
 
         <div id="viewAnual" class="view">
             <div class="card">
-                <h2>Planeamento Anual 2026</h2>
-                <div class="chart-container" style="height: 350px;"><canvas id="annualChart"></canvas></div>
+                <h2>Planejamento Anual 2026</h2>
+                <div class="chart-container" style="height: 400px;"><canvas id="annualChart"></canvas></div>
             </div>
         </div>
 
@@ -109,18 +127,21 @@
             <div class="card">
                 <h2>Novo Lembrete 🔔</h2>
                 <div class="form-group">
-                    <input type="text" id="taskInput" placeholder="O que lembrar?">
+                    <input type="text" id="taskInput" placeholder="O que eu preciso lembrar?">
                     <input type="time" id="taskTime">
-                    <p style="font-size: 11px; color: var(--gold);">Repetir nos dias:</p>
+                    
+                    <p style="font-size: 0.9em; color: var(--gold); margin-top: 5px; font-weight: bold;">Repetir nos dias:</p>
                     <div class="days-selector">
                         <div class="day-btn" data-day="0">D</div><div class="day-btn" data-day="1">S</div><div class="day-btn" data-day="2">T</div><div class="day-btn" data-day="3">Q</div><div class="day-btn" data-day="4">Q</div><div class="day-btn" data-day="5">S</div><div class="day-btn" data-day="6">S</div>
                     </div>
+                    
                     <button class="btn" onclick="addTask()">Salvar Lembrete</button>
-                    <button class="btn" style="background:#444; color:white; font-size:12px;" onclick="testSound()">🔊 Testar Som</button>
+                    <button class="btn" style="background:rgba(255,255,255,0.1); color:white; font-size:0.9em; border: 1px solid #555; margin-top: 5px;" onclick="testSound()">🔊 Testar Som do Alarme</button>
                 </div>
             </div>
+            
             <div class="card" style="background:transparent; border:none; padding:10px 0;">
-                <h2 style="margin-bottom:15px;">Lembretes Ativos</h2>
+                <h2 style="margin-bottom:15px; padding-left: 5px;">Lembretes Ativos</h2>
                 <ul id="taskList" class="item-list"></ul>
             </div>
         </div>
@@ -196,8 +217,8 @@
                 if (ativo) {
                     if (f.tipo === 'ganho') gan += f.valor; else gas += f.valor;
                     list.innerHTML += `<li class="list-item" style="border-left-color:${f.tipo==='ganho'?'var(--green)':'var(--red)'}">
-                        <div class="registro-info"><b>${f.descricao}</b><span class="registro-data">${f.frequencia==='fixo'?'Fixo':'Mensal'}</span></div>
-                        <div style="display:flex;align-items:center;"><b>R$ ${f.valor.toFixed(2)}</b><span onclick="deleteFin('${c.key}')" style="margin-left:10px; cursor:pointer;">🗑️</span></div>
+                        <div class="registro-info"><b>${f.descricao}</b><span class="registro-data">${f.frequencia==='fixo'?'Recorrente':'Apenas no mês'}</span></div>
+                        <div style="display:flex;align-items:center;"><b style="font-size:1.1em;">R$ ${f.valor.toFixed(2)}</b><div class="action-icon" onclick="deleteFin('${c.key}')">🗑️</div></div>
                     </li>`;
                 }
             });
@@ -214,7 +235,7 @@
         function renderMonthlyChart(gan, gas) {
             const ctx = document.getElementById('monthlyChart').getContext('2d');
             if (monthlyChart) monthlyChart.destroy();
-            monthlyChart = new Chart(ctx, { type: 'doughnut', data: { labels: ['Ganhos', 'Gastos'], datasets: [{ data: [gan, gas], backgroundColor: ['#4caf50', '#ff5252'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '80%', plugins: { legend: { position: 'bottom', labels: { color: '#fff' } } } } });
+            monthlyChart = new Chart(ctx, { type: 'doughnut', data: { labels: ['Ganhos', 'Gastos'], datasets: [{ data: [gan, gas], backgroundColor: ['#4caf50', '#ff5252'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '80%', plugins: { legend: { position: 'bottom', labels: { color: '#fff', font: { size: 14 } } } } } });
         }
 
         // --- LÓGICA ANUAL ---
@@ -234,7 +255,7 @@
             });
             const ctx = document.getElementById('annualChart').getContext('2d');
             if (annualChart) annualChart.destroy();
-            annualChart = new Chart(ctx, { type: 'bar', data: { labels: meses, datasets: [{ label: 'Ganhos', data: ganAnual, backgroundColor: '#4caf50' }, { label: 'Gastos', data: gasAnual, backgroundColor: '#ff5252' }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { ticks: { color: '#aaa' } }, x: { ticks: { color: '#aaa' } } }, plugins: { legend: { labels: { color: '#fff' } } } } });
+            annualChart = new Chart(ctx, { type: 'bar', data: { labels: meses, datasets: [{ label: 'Ganhos', data: ganAnual, backgroundColor: '#4caf50' }, { label: 'Gastos', data: gasAnual, backgroundColor: '#ff5252' }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { ticks: { color: '#aaa', font: { size: 14 } } }, x: { ticks: { color: '#aaa', font: { size: 14 } } } }, plugins: { legend: { labels: { color: '#fff', font: { size: 14 } } } } });
         }
 
         // --- LÓGICA DE LEMBRETES ---
@@ -250,7 +271,7 @@
         async function addTask() {
             const txt = document.getElementById('taskInput').value;
             const time = document.getElementById('taskTime').value;
-            if (!txt || !time || selectedDays.length === 0) return alert("Preenche o texto, hora e escolhe os dias!");
+            if (!txt || !time || selectedDays.length === 0) return alert("Preencha o texto, a hora e escolha os dias da semana!");
             await db.ref("tarefas").push({ texto: txt, hora: time, dias: selectedDays, ultimoToque: "" });
             document.getElementById('taskInput').value = ''; fetchTasks();
             if (Notification.permission !== "granted") Notification.requestPermission();
@@ -262,7 +283,7 @@
             const diasNome = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
             snap.forEach(c => {
                 const t = c.val(); const dTxt = t.dias.map(d => diasNome[d]).join(', ');
-                list.innerHTML = `<li class="list-item"><div><b>${t.texto}</b><br><small>⏰ ${t.hora} (${dTxt})</small></div><span onclick="deleteTask('${c.key}')" style="cursor:pointer">✅</span></li>` + list.innerHTML;
+                list.innerHTML = `<li class="list-item"><div><b>${t.texto}</b><br><small style="font-size: 0.9em; color:#bbb;">⏰ ${t.hora} (${dTxt})</small></div><div class="action-icon" onclick="deleteTask('${c.key}')" style="background:rgba(76, 175, 80, 0.2);">✅</div></li>` + list.innerHTML;
             });
         }
 
@@ -285,12 +306,12 @@
             });
         }, 30000);
 
-        function testSound() { alertSound.play().catch(() => alert("Interage com a página primeiro para ativar o som!")); }
-        async function deleteFin(id) { if(confirm("Apagar registo financeiro?")) { await db.ref("financas").child(id).remove(); fetchMonthly(); } }
-        async function deleteTask(id) { if(confirm("Remover lembrete?")) { await db.ref("tarefas").child(id).remove(); fetchTasks(); } }
+        function testSound() { alertSound.play().catch(() => alert("Interaja com a tela primeiro (ex: clicando em algum botão) para liberar o áudio no celular!")); }
+        async function deleteFin(id) { if(confirm("Apagar registro financeiro?")) { await db.ref("financas").child(id).remove(); fetchMonthly(); } }
+        async function deleteTask(id) { if(confirm("Remover este lembrete?")) { await db.ref("tarefas").child(id).remove(); fetchTasks(); } }
 
         // FUNDO DINÂMICO
-        particlesJS('particles-js', { "particles": { "number": { "value": 40 }, "color": { "value": "#d4af37" }, "shape": { "type": "circle" }, "opacity": { "value": 0.2 }, "size": { "value": 2 }, "line_linked": { "enable": true, "distance": 150, "color": "#d4af37", "opacity": 0.1 } } });
+        particlesJS('particles-js', { "particles": { "number": { "value": 40 }, "color": { "value": "#d4af37" }, "shape": { "type": "circle" }, "opacity": { "value": 0.3 }, "size": { "value": 3 }, "line_linked": { "enable": true, "distance": 150, "color": "#d4af37", "opacity": 0.2, "width": 1 } } });
 
         window.onload = () => { fetchMonthly(); fetchTasks(); };
     </script>
