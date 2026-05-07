@@ -10,10 +10,10 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
     <style>
-        :root { --gold: #d4af37; --dark: #121212; --gray: #1e1e1e; --light-gray: #2c2c2c; --text: #e0e0e0; --red: #e74c3c; --green: #2ecc71; }
+        :root { --gold: #d4af37; --dark: #121212; --gray: #1e1e1e; --light-gray: #2c2c2c; --text: #e0e0e0; --red: #e74c3c; --green: #2ecc71; --blue: #3498db; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: var(--dark); color: var(--text); }
-        .app-container { padding: 20px; width: 100%; max-width: 500px; margin: 0 auto; min-height: 100vh; }
+        .app-container { padding: 15px; width: 100%; max-width: 500px; margin: 0 auto; min-height: 100vh; }
         
         /* Sistema de Telas */
         .view { display: none; flex-direction: column; gap: 15px; animation: fadeIn 0.3s ease-in-out; }
@@ -23,32 +23,33 @@
         h1 { text-align: center; color: var(--gold); margin: 20px 0; font-size: 2.2em; }
         h2 { font-size: 1.2em; color: var(--gold); margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 5px; }
         
-        /* Botões Menu Home */
+        /* Menu Home */
         .menu-grid { display: flex; flex-direction: column; gap: 15px; margin-top: 30px; }
-        .btn-menu { background: var(--gray); border: 2px solid var(--gold); color: var(--gold); padding: 30px 20px; border-radius: 15px; font-size: 1.2em; font-weight: bold; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .btn-menu { background: var(--gray); border: 2px solid var(--gold); color: var(--gold); padding: 25px; border-radius: 15px; font-size: 1.1em; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; text-decoration: none; }
         .btn-menu:active { background: var(--gold); color: var(--dark); transform: scale(0.96); }
         
-        /* Botão Voltar */
-        .btn-back { background: transparent; color: var(--text); border: none; font-size: 1em; text-align: left; padding: 10px 0; cursor: pointer; margin-bottom: 10px; display: flex; align-items: center; gap: 5px; }
+        .btn-back { background: transparent; color: var(--text); border: none; font-size: 1em; padding: 10px 0; cursor: pointer; display: flex; align-items: center; gap: 5px; }
 
-        /* Cartões e Elementos */
+        /* Cartões */
         .card { background: var(--gray); padding: 20px; border-radius: 12px; border-top: 3px solid var(--gold); box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
-        .balance-box { display: flex; justify-content: space-between; align-items: center; text-align: center; background: var(--light-gray); padding: 15px; border-radius: 10px; }
-        .balance-item h3 { font-size: 0.8em; color: #aaa; font-weight: normal; margin-bottom: 5px; }
-        .balance-item p { font-size: 1.1em; font-weight: bold; }
-        .val-ganho { color: var(--green); }
-        .val-gasto { color: var(--red); }
-        .val-saldo { font-size: 1.3em !important; }
-        .form-group { display: flex; flex-direction: column; gap: 12px; }
-        select, input, button { width: 100%; padding: 15px; border-radius: 8px; border: none; font-size: 16px; outline: none; }
+        .balance-box { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; background: var(--light-gray); padding: 15px; border-radius: 10px; text-align: center; }
+        .balance-item h3 { font-size: 0.7em; color: #aaa; margin-bottom: 5px; text-transform: uppercase; }
+        .balance-item p { font-size: 0.9em; font-weight: bold; }
+        
+        /* Formulários */
+        .form-group { display: flex; flex-direction: column; gap: 10px; }
+        select, input, button { width: 100%; padding: 14px; border-radius: 8px; border: none; font-size: 16px; outline: none; }
         input, select { background: var(--light-gray); color: white; border: 1px solid #444; }
-        input:focus, select:focus { border-color: var(--gold); }
-        .btn { background: var(--gold); color: #000; font-weight: bold; cursor: pointer; transition: 0.2s; text-transform: uppercase; }
-        .btn:active { background: #f1c40f; transform: scale(0.98); }
-        .task-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
-        .task-item { background: var(--light-gray); padding: 15px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid var(--gold); font-size: 16px; }
-        .task-delete { font-size: 1.2em; padding: 5px 10px; cursor: pointer; }
-        .chart-container { position: relative; height: 250px; width: 100%; margin-top: 15px; }
+        .btn { background: var(--gold); color: #000; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+
+        /* Lista Finanças e Tarefas */
+        .item-list { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+        .list-item { background: var(--light-gray); padding: 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 14px; }
+        .tag { font-size: 10px; padding: 2px 6px; border-radius: 4px; margin-left: 5px; text-transform: uppercase; font-weight: bold; }
+        .tag-fixo { background: var(--blue); color: white; }
+        .tag-mes { background: #666; color: white; }
+        
+        .chart-container { position: relative; height: 200px; width: 100%; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -57,47 +58,41 @@
         
         <div id="viewHome" class="view active">
             <h1>AppFamilia 🏠</h1>
-            <p style="text-align: center; color: #aaa;">Bem-vindo, Maicon!</p>
-            
             <div class="menu-grid">
-                <button class="btn-menu" onclick="navigateTo('viewFinancas')">💰 Gestão Financeira</button>
-                <button class="btn-menu" onclick="navigateTo('viewTarefas')">📝 Lembretes & Tarefas</button>
+                <button class="btn-menu" onclick="navigateTo('viewFinancas')">💰 Finanças</button>
+                <button class="btn-menu" onclick="navigateTo('viewTarefas')">📝 Tarefas</button>
             </div>
         </div>
 
         <div id="viewFinancas" class="view">
-            <button class="btn-back" onclick="navigateTo('viewHome')">⬅ Voltar ao Início</button>
+            <button class="btn-back" onclick="navigateTo('viewHome')">⬅ Voltar</button>
             
             <div class="balance-box">
-                <div class="balance-item">
-                    <h3>Ganhos</h3>
-                    <p id="totalGanho" class="val-ganho">R$ 0</p>
-                </div>
-                <div class="balance-item">
-                    <h3>Saldo Atual</h3>
-                    <p id="totalSaldo" class="val-saldo">R$ 0</p>
-                </div>
-                <div class="balance-item">
-                    <h3>Gastos</h3>
-                    <p id="totalGasto" class="val-gasto">R$ 0</p>
-                </div>
+                <div class="balance-item"><h3>Ganhos</h3><p id="totalGanho" style="color:var(--green)">R$ 0</p></div>
+                <div class="balance-item"><h3>Saldo</h3><p id="totalSaldo">R$ 0</p></div>
+                <div class="balance-item"><h3>Gastos</h3><p id="totalGasto" style="color:var(--red)">R$ 0</p></div>
             </div>
 
             <div class="card">
                 <h2>Lançar Finanças</h2>
                 <div class="form-group">
                     <select id="finType">
-                        <option value="ganho">🟢 Nova Entrada (Ganho)</option>
-                        <option value="gasto">🔴 Nova Saída (Gasto)</option>
+                        <option value="ganho">🟢 Ganho (Entrada)</option>
+                        <option value="gasto">🔴 Gasto (Saída)</option>
                     </select>
-                    <input type="text" id="finDesc" placeholder="Descrição (Ex: Luz, Salário)">
+                    <select id="finFreq">
+                        <option value="mes">📅 Gasto do Mês</option>
+                        <option value="fixo">📌 Gasto Fixo</option>
+                    </select>
+                    <input type="text" id="finDesc" placeholder="Descrição (Ex: Aluguel, Uber)">
                     <input type="number" id="finValue" placeholder="Valor (R$)" inputmode="decimal">
-                    <button class="btn" onclick="addFinance()">Salvar Lançamento</button>
+                    <button class="btn" onclick="addFinance()">Salvar</button>
                 </div>
             </div>
 
             <div class="card">
-                <h2>Visão Geral</h2>
+                <h2>Histórico Recente</h2>
+                <ul id="finList" class="item-list"></ul>
                 <div class="chart-container">
                     <canvas id="financeChart"></canvas>
                 </div>
@@ -105,23 +100,20 @@
         </div>
 
         <div id="viewTarefas" class="view">
-            <button class="btn-back" onclick="navigateTo('viewHome')">⬅ Voltar ao Início</button>
-            
+            <button class="btn-back" onclick="navigateTo('viewHome')">⬅ Voltar</button>
             <div class="card">
                 <h2>Lembretes & Tarefas</h2>
                 <div class="form-group" style="margin-bottom: 15px;">
                     <input type="text" id="taskInput" placeholder="O que precisa ser feito?">
-                    <button class="btn" onclick="addTask()">Adicionar Tarefa</button>
+                    <button class="btn" onclick="addTask()">Adicionar</button>
                 </div>
-                <ul id="taskList" class="task-list">
-                    </ul>
+                <ul id="taskList" class="item-list"></ul>
             </div>
         </div>
 
     </div>
 
     <script>
-        // === SUAS CHAVES OFICIAIS DO FIREBASE ===
         const firebaseConfig = {
             apiKey: "AIzaSyBGKDP5V75gMI7uO4gpZL6IpV3teP6J4ao",
             authDomain: "appfamilia-5ebe4.firebaseapp.com",
@@ -132,163 +124,108 @@
             appId: "1:588166444818:web:4dcc01e0c6d1608cbc65cb"
         };
 
-        // Inicializa o app
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // --- SISTEMA DE NAVEGAÇÃO ---
         function navigateTo(viewId) {
-            // Esconde todas as telas
             document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
-            // Mostra a tela selecionada
             document.getElementById(viewId).classList.add('active');
-
-            // Atualiza os dados quando entra na tela específica
             if(viewId === 'viewFinancas') fetchFinance();
             if(viewId === 'viewTarefas') fetchTasks();
         }
 
-        // --- LÓGICA DE FINANÇAS ---
+        // --- FINANÇAS ---
         async function addFinance() {
             const type = document.getElementById('finType').value;
+            const freq = document.getElementById('finFreq').value;
             const desc = document.getElementById('finDesc').value;
-            const valInput = document.getElementById('finValue').value;
-            const val = parseFloat(valInput.replace(',', '.'));
+            const val = parseFloat(document.getElementById('finValue').value.replace(',', '.'));
 
-            if (!desc || !val) {
-                alert("Preencha a descrição e o valor!");
-                return;
-            }
+            if (!desc || !val) return alert("Preencha tudo!");
 
-            const btn = document.querySelector('#viewFinancas .btn');
-            btn.innerText = "Salvando...";
-            btn.disabled = true;
+            await db.ref("financas").push({
+                tipo: type,
+                frequencia: freq,
+                descricao: desc,
+                valor: val,
+                data: firebase.database.ServerValue.TIMESTAMP
+            });
 
-            try {
-                await db.ref("financas").push({
-                    tipo: type,
-                    descricao: desc,
-                    valor: val,
-                    data: firebase.database.ServerValue.TIMESTAMP
-                });
-
-                document.getElementById('finDesc').value = '';
-                document.getElementById('finValue').value = '';
-                fetchFinance();
-            } catch (error) {
-                alert("Erro ao salvar: " + error.message);
-            } finally {
-                btn.innerText = "Salvar Lançamento";
-                btn.disabled = false;
-            }
+            document.getElementById('finDesc').value = '';
+            document.getElementById('finValue').value = '';
+            fetchFinance();
         }
 
         let myChart;
         async function fetchFinance() {
-            try {
-                const snap = await db.ref("financas").once('value');
-                let ganhos = 0, gastos = 0;
-                let categorias = { "Ganhos": 0, "Gastos": 0 };
-
-                snap.forEach(child => {
-                    const d = child.val();
-                    if (d.tipo === 'ganho') {
-                        ganhos += d.valor;
-                        categorias["Ganhos"] += d.valor;
-                    } else {
-                        gastos += d.valor;
-                        categorias["Gastos"] += d.valor;
-                    }
-                });
-
-                const formataMoeda = (valor) => valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-
-                document.getElementById('totalGanho').innerText = formataMoeda(ganhos);
-                document.getElementById('totalGasto').innerText = formataMoeda(gastos);
+            const snap = await db.ref("financas").limitToLast(20).once('value');
+            let ganhos = 0, gastos = 0;
+            const listEl = document.getElementById('finList');
+            listEl.innerHTML = '';
+            
+            let dataArr = [];
+            snap.forEach(child => {
+                const d = child.val();
+                if (d.tipo === 'ganho') ganhos += d.valor; else gastos += d.valor;
                 
-                const saldo = ganhos - gastos;
-                const saldoEl = document.getElementById('totalSaldo');
-                saldoEl.innerText = formataMoeda(saldo);
-                saldoEl.style.color = saldo >= 0 ? 'var(--green)' : 'var(--red)';
+                // Adiciona na lista visual
+                const tagClass = d.frequencia === 'fixo' ? 'tag-fixo' : 'tag-mes';
+                const tagText = d.frequencia === 'fixo' ? 'FIXO' : 'MÊS';
+                listEl.innerHTML = `<li class="list-item">
+                    <span>${d.descricao} <span class="tag ${tagClass}">${tagText}</span></span>
+                    <b style="color:${d.tipo==='ganho'?'var(--green)':'var(--red)'}">R$ ${d.valor.toFixed(2)}</b>
+                </li>` + listEl.innerHTML;
+            });
 
-                renderChart(categorias);
-            } catch (error) {
-                console.error("Erro ao carregar finanças:", error);
-            }
+            const saldo = ganhos - gastos;
+            document.getElementById('totalGanho').innerText = `R$ ${ganhos.toFixed(2)}`;
+            document.getElementById('totalGasto').innerText = `R$ ${gastos.toFixed(2)}`;
+            const saldoEl = document.getElementById('totalSaldo');
+            saldoEl.innerText = `R$ ${saldo.toFixed(2)}`;
+            saldoEl.style.color = saldo >= 0 ? 'var(--green)' : 'var(--red)';
+
+            renderChart(ganhos, gastos);
         }
 
-        function renderChart(cats) {
+        function renderChart(ganhos, gastos) {
             const ctx = document.getElementById('financeChart').getContext('2d');
             if (myChart) myChart.destroy();
-            
-            if(cats.Ganhos === 0 && cats.Gastos === 0) {
-                cats = {"Sem dados": 1};
-            }
-
             myChart = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
-                    labels: Object.keys(cats),
-                    datasets: [{ 
-                        data: Object.values(cats), 
-                        backgroundColor: cats["Sem dados"] ? ['#555'] : ['#2ecc71', '#e74c3c'],
-                        borderWidth: 0
-                    }]
+                    labels: ['Ganhos', 'Gastos'],
+                    datasets: [{ data: [ganhos, gastos], backgroundColor: ['#2ecc71', '#e74c3c'], borderWidth: 0 }]
                 },
-                options: { 
-                    responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { position: 'bottom', labels: { color: '#fff', padding: 20 } } },
-                    cutout: '70%'
-                }
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, cutout: '80%' }
             });
         }
 
-        // --- LÓGICA DE TAREFAS ---
+        // --- TAREFAS ---
         async function addTask() {
             const val = document.getElementById('taskInput').value;
             if (!val) return;
-            
-            const btn = document.querySelector('#viewTarefas .btn');
-            btn.innerText = "Adicionando...";
-            
-            try {
-                await db.ref("tarefas").push({ 
-                    texto: val, 
-                    data: firebase.database.ServerValue.TIMESTAMP 
-                });
-                document.getElementById('taskInput').value = '';
-                fetchTasks();
-            } catch(error) {
-                alert("Erro ao adicionar tarefa: " + error.message);
-            } finally {
-                btn.innerText = "Adicionar Tarefa";
-            }
+            await db.ref("tarefas").push({ texto: val, data: firebase.database.ServerValue.TIMESTAMP });
+            document.getElementById('taskInput').value = '';
+            fetchTasks();
         }
 
         async function fetchTasks() {
-            try {
-                const snap = await db.ref("tarefas").orderByChild("data").limitToLast(15).once('value');
-                const list = document.getElementById('taskList');
-                list.innerHTML = '';
-                
-                let tarefas = [];
-                snap.forEach(child => {
-                    tarefas.push({ id: child.key, ...child.val() });
-                });
-                
-                tarefas.reverse().forEach(t => {
-                    list.innerHTML += `
-                        <li class="task-item">
-                            <span>${t.texto}</span>
-                            <span class="task-delete" onclick="deleteTask('${t.id}')">✅</span>
-                        </li>`;
-                });
-            } catch (error) {
-                console.error("Erro ao carregar tarefas:", error);
-            }
+            const snap = await db.ref("tarefas").limitToLast(10).once('value');
+            const list = document.getElementById('taskList');
+            list.innerHTML = '';
+            snap.forEach(child => {
+                list.innerHTML = `<li class="list-item">
+                    <span>${child.val().texto}</span>
+                    <span onclick="deleteTask('${child.key}')" style="cursor:pointer">✅</span>
+                </li>` + list.innerHTML;
+            });
         }
 
-        // Carrega dados iniciais escondidos
+        async function deleteTask(id) {
+            await db.ref("tarefas").child(id).remove();
+            fetchTasks();
+        }
+
         window.onload = () => { fetchFinance(); fetchTasks(); };
     </script>
 </body>
