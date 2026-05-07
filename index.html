@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AppFamilia Pro</title>
+    <title>AppFamilia Pro - Dashboard</title>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -69,7 +69,7 @@
                 <div class="chart-container"><canvas id="monthlyChart"></canvas></div>
             </div>
             <div class="card">
-                <h2>Extrato do Mês</h2>
+                <h2>Registos do Mês</h2>
                 <ul id="finList" class="item-list" style="margin-top:10px;"></ul>
             </div>
         </div>
@@ -81,7 +81,7 @@
                     <label>Tipo</label>
                     <select id="finType"><option value="gasto">🔴 Saída / Dívida</option><option value="ganho">🟢 Entrada / Salário</option></select>
                     <label>Descrição</label>
-                    <input type="text" id="finDesc" placeholder="Ex: Aluguel, Uber">
+                    <input type="text" id="finDesc" placeholder="Ex: Aluguel, Mercado">
                     <label>Valor</label>
                     <input type="number" id="finValue" placeholder="0.00" inputmode="decimal">
                     <label>Frequência</label>
@@ -93,14 +93,14 @@
                         <label>Válido até (Mês Final)</label>
                         <input type="month" id="finEndDate">
                     </div>
-                    <button class="btn" onclick="addFinance()">Registrar</button>
+                    <button class="btn" onclick="addFinance()">Gravar Finança</button>
                 </div>
             </div>
         </div>
 
         <div id="viewAnual" class="view">
             <div class="card">
-                <h2>Planejamento 2026</h2>
+                <h2>Planeamento Anual 2026</h2>
                 <div class="chart-container" style="height: 350px;"><canvas id="annualChart"></canvas></div>
             </div>
         </div>
@@ -120,6 +120,7 @@
                 </div>
             </div>
             <div class="card" style="background:transparent; border:none; padding:10px 0;">
+                <h2 style="margin-bottom:15px;">Lembretes Ativos</h2>
                 <ul id="taskList" class="item-list"></ul>
             </div>
         </div>
@@ -128,9 +129,9 @@
 
     <nav class="bottom-nav">
         <div class="nav-item active" onclick="navTab('viewHome', this)"><span>🏠</span>Início</div>
-        <div class="nav-item" onclick="navTab('viewLancamento', this)"><span>➕</span>Lançar</div>
+        <div class="nav-item" onclick="navTab('viewLancamento', this)"><span>➕</span>Finanças</div>
         <div class="nav-item" onclick="navTab('viewAnual', this)"><span>📊</span>Anual</div>
-        <div class="nav-item" onclick="navTab('viewTarefas', this)"><span>📝</span>Tarefas</div>
+        <div class="nav-item" onclick="navTab('viewTarefas', this)"><span>📅</span>Agenda</div>
     </nav>
 
     <script>
@@ -161,14 +162,14 @@
             window.scrollTo(0,0);
         }
 
-        // --- FINANÇAS ---
+        // --- LÓGICA FINANCEIRA ---
         async function addFinance() {
             const type = document.getElementById('finType').value;
             const desc = document.getElementById('finDesc').value;
             const val = parseFloat(document.getElementById('finValue').value.replace(',', '.'));
             const freq = document.getElementById('finFreq').value;
             const end = document.getElementById('finEndDate').value;
-            if (!desc || !val) return alert("Preencha tudo!");
+            if (!desc || !val) return alert("Preencha todos os campos!");
 
             await db.ref("financas").push({
                 tipo: type, descricao: desc, valor: val, frequencia: freq,
@@ -176,7 +177,7 @@
                 dataCriacao: firebase.database.ServerValue.TIMESTAMP,
                 mesCriacao: new Date().toISOString().substring(0, 7)
             });
-            alert("Registrado!");
+            alert("Sucesso!");
             navTab('viewHome', document.querySelector('.nav-item'));
         }
 
@@ -190,32 +191,23 @@
             snap.forEach(c => {
                 const f = c.val();
                 let ativo = (f.frequencia === 'mes' && f.mesCriacao === currentMonth) || 
-                            (f.frequencia === 'fixo' && (!f.dataTermino || f.dataTermino >= currentMonth));
+                            (f.frequencia === 'fixo' && f.mesCriacao <= currentMonth && (!f.dataTermino || f.dataTermino >= currentMonth));
 
                 if (ativo) {
-                    if (f.tipo === 'ganho') gan += f.val(); else gas += f.val(); // Erro corrigido aqui no .val() vs f.valor
-                    if (f.tipo === 'ganho') gan += f.valor; else gas += f.valor; // Correção duplicada removida na lógica real
-                    
-                    // Lógica real simplificada abaixo:
-                }
-            });
-
-            // Recalcular limpo
-            gan = 0; gas = 0;
-            snap.forEach(c => {
-                const f = c.val();
-                if ((f.frequencia === 'mes' && f.mesCriacao === currentMonth) || (f.frequencia === 'fixo' && (!f.dataTermino || f.dataTermino >= currentMonth))) {
                     if (f.tipo === 'ganho') gan += f.valor; else gas += f.valor;
                     list.innerHTML += `<li class="list-item" style="border-left-color:${f.tipo==='ganho'?'var(--green)':'var(--red)'}">
                         <div class="registro-info"><b>${f.descricao}</b><span class="registro-data">${f.frequencia==='fixo'?'Fixo':'Mensal'}</span></div>
-                        <div style="display:flex;align-items:center;"><b>R$ ${f.valor.toFixed(2)}</b><span onclick="deleteFin('${c.key}')" style="margin-left:10px;">🗑️</span></div>
+                        <div style="display:flex;align-items:center;"><b>R$ ${f.valor.toFixed(2)}</b><span onclick="deleteFin('${c.key}')" style="margin-left:10px; cursor:pointer;">🗑️</span></div>
                     </li>`;
                 }
             });
 
             document.getElementById('resumoGanho').innerText = `R$ ${gan.toFixed(2)}`;
             document.getElementById('resumoGasto').innerText = `R$ ${gas.toFixed(2)}`;
-            document.getElementById('resumoSaldo').innerText = `R$ ${(gan-gas).toFixed(2)}`;
+            const saldo = gan - gas;
+            document.getElementById('resumoSaldo').innerText = `R$ ${saldo.toFixed(2)}`;
+            document.getElementById('resumoSaldo').style.color = saldo >= 0 ? 'var(--green)' : 'var(--red)';
+            
             renderMonthlyChart(gan, gas);
         }
 
@@ -225,7 +217,7 @@
             monthlyChart = new Chart(ctx, { type: 'doughnut', data: { labels: ['Ganhos', 'Gastos'], datasets: [{ data: [gan, gas], backgroundColor: ['#4caf50', '#ff5252'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '80%', plugins: { legend: { position: 'bottom', labels: { color: '#fff' } } } } });
         }
 
-        // --- ANUAL ---
+        // --- LÓGICA ANUAL ---
         let annualChart;
         async function fetchAnnual() {
             const snap = await db.ref("financas").once('value');
@@ -242,10 +234,10 @@
             });
             const ctx = document.getElementById('annualChart').getContext('2d');
             if (annualChart) annualChart.destroy();
-            annualChart = new Chart(ctx, { type: 'bar', data: { labels: meses, datasets: [{ label: 'Entradas', data: ganAnual, backgroundColor: '#4caf50' }, { label: 'Saídas', data: gasAnual, backgroundColor: '#ff5252' }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { ticks: { color: '#aaa' } }, x: { ticks: { color: '#aaa' } } }, plugins: { legend: { labels: { color: '#fff' } } } } });
+            annualChart = new Chart(ctx, { type: 'bar', data: { labels: meses, datasets: [{ label: 'Ganhos', data: ganAnual, backgroundColor: '#4caf50' }, { label: 'Gastos', data: gasAnual, backgroundColor: '#ff5252' }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { ticks: { color: '#aaa' } }, x: { ticks: { color: '#aaa' } } }, plugins: { legend: { labels: { color: '#fff' } } } } });
         }
 
-        // --- TAREFAS RECORRENTES ---
+        // --- LÓGICA DE LEMBRETES ---
         const selectedDays = [];
         document.querySelectorAll('.day-btn').forEach(btn => {
             btn.onclick = () => {
@@ -258,7 +250,7 @@
         async function addTask() {
             const txt = document.getElementById('taskInput').value;
             const time = document.getElementById('taskTime').value;
-            if (!txt || !time || selectedDays.length === 0) return alert("Preencha texto, hora e dias!");
+            if (!txt || !time || selectedDays.length === 0) return alert("Preenche o texto, hora e escolhe os dias!");
             await db.ref("tarefas").push({ texto: txt, hora: time, dias: selectedDays, ultimoToque: "" });
             document.getElementById('taskInput').value = ''; fetchTasks();
             if (Notification.permission !== "granted") Notification.requestPermission();
@@ -270,11 +262,11 @@
             const diasNome = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
             snap.forEach(c => {
                 const t = c.val(); const dTxt = t.dias.map(d => diasNome[d]).join(', ');
-                list.innerHTML = `<li class="list-item"><div><b>${t.texto}</b><br><small>⏰ ${t.hora} (${dTxt})</small></div><span onclick="deleteTask('${c.key}')">✅</span></li>` + list.innerHTML;
+                list.innerHTML = `<li class="list-item"><div><b>${t.texto}</b><br><small>⏰ ${t.hora} (${dTxt})</small></div><span onclick="deleteTask('${c.key}')" style="cursor:pointer">✅</span></li>` + list.innerHTML;
             });
         }
 
-        // Verificação de Notificação
+        // Sistema de Notificação
         setInterval(() => {
             const agora = new Date();
             const diaSemana = agora.getDay();
@@ -287,16 +279,15 @@
                     if (t.hora === horaAtual && t.dias && t.dias.includes(diaSemana) && t.ultimoToque !== minutoUnico) {
                         alertSound.play().catch(() => {});
                         if (Notification.permission === "granted") new Notification("AppFamilia: " + t.texto);
-                        else alert("🔔 LEMBRETE: " + t.texto);
                         db.ref("tarefas").child(child.key).update({ ultimoToque: minutoUnico });
                     }
                 });
             });
         }, 30000);
 
-        function testSound() { alertSound.play().catch(() => alert("Toque na tela para habilitar áudio!")); }
-        async function deleteFin(id) { if(confirm("Apagar?")) { await db.ref("financas").child(id).remove(); fetchMonthly(); } }
-        async function deleteTask(id) { await db.ref("tarefas").child(id).remove(); fetchTasks(); }
+        function testSound() { alertSound.play().catch(() => alert("Interage com a página primeiro para ativar o som!")); }
+        async function deleteFin(id) { if(confirm("Apagar registo financeiro?")) { await db.ref("financas").child(id).remove(); fetchMonthly(); } }
+        async function deleteTask(id) { if(confirm("Remover lembrete?")) { await db.ref("tarefas").child(id).remove(); fetchTasks(); } }
 
         // FUNDO DINÂMICO
         particlesJS('particles-js', { "particles": { "number": { "value": 40 }, "color": { "value": "#d4af37" }, "shape": { "type": "circle" }, "opacity": { "value": 0.2 }, "size": { "value": 2 }, "line_linked": { "enable": true, "distance": 150, "color": "#d4af37", "opacity": 0.1 } } });
