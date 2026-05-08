@@ -39,7 +39,7 @@
             margin-bottom: 30px;
             padding-top: 10px;
         }
-        .header h1 { font-size: 24px; font-weight: 600; }
+        .header h1 { font-size: 24px; font-weight: 600; text-transform: capitalize; }
         .header .settings-icon { font-size: 20px; opacity: 0.7; }
 
         /* WIDGET PRINCIPAL (RING CHART) */
@@ -59,8 +59,8 @@
             left: 50%;
             transform: translate(-50%, -50%);
         }
-        .balance-info h2 { font-size: 32px; font-weight: 700; }
-        .balance-info p { color: var(--text-secondary); font-size: 14px; }
+        .balance-info h2 { font-size: 28px; font-weight: 700; white-space: nowrap; }
+        .balance-info p { color: var(--text-secondary); font-size: 14px; margin-top: 4px; }
 
         .stats-row {
             display: flex;
@@ -70,7 +70,7 @@
             padding-top: 20px;
         }
         .stat-item p { font-size: 12px; color: var(--text-secondary); margin-bottom: 5px; }
-        .stat-item span { font-weight: 600; font-size: 16px; }
+        .stat-item span { font-weight: 600; font-size: 14px; }
 
         /* GRID DE INSIGHTS */
         .insights-grid {
@@ -89,10 +89,10 @@
             justify-content: space-between;
         }
         .insight-card h3 { font-size: 12px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
-        .insight-value { font-size: 22px; font-weight: 700; margin-top: 5px; }
+        .insight-value { font-size: 20px; font-weight: 700; margin-top: 5px; }
 
         /* TRANSAÇÕES RECENTES */
-        .section-title { font-size: 18px; font-weight: 600; margin-bottom: 15px; display: flex; justify-content: space-between; }
+        .section-title { font-size: 18px; font-weight: 600; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
         .section-title span { color: var(--accent-blue); font-size: 14px; }
 
         .transaction-list { display: flex; flex-direction: column; gap: 12px; }
@@ -115,8 +115,8 @@
             bottom: 25px;
             left: 50%;
             transform: translateX(-50%);
-            width: 90%;
-            background: rgba(28, 28, 30, 0.8);
+            width: 92%;
+            background: rgba(28, 28, 30, 0.85);
             backdrop-filter: blur(20px);
             border-radius: 30px;
             padding: 15px 25px;
@@ -128,66 +128,63 @@
         }
         .nav-btn { color: var(--text-secondary); font-size: 22px; cursor: pointer; }
         .nav-btn.active { color: var(--text-main); }
-        .add-btn { background: white; color: black; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; margin-top: -40px; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+        .add-btn { background: white; color: black; width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: bold; margin-top: -45px; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
 
-        /* MODAL DE LANÇAMENTO */
+        /* MODAL */
         #modalLancamento {
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9);
+            background: rgba(0,0,0,0.95);
             z-index: 2000;
             padding: 40px 20px;
         }
-        .modal-content { background: #1c1c1e; border-radius: 30px; padding: 30px; }
-        input, select { width: 100%; padding: 15px; border-radius: 12px; border: none; background: #2c2c2e; color: white; margin-bottom: 15px; font-size: 16px; }
-        .btn-save { background: var(--accent-blue); color: white; padding: 18px; border-radius: 15px; border: none; width: 100%; font-weight: bold; font-size: 16px; }
-
-        .view { display: none; }
-        .view.active { display: block; }
+        .modal-content { background: #1c1c1e; border-radius: 30px; padding: 30px; border: 1px solid #333; }
+        input, select { width: 100%; padding: 16px; border-radius: 14px; border: none; background: #2c2c2e; color: white; margin-bottom: 15px; font-size: 16px; outline: none; }
+        .btn-save { background: var(--accent-blue); color: white; padding: 18px; border-radius: 16px; border: none; width: 100%; font-weight: bold; font-size: 16px; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <h1 id="monthYear">February 2026</h1>
+        <h1 id="txtData">Maio 2026</h1>
         <div class="settings-icon">⚙️</div>
     </div>
 
-    <div id="viewHome" class="view active">
+    <div id="viewHome">
         <div class="main-widget">
             <div class="ring-container">
                 <canvas id="balanceRing"></canvas>
                 <div class="balance-info">
-                    <h2 id="totalSaldo">0 €</h2>
-                    <p>left to spend</p>
+                    <h2 id="totalSaldo">R$ 0</h2>
+                    <p>restante</p>
                 </div>
             </div>
             <div class="stats-row">
-                <div class="stat-item"><p>Budget ></p><span id="budgetVal">5.000 €</span></div>
-                <div class="stat-item"><p>Allocated ></p><span id="allocatedVal">0 €</span></div>
-                <div class="stat-item"><p>Available ></p><span id="availableVal">0 €</span></div>
+                <div class="stat-item"><p>Orçamento ></p><span id="budgetVal">R$ 5.000</span></div>
+                <div class="stat-item"><p>Gasto ></p><span id="allocatedVal">R$ 0</span></div>
+                <div class="stat-item"><p>Disponível ></p><span id="availableVal">R$ 0</span></div>
             </div>
         </div>
 
         <div class="insights-grid">
             <div class="insight-card">
-                <h3>Trend</h3>
+                <h3>Tendência</h3>
                 <div class="insight-value">+99 % 📈</div>
-                <small style="color: var(--accent-green)">Increasing</small>
+                <small style="color: var(--accent-green)">Aumentando</small>
             </div>
             <div class="insight-card">
-                <h3>Top Spending</h3>
-                <div class="insight-value" id="topSpend">0 €</div>
-                <small id="topCat">Housing</small>
+                <h3>Maior Gasto</h3>
+                <div class="insight-value" id="topSpend">R$ 0</div>
+                <small id="topCat">Moradia</small>
             </div>
             <div class="insight-card">
-                <h3>Planned</h3>
-                <div class="insight-value">280 €</div>
-                <small>3 expenses</small>
+                <h3>Planejado</h3>
+                <div class="insight-value">R$ 280</div>
+                <small>3 despesas</small>
             </div>
             <div class="insight-card">
-                <h3>Saving Rate</h3>
+                <h3>Taxa Poupança</h3>
                 <div class="insight-value">20 %</div>
                 <div style="width: 100%; height: 4px; background: #333; border-radius: 2px; margin-top: 10px;">
                     <div style="width: 20%; height: 100%; background: var(--accent-blue); border-radius: 2px;"></div>
@@ -196,8 +193,8 @@
         </div>
 
         <div class="section-title">
-            Recent Transactions
-            <span>View all</span>
+            Transações Recentes
+            <span>Ver tudo</span>
         </div>
         <div class="transaction-list" id="recentList">
             </div>
@@ -218,15 +215,15 @@
                 <option value="gasto">🔴 Saída / Gasto</option>
                 <option value="ganho">🟢 Entrada / Salário</option>
             </select>
-            <input type="text" id="finDesc" placeholder="Descrição (Ex: Café, Aluguel)">
-            <input type="number" id="finValue" placeholder="Valor (€)" inputmode="decimal">
+            <input type="text" id="finDesc" placeholder="Descrição (Ex: Almoço, Aluguel)">
+            <input type="number" id="finValue" placeholder="Valor (R$)" inputmode="decimal">
             <button class="btn-save" onclick="addFinance()">Salvar Registro</button>
-            <button onclick="closeModal()" style="background:none; border:none; color:var(--text-secondary); width:100%; margin-top:15px;">Cancelar</button>
+            <button onclick="closeModal()" style="background:none; border:none; color:var(--text-secondary); width:100%; margin-top:20px; font-size: 14px;">Cancelar</button>
         </div>
     </div>
 
     <script>
-        // CONFIG FIREBASE (Sua configuração mantida)
+        // CONFIG FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyBGKDP5V75gMI7uO4gpZL6IpV3teP6J4ao",
             authDomain: "appfamilia-5ebe4.firebaseapp.com",
@@ -238,6 +235,11 @@
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
+
+        // Atualiza mês atual
+        const data = new Date();
+        const meses = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+        document.getElementById('txtData').innerText = `${meses[data.getMonth()]} ${data.getFullYear()}`;
 
         function openModal() { document.getElementById('modalLancamento').style.display = 'block'; }
         function closeModal() { document.getElementById('modalLancamento').style.display = 'none'; }
@@ -261,23 +263,22 @@
         function renderRing(allocated, budget) {
             const ctx = document.getElementById('balanceRing').getContext('2d');
             if(ringChart) ringChart.destroy();
-            const percent = (allocated / budget) * 100;
             
+            // Garante que o gráfico não quebre se o gasto for maior que o orçamento
+            const displayAllocated = Math.min(allocated, budget);
+            const remaining = Math.max(0, budget - allocated);
+
             ringChart = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
                     datasets: [{
-                        data: [allocated, budget - allocated],
-                        backgroundColor: ['#0a84ff', '#1c1c1e'],
+                        data: [displayAllocated, remaining],
+                        backgroundColor: [allocated > budget ? '#ff375f' : '#0a84ff', '#1c1c1e'],
                         borderWidth: 0,
                         borderRadius: 20
                     }]
                 },
-                options: {
-                    cutout: '85%',
-                    responsive: true,
-                    plugins: { legend: { display: false } }
-                }
+                options: { cutout: '85%', responsive: true, plugins: { legend: { display: false } } }
             });
         }
 
@@ -297,20 +298,24 @@
                         <div class="icon-box">${f.tipo === 'ganho' ? '💰' : '🛒'}</div>
                         <div class="tx-info">
                             <b>${f.descricao}</b>
-                            <small>${new Date(f.data).toLocaleDateString()}</small>
+                            <small>${new Date(f.data).toLocaleDateString('pt-BR')}</small>
                         </div>
                     </div>
                     <div class="tx-amount" style="color: ${f.tipo === 'ganho' ? 'var(--accent-green)' : 'white'}">
-                        ${f.tipo === 'ganho' ? '+' : '-'}${f.valor} €
+                        ${f.tipo === 'ganho' ? '+' : '-'}R$ ${f.valor.toLocaleString('pt-BR')}
                     </div>
                 </div>` + list.innerHTML;
             });
 
-            const budget = 5000;
-            document.getElementById('totalSaldo').innerText = `${budget - gas} €`;
-            document.getElementById('allocatedVal').innerText = `${gas} €`;
-            document.getElementById('availableVal').innerText = `${budget - gas} €`;
-            renderRing(gas, budget);
+            const orcamentoTotal = 5000;
+            const disponivel = orcamentoTotal - gas;
+            
+            document.getElementById('totalSaldo').innerText = `R$ ${disponivel.toLocaleString('pt-BR')}`;
+            document.getElementById('budgetVal').innerText = `R$ ${orcamentoTotal.toLocaleString('pt-BR')}`;
+            document.getElementById('allocatedVal').innerText = `R$ ${gas.toLocaleString('pt-BR')}`;
+            document.getElementById('availableVal').innerText = `R$ ${disponivel.toLocaleString('pt-BR')}`;
+            
+            renderRing(gas, orcamentoTotal);
         }
 
         window.onload = fetchData;
