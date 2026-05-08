@@ -13,7 +13,6 @@
         :root {
             --bg-dark: #000000; --card-bg: #1c1c1e; --text-main: #ffffff;
             --text-secondary: #8e8e93; --accent-blue: #0a84ff; --accent-green: #30d158;
-            --accent-pink: #ff375f;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -22,17 +21,18 @@
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
         .header h1 { font-size: 24px; font-weight: 600; text-transform: capitalize; }
 
-        /* WIDGETS */
+        /* WIDGET PRINCIPAL */
         .main-widget { background: radial-gradient(circle at center, #1c1c1e 0%, #000 100%); border-radius: 35px; padding: 40px 20px; text-align: center; margin-bottom: 25px; border: 1px solid #2c2c2e; }
         .ring-container { width: 220px; height: 220px; margin: 0 auto; position: relative; }
-        .balance-info { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
-        .balance-info h2 { font-size: 26px; font-weight: 700; }
+        .balance-info { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 100%; }
+        .balance-info h2 { font-size: 24px; font-weight: 700; }
+        .balance-info p { font-size: 12px; color: var(--text-secondary); margin-top: 5px; }
 
         .stats-row { display: flex; justify-content: space-around; margin-top: 30px; border-top: 1px solid #2c2c2e; padding-top: 20px; }
         .stat-item p { font-size: 11px; color: var(--text-secondary); margin-bottom: 5px; }
         .stat-item span { font-weight: 600; font-size: 13px; }
 
-        /* TRANSAÇÕES */
+        /* LISTA DE TRANSAÇÕES */
         .section-title { font-size: 18px; font-weight: 600; margin-bottom: 15px; }
         .transaction-list { display: flex; flex-direction: column; gap: 12px; }
         .transaction-item { background: #1c1c1e; padding: 18px; border-radius: 24px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #2c2c2e; }
@@ -40,12 +40,11 @@
         .icon-circle { width: 45px; height: 45px; background: #2c2c2e; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
         .tx-details b { font-size: 16px; display: block; }
         .tx-details span { font-size: 12px; color: var(--text-secondary); }
-        .tx-right { text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
-        .tx-actions { display: flex; gap: 15px; font-size: 18px; margin-top: 5px; }
+        .tx-right { text-align: right; }
+        .tx-actions { display: flex; gap: 15px; font-size: 18px; margin-top: 8px; justify-content: flex-end; }
         .action-btn { cursor: pointer; opacity: 0.6; }
-        .action-btn:active { opacity: 1; }
 
-        /* NAV BAR */
+        /* MENU INFERIOR */
         .nav-bar { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); width: 92%; background: rgba(28, 28, 30, 0.9); backdrop-filter: blur(20px); border-radius: 30px; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.1); z-index: 1000; }
         .nav-btn { color: var(--text-secondary); font-size: 24px; cursor: pointer; }
         .nav-btn.active { color: var(--text-main); }
@@ -55,10 +54,7 @@
         #modalLancamento { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 2000; padding: 40px 20px; }
         .modal-content { background: #1c1c1e; border-radius: 30px; padding: 30px; border: 1px solid #333; }
         input, select { width: 100%; padding: 16px; border-radius: 14px; border: none; background: #2c2c2e; color: white; margin-bottom: 15px; font-size: 16px; outline: none; }
-        .btn-save { background: var(--accent-blue); color: white; padding: 18px; border-radius: 16px; border: none; width: 100%; font-weight: bold; font-size: 16px; }
-
-        .view { display: none; }
-        .view.active { display: block; }
+        .btn-save { background: var(--accent-blue); color: white; padding: 18px; border-radius: 16px; border: none; width: 100%; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -68,28 +64,26 @@
         <div style="font-size: 20px;">⚙️</div>
     </div>
 
-    <div id="viewHome" class="view active">
-        <div class="main-widget">
-            <div class="ring-container">
-                <canvas id="balanceRing"></canvas>
-                <div class="balance-info">
-                    <h2 id="totalSaldo">R$ 0</h2>
-                    <p>restante</p>
-                </div>
-            </div>
-            <div class="stats-row">
-                <div class="stat-item"><p>Orçamento ></p><span id="budgetVal">R$ 5.000</span></div>
-                <div class="stat-item"><p>Gasto ></p><span id="allocatedVal">R$ 0</span></div>
-                <div class="stat-item"><p>Disponível ></p><span id="availableVal">R$ 0</span></div>
+    <div class="main-widget">
+        <div class="ring-container">
+            <canvas id="balanceRing"></canvas>
+            <div class="balance-info">
+                <h2 id="totalSaldo">R$ 0</h2>
+                <p>restante no mês</p>
             </div>
         </div>
-        
-        <div class="section-title">Histórico de Transações</div>
-        <div class="transaction-list" id="recentList"></div>
+        <div class="stats-row">
+            <div class="stat-item"><p>Orçamento ></p><span id="budgetVal">R$ 5.000</span></div>
+            <div class="stat-item"><p>Gasto ></p><span id="allocatedVal">R$ 0</span></div>
+            <div class="stat-item"><p>Disponível ></p><span id="availableVal">R$ 0</span></div>
+        </div>
     </div>
+    
+    <div class="section-title">Transações do Mês</div>
+    <div class="transaction-list" id="recentList"></div>
 
     <nav class="nav-bar">
-        <div class="nav-btn active" onclick="navTab('viewHome', this)">🏠</div>
+        <div class="nav-btn active">🏠</div>
         <div class="nav-btn">📊</div>
         <div class="add-btn" onclick="openModal()">+</div>
         <div class="nav-btn">🎯</div>
@@ -120,32 +114,89 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        function navTab(viewId, element) {
-            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-            document.getElementById(viewId).classList.add('active');
-            fetchData();
+        let ringChart;
+
+        // INICIALIZAÇÃO E LISTENER REAL-TIME
+        window.onload = () => {
+            // "on" garante que qualquer mudança no banco atualize o gráfico na hora
+            db.ref("financas").on('value', (snap) => {
+                updateDashboard(snap);
+            });
+        };
+
+        function updateDashboard(snap) {
+            const currentMonth = new Date().toISOString().substring(0, 7);
+            let gan = 0, gas = 0;
+            const list = document.getElementById('recentList');
+            list.innerHTML = '';
+
+            snap.forEach(c => {
+                const f = c.val();
+                if (f.mes === currentMonth || !f.mes) {
+                    if (f.tipo === 'ganho') gan += f.valor; else gas += f.valor;
+                    
+                    list.innerHTML = `
+                    <div class="transaction-item">
+                        <div class="tx-left">
+                            <div class="icon-circle">${f.tipo==='ganho'?'💰':'🛒'}</div>
+                            <div class="tx-details"><b>${f.descricao}</b><span>${new Date(f.data).toLocaleDateString()}</span></div>
+                        </div>
+                        <div class="tx-right">
+                            <b style="color:${f.tipo==='ganho'?'#30d158':'#fff'}">R$ ${f.valor.toFixed(2)}</b>
+                            <div class="tx-actions">
+                                <span class="action-btn" onclick="editFin('${c.key}')">✏️</span>
+                                <span class="action-btn" onclick="deleteFin('${c.key}')">🗑️</span>
+                            </div>
+                        </div>
+                    </div>` + list.innerHTML;
+                }
+            });
+
+            const orcamento = 5000;
+            const saldoFinal = orcamento - gas;
+            
+            document.getElementById('totalSaldo').innerText = `R$ ${saldoFinal.toFixed(2)}`;
+            document.getElementById('allocatedVal').innerText = `R$ ${gas.toFixed(2)}`;
+            document.getElementById('availableVal').innerText = `R$ ${saldoFinal.toFixed(2)}`;
+            
+            renderRing(gas, orcamento);
         }
 
-        function openModal(editData = null) {
-            const modal = document.getElementById('modalLancamento');
-            const title = document.getElementById('modalTitle');
-            const btn = document.getElementById('btnSave');
+        function renderRing(gas, total) {
+            const canvas = document.getElementById('balanceRing');
+            const ctx = canvas.getContext('2d');
             
+            if(ringChart) ringChart.destroy();
+            
+            ringChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    datasets: [{
+                        data: [gas, Math.max(0, total - gas)],
+                        backgroundColor: ['#0a84ff', '#1c1c1e'],
+                        borderWidth: 0,
+                        borderRadius: 20
+                    }]
+                },
+                options: { cutout: '85%', responsive: true, maintainAspectRatio: true, plugins: { legend: { display: false } } }
+            });
+        }
+
+        // CRUD FUNCTIONS
+        function openModal(editData = null) {
             if(editData) {
-                title.innerText = "Editar Registro";
-                btn.innerText = "Atualizar Dados";
+                document.getElementById('modalTitle').innerText = "Editar";
                 document.getElementById('editKey').value = editData.key;
                 document.getElementById('finType').value = editData.tipo;
                 document.getElementById('finDesc').value = editData.descricao;
                 document.getElementById('finValue').value = editData.valor;
             } else {
-                title.innerText = "Novo Registro";
-                btn.innerText = "Salvar Registro";
+                document.getElementById('modalTitle').innerText = "Novo";
                 document.getElementById('editKey').value = "";
                 document.getElementById('finDesc').value = "";
                 document.getElementById('finValue').value = "";
             }
-            modal.style.display = 'block';
+            document.getElementById('modalLancamento').style.display = 'block';
         }
 
         function closeModal() { document.getElementById('modalLancamento').style.display = 'none'; }
@@ -156,85 +207,28 @@
             const desc = document.getElementById('finDesc').value;
             const val = parseFloat(document.getElementById('finValue').value) || 0;
 
-            if(!desc || val <= 0) return alert("Preencha corretamente!");
+            if(!desc || val <= 0) return alert("Dados inválidos");
 
-            const dataObj = {
+            const data = {
                 tipo: type, descricao: desc, valor: val,
                 data: firebase.database.ServerValue.TIMESTAMP,
                 mes: new Date().toISOString().substring(0, 7)
             };
 
-            if(key) {
-                await db.ref("financas").child(key).update(dataObj);
-            } else {
-                await db.ref("financas").push(dataObj);
-            }
+            if(key) await db.ref("financas").child(key).update(data);
+            else await db.ref("financas").push(data);
             
             closeModal();
-            fetchData();
         }
 
         async function deleteFin(key) {
-            if(confirm("Tem certeza que deseja excluir permanentemente?")) {
-                await db.ref("financas").child(key).remove();
-                fetchData();
-            }
+            if(confirm("Excluir?")) await db.ref("financas").child(key).remove();
         }
 
         async function editFin(key) {
             const snap = await db.ref("financas").child(key).once('value');
-            openModal({key: key, ...snap.val()});
+            openModal({key, ...snap.val()});
         }
-
-        let ringChart;
-        function renderRing(allocated, budget) {
-            const ctx = document.getElementById('balanceRing').getContext('2d');
-            if(ringChart) ringChart.destroy();
-            ringChart = new Chart(ctx, {
-                type: 'doughnut',
-                data: { datasets: [{ data: [allocated, Math.max(0, budget - allocated)], backgroundColor: ['#0a84ff', '#1c1c1e'], borderWidth: 0, borderRadius: 20 }] },
-                options: { cutout: '85%', responsive: true, plugins: { legend: { display: false } } }
-            });
-        }
-
-        async function fetchData() {
-            const snap = await db.ref("financas").orderByChild("data").once('value');
-            let gan = 0, gas = 0;
-            const list = document.getElementById('recentList');
-            list.innerHTML = '';
-
-            snap.forEach(c => {
-                const f = c.val();
-                const key = c.key;
-                if(f.tipo === 'ganho') gan += f.valor; else gas += f.valor;
-                
-                list.innerHTML = `
-                <div class="transaction-item">
-                    <div class="tx-left">
-                        <div class="icon-circle">${f.tipo==='ganho'?'💰':'🛒'}</div>
-                        <div class="tx-details">
-                            <b>${f.descricao}</b>
-                            <span>${new Date(f.data).toLocaleDateString()}</span>
-                        </div>
-                    </div>
-                    <div class="tx-right">
-                        <b style="color:${f.tipo==='ganho'?'#30d158':'#fff'}">R$ ${f.valor}</b>
-                        <div class="tx-actions">
-                            <span class="action-btn" onclick="editFin('${key}')">✏️</span>
-                            <span class="action-btn" onclick="deleteFin('${key}')">🗑️</span>
-                        </div>
-                    </div>
-                </div>` + list.innerHTML;
-            });
-
-            const total = 5000;
-            document.getElementById('totalSaldo').innerText = `R$ ${total - gas}`;
-            document.getElementById('allocatedVal').innerText = `R$ ${gas}`;
-            document.getElementById('availableVal').innerText = `R$ ${total - gas}`;
-            renderRing(gas, total);
-        }
-
-        window.onload = fetchData;
     </script>
 </body>
 </html>
