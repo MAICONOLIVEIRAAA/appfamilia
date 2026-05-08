@@ -17,34 +17,24 @@
             --text-secondary: #8e8e93;
             --accent-blue: #0a84ff;
             --accent-green: #30d158;
-            --accent-orange: #ff9f0a;
             --accent-pink: #ff375f;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         
         body { 
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif; 
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif; 
             background-color: var(--bg-dark); 
             color: var(--text-main); 
             padding: 20px;
-            padding-bottom: 100px;
+            padding-bottom: 110px;
         }
 
-        /* HEADER */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            padding-top: 10px;
-        }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
         .header h1 { font-size: 24px; font-weight: 600; text-transform: capitalize; }
-        .header .settings-icon { font-size: 20px; opacity: 0.7; }
 
-        /* WIDGET PRINCIPAL (RING CHART) */
+        /* WIDGETS */
         .main-widget {
-            position: relative;
             background: radial-gradient(circle at center, #1c1c1e 0%, #000 100%);
             border-radius: 35px;
             padding: 40px 20px;
@@ -53,105 +43,53 @@
             border: 1px solid #2c2c2e;
         }
         .ring-container { width: 220px; height: 220px; margin: 0 auto; position: relative; }
-        .balance-info {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
-        .balance-info h2 { font-size: 28px; font-weight: 700; white-space: nowrap; }
-        .balance-info p { color: var(--text-secondary); font-size: 14px; margin-top: 4px; }
+        .balance-info { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .balance-info h2 { font-size: 26px; font-weight: 700; }
 
-        .stats-row {
-            display: flex;
-            justify-content: space-around;
-            margin-top: 30px;
-            border-top: 1px solid #2c2c2e;
-            padding-top: 20px;
-        }
-        .stat-item p { font-size: 12px; color: var(--text-secondary); margin-bottom: 5px; }
-        .stat-item span { font-weight: 600; font-size: 14px; }
+        .stats-row { display: flex; justify-content: space-around; margin-top: 30px; border-top: 1px solid #2c2c2e; padding-top: 20px; }
+        .stat-item p { font-size: 11px; color: var(--text-secondary); margin-bottom: 5px; }
+        .stat-item span { font-weight: 600; font-size: 13px; }
 
-        /* GRID DE INSIGHTS */
-        .insights-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-        .insight-card {
-            background: var(--card-bg);
-            border-radius: 24px;
-            padding: 20px;
-            height: 160px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-        .insight-card h3 { font-size: 12px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
-        .insight-value { font-size: 20px; font-weight: 700; margin-top: 5px; }
+        .insights-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 30px; }
+        .insight-card { background: var(--card-bg); border-radius: 24px; padding: 20px; height: 160px; display: flex; flex-direction: column; justify-content: space-between; }
+        .insight-card h3 { font-size: 11px; color: var(--text-secondary); text-transform: uppercase; }
 
-        /* TRANSAÇÕES RECENTES */
-        .section-title { font-size: 18px; font-weight: 600; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
-        .section-title span { color: var(--accent-blue); font-size: 14px; }
+        .section-title { font-size: 18px; font-weight: 600; margin-bottom: 15px; }
 
         .transaction-list { display: flex; flex-direction: column; gap: 12px; }
-        .transaction-item {
-            background: #1c1c1e;
-            padding: 15px;
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .icon-box { width: 40px; height: 40px; background: #2c2c2e; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-right: 15px; }
-        .tx-info b { font-size: 15px; display: block; }
-        .tx-info small { color: var(--text-secondary); font-size: 12px; }
-        .tx-amount { font-weight: 700; font-size: 15px; }
+        .transaction-item { background: #1c1c1e; padding: 15px; border-radius: 20px; display: flex; justify-content: space-between; align-items: center; }
 
-        /* MENU INFERIOR */
+        /* MENU INFERIOR FUNCIONAL */
         .nav-bar {
-            position: fixed;
-            bottom: 25px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 92%;
-            background: rgba(28, 28, 30, 0.85);
-            backdrop-filter: blur(20px);
-            border-radius: 30px;
-            padding: 15px 25px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border: 1px solid rgba(255,255,255,0.1);
-            z-index: 1000;
+            position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%);
+            width: 92%; background: rgba(28, 28, 30, 0.9); backdrop-filter: blur(20px);
+            border-radius: 30px; padding: 15px 20px; display: flex; justify-content: space-between;
+            align-items: center; border: 1px solid rgba(255,255,255,0.1); z-index: 1000;
         }
-        .nav-btn { color: var(--text-secondary); font-size: 22px; cursor: pointer; }
-        .nav-btn.active { color: var(--text-main); }
-        .add-btn { background: white; color: black; width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: bold; margin-top: -45px; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+        .nav-btn { color: var(--text-secondary); font-size: 24px; cursor: pointer; transition: 0.3s; padding: 10px; }
+        .nav-btn.active { color: var(--text-main); transform: scale(1.1); }
+        .add-btn { background: white; color: black; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; margin-top: -50px; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
 
         /* MODAL */
-        #modalLancamento {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.95);
-            z-index: 2000;
-            padding: 40px 20px;
-        }
-        .modal-content { background: #1c1c1e; border-radius: 30px; padding: 30px; border: 1px solid #333; }
+        #modalLancamento { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 2000; padding: 40px 20px; }
+        .modal-content { background: #1c1c1e; border-radius: 30px; padding: 30px; }
         input, select { width: 100%; padding: 16px; border-radius: 14px; border: none; background: #2c2c2e; color: white; margin-bottom: 15px; font-size: 16px; outline: none; }
-        .btn-save { background: var(--accent-blue); color: white; padding: 18px; border-radius: 16px; border: none; width: 100%; font-weight: bold; font-size: 16px; }
+        .btn-save { background: var(--accent-blue); color: white; padding: 18px; border-radius: 16px; border: none; width: 100%; font-weight: bold; }
+
+        /* VIEW SYSTEM */
+        .view { display: none; }
+        .view.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
 
     <div class="header">
         <h1 id="txtData">Maio 2026</h1>
-        <div class="settings-icon">⚙️</div>
+        <div style="font-size: 20px;">⚙️</div>
     </div>
 
-    <div id="viewHome">
+    <div id="viewHome" class="view active">
         <div class="main-widget">
             <div class="ring-container">
                 <canvas id="balanceRing"></canvas>
@@ -166,59 +104,32 @@
                 <div class="stat-item"><p>Disponível ></p><span id="availableVal">R$ 0</span></div>
             </div>
         </div>
-
         <div class="insights-grid">
-            <div class="insight-card">
-                <h3>Tendência</h3>
-                <div class="insight-value">+99 % 📈</div>
-                <small style="color: var(--accent-green)">Aumentando</small>
-            </div>
-            <div class="insight-card">
-                <h3>Maior Gasto</h3>
-                <div class="insight-value" id="topSpend">R$ 0</div>
-                <small id="topCat">Moradia</small>
-            </div>
-            <div class="insight-card">
-                <h3>Planejado</h3>
-                <div class="insight-value">R$ 280</div>
-                <small>3 despesas</small>
-            </div>
-            <div class="insight-card">
-                <h3>Taxa Poupança</h3>
-                <div class="insight-value">20 %</div>
-                <div style="width: 100%; height: 4px; background: #333; border-radius: 2px; margin-top: 10px;">
-                    <div style="width: 20%; height: 100%; background: var(--accent-blue); border-radius: 2px;"></div>
-                </div>
-            </div>
+            <div class="insight-card"><h3>Tendência</h3><div style="font-size:20px;font-weight:700;margin-top:10px;">+99% 📈</div><small style="color:var(--accent-green)">Aumentando</small></div>
+            <div class="insight-card"><h3>Poupança</h3><div style="font-size:20px;font-weight:700;margin-top:10px;">20%</div><div style="width:100%;height:4px;background:#333;margin-top:10px;"><div style="width:20%;height:100%;background:var(--accent-blue);"></div></div></div>
         </div>
+    </div>
 
-        <div class="section-title">
-            Transações Recentes
-            <span>Ver tudo</span>
-        </div>
-        <div class="transaction-list" id="recentList">
-            </div>
+    <div id="viewHistorico" class="view">
+        <div class="section-title">Transações Recentes</div>
+        <div class="transaction-list" id="recentList"></div>
     </div>
 
     <nav class="nav-bar">
-        <div class="nav-btn active">🏠</div>
-        <div class="nav-btn">📊</div>
+        <div class="nav-btn active" onclick="navTab('viewHome', this)">🏠</div>
+        <div class="nav-btn" onclick="navTab('viewHistorico', this)">📊</div>
         <div class="add-btn" onclick="openModal()">+</div>
-        <div class="nav-btn">🎯</div>
-        <div class="nav-btn">👤</div>
+        <div class="nav-btn" onclick="navTab('viewHome', this)">🎯</div>
+        <div class="nav-btn" onclick="navTab('viewHome', this)">👤</div>
     </nav>
 
     <div id="modalLancamento">
         <div class="modal-content">
             <h2 style="margin-bottom: 20px;">Novo Registro</h2>
-            <select id="finType">
-                <option value="gasto">🔴 Saída / Gasto</option>
-                <option value="ganho">🟢 Entrada / Salário</option>
-            </select>
-            <input type="text" id="finDesc" placeholder="Descrição (Ex: Almoço, Aluguel)">
-            <input type="number" id="finValue" placeholder="Valor (R$)" inputmode="decimal">
-            <button class="btn-save" onclick="addFinance()">Salvar Registro</button>
-            <button onclick="closeModal()" style="background:none; border:none; color:var(--text-secondary); width:100%; margin-top:20px; font-size: 14px;">Cancelar</button>
+            <select id="finType"><option value="gasto">🔴 Saída</option><option value="ganho">🟢 Entrada</option></select>
+            <input type="text" id="finDesc" placeholder="Descrição"><input type="number" id="finValue" placeholder="Valor R$" inputmode="decimal">
+            <button class="btn-save" onclick="addFinance()">Salvar</button>
+            <button onclick="closeModal()" style="background:none;border:none;color:var(--text-secondary);width:100%;margin-top:20px;">Cancelar</button>
         </div>
     </div>
 
@@ -236,10 +147,16 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // Atualiza mês atual
-        const data = new Date();
-        const meses = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
-        document.getElementById('txtData').innerText = `${meses[data.getMonth()]} ${data.getFullYear()}`;
+        // NAVEGAÇÃO ENTRE ABAS
+        function navTab(viewId, element) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            
+            document.getElementById(viewId).classList.add('active');
+            element.classList.add('active');
+            
+            if(viewId === 'viewHome' || viewId === 'viewHistorico') fetchData();
+        }
 
         function openModal() { document.getElementById('modalLancamento').style.display = 'block'; }
         function closeModal() { document.getElementById('modalLancamento').style.display = 'none'; }
@@ -263,58 +180,31 @@
         function renderRing(allocated, budget) {
             const ctx = document.getElementById('balanceRing').getContext('2d');
             if(ringChart) ringChart.destroy();
-            
-            // Garante que o gráfico não quebre se o gasto for maior que o orçamento
-            const displayAllocated = Math.min(allocated, budget);
-            const remaining = Math.max(0, budget - allocated);
-
             ringChart = new Chart(ctx, {
                 type: 'doughnut',
-                data: {
-                    datasets: [{
-                        data: [displayAllocated, remaining],
-                        backgroundColor: [allocated > budget ? '#ff375f' : '#0a84ff', '#1c1c1e'],
-                        borderWidth: 0,
-                        borderRadius: 20
-                    }]
-                },
+                data: { datasets: [{ data: [allocated, Math.max(0, budget - allocated)], backgroundColor: ['#0a84ff', '#1c1c1e'], borderWidth: 0, borderRadius: 20 }] },
                 options: { cutout: '85%', responsive: true, plugins: { legend: { display: false } } }
             });
         }
 
         async function fetchData() {
-            const snap = await db.ref("financas").orderByChild("data").limitToLast(10).once('value');
+            const snap = await db.ref("financas").orderByChild("data").once('value');
             let gan = 0, gas = 0;
             const list = document.getElementById('recentList');
-            list.innerHTML = '';
+            if(list) list.innerHTML = '';
 
             snap.forEach(c => {
                 const f = c.val();
                 if(f.tipo === 'ganho') gan += f.valor; else gas += f.valor;
-
-                list.innerHTML = `
-                <div class="transaction-item">
-                    <div style="display: flex; align-items: center;">
-                        <div class="icon-box">${f.tipo === 'ganho' ? '💰' : '🛒'}</div>
-                        <div class="tx-info">
-                            <b>${f.descricao}</b>
-                            <small>${new Date(f.data).toLocaleDateString('pt-BR')}</small>
-                        </div>
-                    </div>
-                    <div class="tx-amount" style="color: ${f.tipo === 'ganho' ? 'var(--accent-green)' : 'white'}">
-                        ${f.tipo === 'ganho' ? '+' : '-'}R$ ${f.valor.toLocaleString('pt-BR')}
-                    </div>
-                </div>` + list.innerHTML;
+                if(list) {
+                    list.innerHTML = `<div class="transaction-item"><div><b>${f.descricao}</b><br><small>${new Date(f.data).toLocaleDateString()}</small></div><b style="color:${f.tipo==='ganho'?'#30d158':'#fff'}">${f.tipo==='ganho'?'+':'-'} R$ ${f.valor}</b></div>` + list.innerHTML;
+                }
             });
 
             const orcamentoTotal = 5000;
-            const disponivel = orcamentoTotal - gas;
-            
-            document.getElementById('totalSaldo').innerText = `R$ ${disponivel.toLocaleString('pt-BR')}`;
-            document.getElementById('budgetVal').innerText = `R$ ${orcamentoTotal.toLocaleString('pt-BR')}`;
-            document.getElementById('allocatedVal').innerText = `R$ ${gas.toLocaleString('pt-BR')}`;
-            document.getElementById('availableVal').innerText = `R$ ${disponivel.toLocaleString('pt-BR')}`;
-            
+            document.getElementById('totalSaldo').innerText = `R$ ${orcamentoTotal - gas}`;
+            document.getElementById('allocatedVal').innerText = `R$ ${gas}`;
+            document.getElementById('availableVal').innerText = `R$ ${orcamentoTotal - gas}`;
             renderRing(gas, orcamentoTotal);
         }
 
