@@ -3,37 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Brim Racer - Pro</title>
+    <title>Brim Racer - Pay to Play</title>
     <style>
-        body { 
-            margin: 0; background: #000; overflow: hidden; 
-            font-family: sans-serif; color: white; touch-action: none;
-        }
-        canvas { display: block; }
+        :root { --nu-purple: #820ad1; --accent-blue: #0a84ff; --red: #ff375f; }
+        body { margin: 0; background: #000; overflow: hidden; font-family: sans-serif; color: white; touch-action: none; }
+        
+        /* UI de Vidas */
         #ui {
             position: absolute; top: 20px; left: 20px;
-            font-size: 24px; font-weight: bold; pointer-events: none;
-            text-shadow: 0 0 10px #0a84ff;
+            display: flex; flex-direction: column; gap: 5px;
+            font-size: 18px; font-weight: bold; pointer-events: none;
         }
-        #msg {
+        .heart { color: var(--red); font-size: 24px; }
+
+        /* Modal de Pagamento/Continue */
+        #paymentModal {
             position: absolute; top: 50%; left: 50%;
             transform: translate(-50%, -50%);
-            text-align: center; display: none;
+            background: #1c1c1e; padding: 30px; border-radius: 30px;
+            text-align: center; display: none; width: 80%; max-width: 350px;
+            border: 1px solid #333; box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            z-index: 100;
         }
-        .btn-restart {
-            margin-top: 20px; padding: 15px 30px;
-            background: #0a84ff; border: none; color: white;
-            border-radius: 30px; font-weight: bold; cursor: pointer;
+        .btn-pay {
+            display: block; width: 100%; margin-top: 20px; padding: 15px;
+            background: var(--accent-blue); border: none; color: white;
+            border-radius: 15px; font-weight: bold; font-size: 16px; cursor: pointer;
         }
+        .btn-exit { background: none; color: #8e8e93; border: none; margin-top: 15px; font-size: 14px; }
+        
+        canvas { display: block; }
     </style>
 </head>
 <body>
 
-    <div id="ui">Score: 0</div>
-    <div id="msg">
-        <h1>GAME OVER</h1>
-        <p id="finalScore"></p>
-        <button class="btn-restart" onclick="resetGame()">Tentar Novamente</button>
+    <div id="ui">
+        <div>Score: <span id="scoreVal">0</span></div>
+        <div id="livesContainer">Vidas: <span class="heart">❤️</span><span class="heart">❤️</span></div>
+    </div>
+
+    <div id="paymentModal">
+        <h2 style="color: var(--accent-blue);">FIM DE PAPO?</h2>
+        <p>Você perdeu todas as suas vidas!</p>
+        <p style="font-size: 13px; color: #8e8e93;">Compre mais 3 vidas para continuar desta pontuação.</p>
+        
+        <button class="btn-pay" onclick="simulatePayment()">COMPRAR VIDAS - R$ 1,00</button>
+        <button class="btn-exit" onclick="resetGame()">Desistir e Recomeçar</button>
     </div>
 
     <canvas id="gameCanvas"></canvas>
@@ -41,115 +56,104 @@
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
-        const ui = document.getElementById('ui');
-        const msg = document.getElementById('msg');
-        const finalScore = document.getElementById('finalScore');
+        const paymentModal = document.getElementById('paymentModal');
 
-        // Configuração de tela
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
 
-        // Estado do Jogo
         let score = 0;
+        let lives = 2; // Começa com 2 vidas
         let gameActive = true;
         let speed = 5;
+        let obstacles = [];
 
-        // Jogador (Inspirado no design C63/BMW)
-        const player = {
-            x: canvas.width / 2 - 25,
-            y: canvas.height - 120,
-            w: 50,
-            h: 90,
-            color: '#0a84ff'
-        };
+        const player = { x: canvas.width / 2 - 25, y: canvas.height - 150, w: 50, h: 90, color: '#0a84ff' };
 
-        // Obstáculos
-        const obstacles = [];
-        function createObstacle() {
-            const width = Math.random() * (canvas.width * 0.3) + 50;
-            obstacles.push({
-                x: Math.random() * (canvas.width - width),
-                y: -100,
-                w: width,
-                h: 40,
-                color: '#ff375f'
-            });
+        // Lógica de Vidas
+        function updateLivesUI() {
+            const container = document.getElementById('livesContainer');
+            container.innerHTML = 'Vidas: ' + '❤️'.repeat(lives);
+            if (lives === 0) container.innerHTML = 'Vidas: <span style="color: grey">💀</span>';
         }
 
-        // Controles Touch para o POCO X7 Pro
+        function createObstacle() {
+            const w = Math.random() * (canvas.width * 0.4) + 60;
+            obstacles.push({ x: Math.random() * (canvas.width - w), y: -100, w: w, h: 40 });
+        }
+
+        // Touch Control
         window.addEventListener('touchmove', (e) => {
             if (!gameActive) return;
-            const touchX = e.touches[0].clientX;
-            player.x = touchX - player.w / 2;
-            
-            // Limites da tela
-            if (player.x < 0) player.x = 0;
-            if (player.x > canvas.width - player.w) player.x = canvas.width - player.w;
+            player.x = e.touches[0].clientX - player.w / 2;
         });
+
+        function gameOverTrigger() {
+            if (lives > 0) {
+                lives--;
+                updateLivesUI();
+                obstacles = []; // Limpa a pista para dar chance ao player
+                speed = 5;      // Reseta a velocidade base
+            } else {
+                gameActive = false;
+                paymentModal.style.display = 'block';
+            }
+        }
+
+        // Simulação de Pagamento
+        function simulatePayment() {
+            alert("Processando pagamento via Pix...");
+            // Aqui entraria o redirecionamento para o checkout do Mercado Pago
+            setTimeout(() => {
+                lives = 3;
+                updateLivesUI();
+                paymentModal.style.display = 'none';
+                gameActive = true;
+                requestAnimationFrame(loop);
+            }, 1000);
+        }
+
+        function resetGame() {
+            score = 0; lives = 2; speed = 5; obstacles = []; gameActive = true;
+            paymentModal.style.display = 'none';
+            updateLivesUI();
+            requestAnimationFrame(loop);
+        }
 
         function update() {
             if (!gameActive) return;
-
             score++;
-            ui.innerText = `Score: ${score}`;
-            speed += 0.001; // Aumenta a dificuldade gradualmente
+            document.getElementById('scoreVal').innerText = score;
+            speed += 0.001;
 
-            // Criar obstáculos
             if (score % 60 === 0) createObstacle();
 
-            // Mover obstáculos
             for (let i = obstacles.length - 1; i >= 0; i--) {
                 const o = obstacles[i];
                 o.y += speed;
 
-                // Colisão
-                if (player.x < o.x + o.w &&
-                    player.x + player.w > o.x &&
-                    player.y < o.y + o.h &&
-                    player.y + player.h > o.y) {
-                    gameOver();
+                if (player.x < o.x + o.w && player.x + player.w > o.x &&
+                    player.y < o.y + o.h && player.y + player.h > o.y) {
+                    gameOverTrigger();
                 }
 
-                // Remover fora da tela
                 if (o.y > canvas.height) obstacles.splice(i, 1);
             }
         }
 
         function draw() {
-            // Fundo Dark
             ctx.fillStyle = '#000';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Linhas da estrada (Efeito de velocidade)
-            ctx.strokeStyle = '#1c1c1e';
-            ctx.setLineDash([20, 20]);
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.moveTo(canvas.width / 2, 0);
-            ctx.lineTo(canvas.width / 2, canvas.height);
-            ctx.stroke();
-
-            // Desenhar Jogador (Design elegante)
+            // Desenhar Jogador
             ctx.fillStyle = player.color;
-            ctx.shadowBlur = 15;
-            ctx.shadowColor = player.color;
-            ctx.beginPath();
-            ctx.roundRect(player.x, player.y, player.w, player.h, 10);
-            ctx.fill();
-            
-            // Faróis
-            ctx.fillStyle = 'white';
-            ctx.fillRect(player.x + 5, player.y, 10, 5);
-            ctx.fillRect(player.x + player.w - 15, player.y, 10, 5);
+            ctx.shadowBlur = 20; ctx.shadowColor = player.color;
+            ctx.beginPath(); ctx.roundRect(player.x, player.y, player.w, player.h, 10); ctx.fill();
 
             // Desenhar Obstáculos
-            ctx.shadowBlur = 10;
-            ctx.shadowColor = '#ff375f';
             ctx.fillStyle = '#ff375f';
+            ctx.shadowColor = '#ff375f';
             for (const o of obstacles) {
-                ctx.beginPath();
-                ctx.roundRect(o.x, o.y, o.w, o.h, 5);
-                ctx.fill();
+                ctx.beginPath(); ctx.roundRect(o.x, o.y, o.w, o.h, 5); ctx.fill();
             }
         }
 
@@ -159,31 +163,8 @@
             if (gameActive) requestAnimationFrame(loop);
         }
 
-        function gameOver() {
-            gameActive = false;
-            msg.style.display = 'block';
-            finalScore.innerText = `Sua pontuação final: ${score}`;
-        }
-
-        function resetGame() {
-            score = 0;
-            speed = 5;
-            obstacles.length = 0;
-            player.x = canvas.width / 2 - 25;
-            gameActive = true;
-            msg.style.display = 'none';
-            loop();
-        }
-
-        // Iniciar
+        updateLivesUI();
         loop();
-
-        // Redimensionamento
-        window.addEventListener('resize', () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            player.y = canvas.height - 120;
-        });
     </script>
 </body>
 </html>
