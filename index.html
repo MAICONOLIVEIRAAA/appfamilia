@@ -39,7 +39,6 @@ async function handleUserMessage() {
 }
 
 async function chamarInteligenciaArtificial(prompt) {
-    // ATUALIZADO PARA O MOTOR MAIS RECENTE E RÁPIDO (1.5 Flash)
     const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
     
     const payload = {
@@ -52,10 +51,9 @@ async function chamarInteligenciaArtificial(prompt) {
         body: JSON.stringify(payload)
     });
 
-    // SE A API NEGAR, EXTRAÍMOS O MOTIVO EXATO
     if (!resposta.ok) {
         const errorData = await resposta.json();
-        throw new Error(errorData.error.message || `HTTP Status: ${resposta.status}`);
+        throw new Error(errorData.error?.message || `HTTP Status: ${resposta.status}`);
     }
     
     const dados = await resposta.json();
@@ -80,6 +78,7 @@ function initChat() {
             const m = child.val();
             const isMe = m.user === currentUser;
             
+            // As tags HTML precisam estar intactas aqui!
             let formattedText = m.text
                 .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
                 .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
