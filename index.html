@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Brim Dev - AppFamilia Pro</title>
+    <title>Brim Dev - AppFamilia Pro v4.1</title>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -22,52 +22,50 @@
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
         .header h1 { font-size: 24px; font-weight: 600; text-transform: capitalize; }
 
-        /* WIDGET PRINCIPAL (RING) */
-        .main-widget { background: radial-gradient(circle at center, #1c1c1e 0%, #000 100%); border-radius: 35px; padding: 40px 20px; text-align: center; margin-bottom: 20px; border: 1px solid #2c2c2e; }
-        .ring-container { width: 200px; height: 200px; margin: 0 auto; position: relative; }
-        .balance-info { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 100%; }
+        /* WIDGET PRINCIPAL (DASHBOARD) */
+        .main-widget { background: radial-gradient(circle at center, #1c1c1e 0%, #000 100%); border-radius: 35px; padding: 40px 20px; text-align: center; margin-bottom: 20px; border: 1px solid #2c2c2e; min-height: 300px; }
+        .ring-container { width: 220px; height: 220px; margin: 0 auto; position: relative; }
+        .balance-info { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 100%; z-index: 10; }
         .balance-info h2 { font-size: 24px; font-weight: 700; }
         .balance-info p { font-size: 11px; color: var(--text-secondary); margin-top: 5px; }
 
-        /* INSIGHTS GRID */
+        /* INSIGHTS */
         .insights-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
         .insight-card { background: var(--card-bg); border-radius: 24px; padding: 20px; height: 150px; display: flex; flex-direction: column; justify-content: space-between; }
-        .insight-card h3 { font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
+        .insight-card h3 { font-size: 11px; color: var(--text-secondary); text-transform: uppercase; }
         .insight-value { font-size: 20px; font-weight: 700; }
 
-        /* LISTA DE METAS (PLANEJAMENTO) */
-        .section-title { font-size: 18px; font-weight: 600; margin-bottom: 15px; display: flex; justify-content: space-between; }
+        /* PLANEJAMENTO */
+        .section-title { font-size: 18px; font-weight: 600; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
         .meta-card { background: var(--card-bg); border-radius: 20px; padding: 18px; margin-bottom: 12px; }
-        .meta-header { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 14px; }
-        .progress-bar { width: 100%; height: 6px; background: #333; border-radius: 3px; overflow: hidden; }
-        .progress-fill { height: 100%; background: var(--accent-purple); transition: 0.5s; }
+        .progress-bar { width: 100%; height: 6px; background: #333; border-radius: 3px; overflow: hidden; margin: 10px 0; }
+        .progress-fill { height: 100%; background: var(--accent-purple); transition: 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
 
-        /* TRANSAÇÕES RECENTES */
         .transaction-list { display: flex; flex-direction: column; gap: 10px; }
-        .transaction-item { background: #1c1c1e; padding: 15px; border-radius: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .transaction-item { background: #1c1c1e; padding: 15px; border-radius: 20px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #222; }
 
         /* NAV BAR */
-        .nav-bar { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); width: 92%; background: rgba(28, 28, 30, 0.9); backdrop-filter: blur(20px); border-radius: 30px; padding: 15px; display: flex; justify-content: space-around; align-items: center; border: 1px solid rgba(255,255,255,0.1); z-index: 1000; }
-        .nav-btn { color: var(--text-secondary); font-size: 24px; cursor: pointer; transition: 0.3s; }
-        .nav-btn.active { color: var(--text-main); }
+        .nav-bar { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); width: 92%; background: rgba(28, 28, 30, 0.9); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-radius: 30px; padding: 15px; display: flex; justify-content: space-around; align-items: center; border: 1px solid rgba(255,255,255,0.1); z-index: 1000; }
+        .nav-btn { color: var(--text-secondary); font-size: 24px; cursor: pointer; transition: 0.2s; }
+        .nav-btn.active { color: var(--text-main); transform: scale(1.1); }
         .add-btn { background: white; color: black; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; margin-top: -50px; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
 
         /* MODAL */
         #modalGeneric { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 2000; padding: 40px 20px; }
-        .modal-content { background: #1c1c1e; border-radius: 30px; padding: 30px; }
+        .modal-content { background: #1c1c1e; border-radius: 30px; padding: 30px; border: 1px solid #333; }
         input, select { width: 100%; padding: 16px; border-radius: 14px; border: none; background: #2c2c2e; color: white; margin-bottom: 15px; font-size: 16px; outline: none; }
         .btn-save { background: var(--accent-blue); color: white; padding: 18px; border-radius: 16px; border: none; width: 100%; font-weight: bold; }
 
         .view { display: none; }
-        .view.active { display: block; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .view.active { display: block; animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
     <div class="header">
         <h1 id="txtData">Maio 2026</h1>
-        <div style="font-size: 20px;">⚙️</div>
+        <div style="font-size: 20px; opacity: 0.5;">⚙️</div>
     </div>
 
     <div id="viewHome" class="view active">
@@ -84,22 +82,22 @@
         <div class="insights-grid">
             <div class="insight-card">
                 <h3>Tendência</h3>
-                <div class="insight-value" id="trendVal">+0% 📈</div>
-                <small style="color:var(--accent-green)">Análise Real</small>
+                <div class="insight-value" id="trendVal">+0%</div>
+                <small style="color:var(--accent-green)">Análise mensal</small>
             </div>
             <div class="insight-card">
                 <h3>Taxa Poupança</h3>
                 <div class="insight-value" id="saveRate">0%</div>
-                <div class="progress-bar" style="margin-top:10px;"><div id="saveFill" class="progress-fill" style="width: 0%; background: var(--accent-blue);"></div></div>
+                <div class="progress-bar"><div id="saveFill" class="progress-fill" style="width: 0%; background: var(--accent-blue);"></div></div>
             </div>
         </div>
 
-        <div class="section-title">Transações Recentes</div>
+        <div class="section-title">Atividades</div>
         <div class="transaction-list" id="recentList"></div>
     </div>
 
     <div id="viewPlanejamento" class="view">
-        <div class="section-title">Metas e Sonhos <span onclick="openModal('meta')" style="color:var(--accent-blue); cursor:pointer;">+ Nova</span></div>
+        <div class="section-title">Metas e Sonhos <span onclick="openModal('meta')" style="color:var(--accent-blue); font-size: 14px;">+ Nova Meta</span></div>
         <div id="metaList"></div>
     </div>
 
@@ -113,17 +111,17 @@
 
     <div id="modalGeneric">
         <div class="modal-content">
-            <h2 id="modalTitle" style="margin-bottom: 20px;">Novo Registro</h2>
+            <h2 id="modalTitle" style="margin-bottom: 20px;">Adicionar</h2>
             <div id="formFinance">
                 <select id="finType"><option value="gasto">🔴 Saída</option><option value="ganho">🟢 Entrada</option></select>
                 <input type="text" id="finDesc" placeholder="Descrição"><input type="number" id="finValue" placeholder="Valor R$" inputmode="decimal">
                 <button class="btn-save" onclick="saveFinance()">Salvar</button>
             </div>
             <div id="formMeta" style="display:none;">
-                <input type="text" id="metaName" placeholder="Nome da Meta (ex: BMW GS)">
-                <input type="number" id="metaTarget" placeholder="Valor Alvo R$" inputmode="decimal">
-                <input type="number" id="metaCurrent" placeholder="Valor Atual R$" inputmode="decimal">
-                <button class="btn-save" onclick="saveMeta()">Criar Meta</button>
+                <input type="text" id="metaName" placeholder="Título (ex: BMW GS 1250)">
+                <input type="number" id="metaTarget" placeholder="Meta Final R$" inputmode="decimal">
+                <input type="number" id="metaCurrent" placeholder="Guardado R$" inputmode="decimal">
+                <button class="btn-save" onclick="saveMeta()">Criar Planejamento</button>
             </div>
             <button onclick="closeModal()" style="background:none;border:none;color:var(--text-secondary);width:100%;margin-top:20px;">Cancelar</button>
         </div>
@@ -142,30 +140,30 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
+        let ringChart = null;
+
         function navTab(viewId, element) {
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             document.getElementById(viewId).classList.add('active');
             element.classList.add('active');
             if(viewId === 'viewPlanejamento') fetchMetas();
+            // Recalcula o gráfico ao voltar para a home para garantir o render
+            if(viewId === 'viewHome') {
+                setTimeout(() => { db.ref("financas").once('value', snap => updateDashboard(snap)); }, 100);
+            }
         }
 
         function openModal(mode) {
             document.getElementById('modalGeneric').style.display = 'block';
-            if(mode === 'finance') {
-                document.getElementById('formFinance').style.display = 'block';
-                document.getElementById('formMeta').style.display = 'none';
-                document.getElementById('modalTitle').innerText = "Novo Gasto/Ganho";
-            } else {
-                document.getElementById('formFinance').style.display = 'none';
-                document.getElementById('formMeta').style.display = 'block';
-                document.getElementById('modalTitle').innerText = "Planejar Meta";
-            }
+            const isFin = mode === 'finance';
+            document.getElementById('formFinance').style.display = isFin ? 'block' : 'none';
+            document.getElementById('formMeta').style.display = isFin ? 'none' : 'block';
+            document.getElementById('modalTitle').innerText = isFin ? "Novo Registro" : "Nova Meta";
         }
 
         function closeModal() { document.getElementById('modalGeneric').style.display = 'none'; }
 
-        // --- LÓGICA FINANCEIRA ---
         async function saveFinance() {
             const type = document.getElementById('finType').value;
             const desc = document.getElementById('finDesc').value;
@@ -173,9 +171,9 @@
             if(!desc || val <= 0) return alert("Preencha corretamente!");
             await db.ref("financas").push({ tipo: type, descricao: desc, valor: val, data: firebase.database.ServerValue.TIMESTAMP });
             closeModal();
+            document.getElementById('finDesc').value = ''; document.getElementById('finValue').value = '';
         }
 
-        // --- LÓGICA DE METAS ---
         async function saveMeta() {
             const name = document.getElementById('metaName').value;
             const target = parseFloat(document.getElementById('metaTarget').value) || 0;
@@ -194,40 +192,65 @@
                 const pct = Math.min(100, (m.atual / m.alvo) * 100).toFixed(1);
                 list.innerHTML += `
                 <div class="meta-card">
-                    <div class="meta-header"><b>${m.nome}</b><span>R$ ${m.atual} / ${m.alvo}</span></div>
+                    <div style="display:flex; justify-content:space-between;"><b>${m.nome}</b><span style="font-size:12px;">R$ ${m.atual.toLocaleString()}</span></div>
                     <div class="progress-bar"><div class="progress-fill" style="width: ${pct}%"></div></div>
-                    <div style="font-size:10px; color:var(--text-secondary); margin-top:5px; text-align:right;">${pct}% concluído</div>
+                    <div style="font-size:10px; color:var(--text-secondary); text-align:right;">Alvo: R$ ${m.alvo.toLocaleString()} (${pct}%)</div>
                 </div>`;
             });
         }
 
-        let ringChart;
         function renderRing(gas, total) {
-            const ctx = document.getElementById('balanceRing').getContext('2d');
+            const canvas = document.getElementById('balanceRing');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            
             if(ringChart) ringChart.destroy();
+            
             ringChart = new Chart(ctx, {
                 type: 'doughnut',
-                data: { datasets: [{ data: [gas, Math.max(0, total - gas)], backgroundColor: ['#0a84ff', '#1c1c1e'], borderWidth: 0, borderRadius: 20 }] },
-                options: { cutout: '85%', responsive: true, plugins: { legend: { display: false } } }
+                data: { 
+                    datasets: [{ 
+                        data: [gas, Math.max(0, total - gas)], 
+                        backgroundColor: ['#0a84ff', '#1c1c1e'], 
+                        borderWidth: 0, 
+                        borderRadius: 20 
+                    }] 
+                },
+                options: { 
+                    cutout: '85%', 
+                    responsive: true, 
+                    maintainAspectRatio: true,
+                    animation: { duration: 1000, easing: 'easeOutQuart' },
+                    plugins: { legend: { display: false }, tooltip: { enabled: false } } 
+                }
             });
         }
 
-        window.onload = () => {
-            db.ref("financas").on('value', snap => {
-                let gan = 0, gas = 0;
-                const list = document.getElementById('recentList'); list.innerHTML = '';
-                snap.forEach(c => {
-                    const f = c.val();
-                    if(f.tipo === 'ganho') gan += f.valor; else gas += f.valor;
-                    list.innerHTML = `<div class="transaction-item"><b>${f.descricao}</b><b style="color:${f.tipo==='ganho'?'#30d158':'#fff'}">R$ ${f.valor}</b></div>` + list.innerHTML;
-                });
-                const total = 5000;
-                document.getElementById('totalSaldo').innerText = `R$ ${total - gas}`;
-                const savePct = gan > 0 ? Math.min(100, ((gan - gas) / gan) * 100).toFixed(0) : 0;
-                document.getElementById('saveRate').innerText = `${savePct}%`;
-                document.getElementById('saveFill').style.width = `${savePct}%`;
-                renderRing(gas, total);
+        function updateDashboard(snap) {
+            let gan = 0, gas = 0;
+            const list = document.getElementById('recentList'); 
+            if(list) list.innerHTML = '';
+            
+            snap.forEach(c => {
+                const f = c.val();
+                if(f.tipo === 'ganho') gan += f.valor; else gas += f.valor;
+                if(list) {
+                    list.innerHTML = `<div class="transaction-item"><div><b>${f.descricao}</b></div><b style="color:${f.tipo==='ganho'?'#30d158':'#fff'}">R$ ${f.valor.toLocaleString()}</b></div>` + list.innerHTML;
+                }
             });
+
+            const orcamentoTotal = 5000;
+            document.getElementById('totalSaldo').innerText = `R$ ${(orcamentoTotal - gas).toLocaleString()}`;
+            
+            const savePct = gan > 0 ? Math.min(100, ((gan - gas) / gan) * 100).toFixed(0) : 0;
+            document.getElementById('saveRate').innerText = `${savePct}%`;
+            document.getElementById('saveFill').style.width = `${savePct}%`;
+            
+            renderRing(gas, orcamentoTotal);
+        }
+
+        window.onload = () => {
+            db.ref("financas").on('value', snap => updateDashboard(snap));
         };
     </script>
 </body>
