@@ -3,167 +3,222 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Brim Racer - Sudden Death</title>
+    <title>BrimChat - Pro</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
     <style>
-        :root { --accent-blue: #0a84ff; --red: #ff375f; --bg: #000; }
-        body { margin: 0; background: var(--bg); overflow: hidden; font-family: -apple-system, sans-serif; color: white; touch-action: none; }
+        :root {
+            --bg-dark: #0b141a; /* Cor do fundo do zap */
+            --bg-panel: #111b21;
+            --bubble-me: #005c4b;
+            --bubble-other: #202c33;
+            --accent-green: #00a884;
+            --text-main: #e9edef;
+            --text-dim: #8696a0;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         
-        /* UI */
-        #ui {
-            position: absolute; top: 20px; left: 20px;
-            font-size: 20px; font-weight: bold; pointer-events: none;
+        body { 
+            font-family: -apple-system, system-ui, sans-serif; 
+            background-color: var(--bg-dark); 
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* HEADER */
+        .chat-header {
+            background-color: var(--bg-panel);
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.4);
             z-index: 10;
         }
-        .life-status { color: var(--red); margin-left: 10px; }
+        .avatar { width: 40px; height: 40px; background: #6a7175; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        .user-info b { font-size: 16px; display: block; }
+        .user-info span { font-size: 12px; color: var(--accent-green); }
 
-        /* Modal de Recarga */
-        #rechargeModal {
-            position: absolute; top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            background: #1c1c1e; padding: 30px; border-radius: 28px;
-            text-align: center; display: none; width: 85%; max-width: 380px;
-            border: 1px solid #333; box-shadow: 0 25px 50px rgba(0,0,0,0.9);
-            z-index: 100;
+        /* ÁREA DE MENSAGENS */
+        #chatWindow {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); /* Pattern do Zap */
+            background-blend-mode: overlay;
+            background-color: var(--bg-dark);
         }
-        .btn-pix {
-            display: block; width: 100%; margin-top: 25px; padding: 18px;
-            background: var(--accent-blue); border: none; color: white;
-            border-radius: 16px; font-weight: bold; font-size: 16px; cursor: pointer;
+
+        .msg {
+            max-width: 80%;
+            padding: 8px 12px;
+            border-radius: 12px;
+            font-size: 15px;
+            position: relative;
+            line-height: 1.4;
         }
-        .btn-reset { background: none; color: #666; border: none; margin-top: 20px; font-size: 14px; text-decoration: underline; }
-        
-        canvas { display: block; }
+        .msg.me {
+            align-self: flex-end;
+            background-color: var(--bubble-me);
+            border-top-right-radius: 2px;
+        }
+        .msg.other {
+            align-self: flex-start;
+            background-color: var(--bubble-other);
+            border-top-left-radius: 2px;
+        }
+        .msg-info {
+            display: flex;
+            justify-content: flex-end;
+            gap: 5px;
+            font-size: 10px;
+            color: rgba(255,255,255,0.5);
+            margin-top: 4px;
+        }
+
+        /* INPUT AREA */
+        .input-area {
+            background-color: var(--bg-panel);
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-bottom: calc(10px + env(safe-area-inset-bottom));
+        }
+        input {
+            flex: 1;
+            background-color: #2a3942;
+            border: none;
+            border-radius: 25px;
+            padding: 12px 20px;
+            color: white;
+            font-size: 15px;
+            outline: none;
+        }
+        .send-btn {
+            background-color: var(--accent-green);
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            cursor: pointer;
+        }
+
+        /* LOGIN OVERLAY */
+        #loginOverlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-dark); z-index: 100;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 20px; text-align: center;
+        }
+        .login-card { background: var(--bg-panel); padding: 30px; border-radius: 20px; width: 100%; max-width: 350px; }
+        .login-card h2 { margin-bottom: 20px; color: var(--accent-green); }
     </style>
 </head>
 <body>
 
-    <div id="ui">
-        Score: <span id="scoreVal">0</span>
-        <span id="lifeIcon" class="life-status">❤️</span>
-    </div>
-
-    <div id="rechargeModal">
-        <h2 style="font-size: 24px; margin-bottom: 10px;">Fim da Linha! 🛑</h2>
-        <p style="color: #8e8e93; font-size: 15px;">Você usou sua única chance.</p>
-        <div style="background: #2c2c2e; padding: 15px; border-radius: 15px; margin-top: 20px;">
-            <p style="margin: 0; font-size: 14px;">Deseja continuar deste Score?</p>
-            <b style="font-size: 20px; color: var(--accent-blue);">R$ 1,00</b>
+    <div id="loginOverlay">
+        <div class="login-card">
+            <h2>Bem-vindo</h2>
+            <p style="color: var(--text-dim); margin-bottom: 20px;">Como devemos te chamar?</p>
+            <input type="text" id="userName" placeholder="Seu nome..." style="margin-bottom: 20px; width: 100%;">
+            <button class="send-btn" style="width: 100%; border-radius: 10px; color: black; font-weight: bold;" onclick="login()">ENTRAR</button>
         </div>
-        
-        <button class="btn-pix" onclick="processPayment()">RECARREGAR VIA PIX</button>
-        <button class="btn-reset" onclick="resetGame()">Perder progresso e reiniciar</button>
     </div>
 
-    <canvas id="gameCanvas"></canvas>
+    <header class="chat-header">
+        <div class="avatar" id="headerAvatar">?</div>
+        <div class="user-info">
+            <b id="headerName">Grupo Brim</b>
+            <span>online</span>
+        </div>
+    </header>
+
+    <div id="chatWindow">
+        </div>
+
+    <div class="input-area">
+        <input type="text" id="msgInput" placeholder="Mensagem" onkeypress="if(event.key==='Enter') sendMsg()">
+        <button class="send-btn" onclick="sendMsg()">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="black"><path d="M1.101 21.757L23.8 12.028 1.101 2.3l.011 7.912 13.623 1.816-13.623 1.817-.011 7.912z"></path></svg>
+        </button>
+    </div>
 
     <script>
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
-        const rechargeModal = document.getElementById('rechargeModal');
+        // CONFIG FIREBASE (O seu continua o mesmo)
+        const firebaseConfig = {
+            apiKey: "AIzaSyBGKDP5V75gMI7uO4gpZL6IpV3teP6J4ao",
+            authDomain: "appfamilia-5ebe4.firebaseapp.com",
+            databaseURL: "https://appfamilia-5ebe4-default-rtdb.firebaseio.com",
+            projectId: "appfamilia-5ebe4",
+            storageBucket: "appfamilia-5ebe4.firebasestorage.app",
+            messagingSenderId: "588166444818",
+            appId: "1:588166444818:web:4dcc01e0c6d1608cbc65cb"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
 
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+        let currentUser = "";
 
-        let score = 0;
-        let lives = 1; // Sistema de Chance Única
-        let gameActive = true;
-        let speed = 5;
-        let obstacles = [];
-
-        const player = { x: canvas.width / 2 - 25, y: canvas.height - 150, w: 50, h: 90, color: '#0a84ff' };
-
-        // Controles de Toque para o POCO X7 Pro
-        window.addEventListener('touchmove', (e) => {
-            if (!gameActive) return;
-            const touchX = e.touches[0].clientX;
-            player.x = touchX - player.w / 2;
-            if (player.x < 0) player.x = 0;
-            if (player.x > canvas.width - player.w) player.x = canvas.width - player.w;
-        });
-
-        function createObstacle() {
-            const w = Math.random() * (canvas.width * 0.4) + 70;
-            obstacles.push({ x: Math.random() * (canvas.width - w), y: -100, w: w, h: 45 });
+        function login() {
+            const name = document.getElementById('userName').value.trim();
+            if(!name) return alert("Digite um nome!");
+            currentUser = name;
+            document.getElementById('loginOverlay').style.display = 'none';
+            document.getElementById('headerAvatar').innerText = currentUser.charAt(0).toUpperCase();
+            loadMessages();
         }
 
-        function onCollision() {
-            gameActive = false;
-            document.getElementById('lifeIcon').innerText = '💀';
-            rechargeModal.style.display = 'block';
+        function sendMsg() {
+            const input = document.getElementById('msgInput');
+            const text = input.value.trim();
+            if(!text) return;
+
+            db.ref("mensagens").push({
+                user: currentUser,
+                text: text,
+                time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+            });
+
+            input.value = "";
         }
 
-        // Lógica de Pagamento [Conceito para API Mercado Pago]
-        function processPayment() {
-            alert("Gerando QR Code Pix de R$ 1,00...");
+        function loadMessages() {
+            const chat = document.getElementById('chatWindow');
             
-            // Simulação de confirmação do Webhook do Firebase
-            setTimeout(() => {
-                lives = 1;
-                document.getElementById('lifeIcon').innerText = '❤️';
-                rechargeModal.style.display = 'none';
-                obstacles = []; // Limpa a pista para o reinício seguro
-                gameActive = true;
-                requestAnimationFrame(loop);
-            }, 1500);
+            // "on" para escutar em tempo real
+            db.ref("mensagens").orderByChild("timestamp").on('value', (snap) => {
+                chat.innerHTML = "";
+                snap.forEach(child => {
+                    const m = child.val();
+                    const isMe = m.user === currentUser;
+                    
+                    chat.innerHTML += `
+                        <div class="msg ${isMe ? 'me' : 'other'}">
+                            ${!isMe ? `<div style="font-size: 11px; font-weight: bold; color: var(--accent-green); margin-bottom: 3px;">${m.user}</div>` : ''}
+                            ${m.text}
+                            <div class="msg-info">
+                                <span>${m.time}</span>
+                                ${isMe ? '<span>✓✓</span>' : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+                chat.scrollTop = chat.scrollHeight; // Auto-scroll para a última mensagem
+            });
         }
-
-        function resetGame() {
-            score = 0; lives = 1; speed = 5; obstacles = []; gameActive = true;
-            document.getElementById('lifeIcon').innerText = '❤️';
-            rechargeModal.style.display = 'none';
-            requestAnimationFrame(loop);
-        }
-
-        function update() {
-            if (!gameActive) return;
-            score++;
-            document.getElementById('scoreVal').innerText = score;
-            speed += 0.001; // Dificuldade incremental
-
-            if (score % 60 === 0) createObstacle();
-
-            for (let i = obstacles.length - 1; i >= 0; i--) {
-                const o = obstacles[i];
-                o.y += speed;
-
-                // Teste de Colisão AABB
-                if (player.x < o.x + o.w && player.x + player.w > o.x &&
-                    player.y < o.y + o.h && player.y + player.h > o.y) {
-                    onCollision();
-                }
-
-                if (o.y > canvas.height) obstacles.splice(i, 1);
-            }
-        }
-
-        function draw() {
-            ctx.fillStyle = '#000';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            // Jogador (Estética Neon)
-            ctx.shadowBlur = 15; ctx.shadowColor = player.color;
-            ctx.fillStyle = player.color;
-            ctx.beginPath();
-            ctx.roundRect(player.x, player.y, player.w, player.h, 12);
-            ctx.fill();
-
-            // Obstáculos
-            ctx.shadowBlur = 10; ctx.shadowColor = '#ff375f';
-            ctx.fillStyle = '#ff375f';
-            for (const o of obstacles) {
-                ctx.beginPath();
-                ctx.roundRect(o.x, o.y, o.w, o.h, 8);
-                ctx.fill();
-            }
-        }
-
-        function loop() {
-            update();
-            draw();
-            if (gameActive) requestAnimationFrame(loop);
-        }
-
-        loop();
     </script>
 </body>
 </html>
