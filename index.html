@@ -3,113 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BrimChat Pro v2.0</title>
+    <title>BrimChat AI - v3.0</title>
     
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
 
     <style>
         :root {
             --bg-dark: #0b141a; --bg-panel: #111b21; --accent: #00a884;
-            --bubble-me: #005c4b; --bubble-other: #202c33; --text: #e9edef;
+            --bubble-me: #005c4b; --bubble-ai: #1e2a30; --text: #e9edef;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
-        body { background: var(--bg-dark); color: var(--text); height: 100vh; display: flex; overflow: hidden; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, sans-serif; }
+        body { background: var(--bg-dark); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
-        /* SIDEBAR DE CONTATOS */
-        .sidebar {
-            width: 30%; min-width: 80px; background: var(--bg-panel);
-            border-right: 1px solid #222; display: flex; flex-direction: column;
-        }
-        .contact-item {
-            padding: 15px; border-bottom: 1px solid #222; cursor: pointer;
-            display: flex; align-items: center; gap: 10px; transition: 0.2s;
-        }
-        .contact-item:hover { background: #202c33; }
-        .contact-item.active { background: #2a3942; }
-
-        /* ÁREA PRINCIPAL CHAT */
-        .main-chat { flex: 1; display: flex; flex-direction: column; position: relative; }
-        
         .chat-header {
             background: var(--bg-panel); padding: 10px 20px;
-            display: flex; justify-content: space-between; align-items: center;
+            display: flex; align-items: center; gap: 15px; border-bottom: 1px solid #222;
+        }
+        .ai-avatar {
+            width: 40px; height: 40px; background: var(--accent); border-radius: 50%;
+            display: grid; place-items: center; font-weight: bold; color: #000;
         }
 
         #chatWindow {
             flex: 1; overflow-y: auto; padding: 20px; display: flex;
-            flex-direction: column; gap: 8px; background-color: #0b141a;
+            flex-direction: column; gap: 10px;
         }
 
-        /* MENSAGENS E MÍDIA */
-        .msg { max-width: 65%; padding: 8px 12px; border-radius: 10px; position: relative; font-size: 14px; }
-        .msg.me { align-self: flex-end; background: var(--bubble-me); }
-        .msg.other { align-self: flex-start; background: var(--bubble-other); }
-        .msg img { max-width: 100%; border-radius: 8px; margin-top: 5px; cursor: pointer; }
-
-        /* INPUT AREA */
-        .input-area {
-            background: var(--bg-panel); padding: 10px; display: flex; align-items: center; gap: 10px;
-        }
-        #msgInput { flex: 1; background: #2a3942; border: none; padding: 12px; border-radius: 20px; color: white; outline: none; }
+        .msg { max-width: 80%; padding: 12px 16px; border-radius: 12px; font-size: 15px; line-height: 1.5; position: relative; }
+        .msg.me { align-self: flex-end; background: var(--bubble-me); border-top-right-radius: 2px; }
+        .msg.ai { align-self: flex-start; background: var(--bubble-ai); border-top-left-radius: 2px; border: 1px solid #333; }
         
-        .btn-icon { background: none; border: none; cursor: pointer; color: var(--text); font-size: 20px; }
-        #typing { font-size: 11px; color: var(--accent); position: absolute; bottom: 65px; left: 20px; display: none; }
+        /* Formatação de código da IA */
+        .msg pre { background: #000; padding: 10px; border-radius: 8px; overflow-x: auto; margin-top: 10px; font-family: monospace; font-size: 13px; }
+        .msg code { font-family: monospace; color: var(--accent); }
 
-        /* LOGIN */
-        #loginOverlay {
-            position: fixed; inset: 0; background: var(--bg-dark); z-index: 1000;
-            display: flex; align-items: center; justify-content: center;
-        }
+        .input-area { background: var(--bg-panel); padding: 10px; display: flex; align-items: center; gap: 10px; padding-bottom: calc(10px + env(safe-area-inset-bottom)); }
+        #msgInput { flex: 1; background: #2a3942; border: none; padding: 15px; border-radius: 25px; color: white; outline: none; font-size: 15px; }
+        .btn-send { background: var(--accent); width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; border: none; cursor: pointer; color: black; font-size: 20px; }
 
-        @media (max-width: 600px) { .sidebar { width: 80px; } .contact-name { display: none; } }
+        #aiTyping { font-size: 12px; color: var(--accent); padding: 0 20px 10px 20px; display: none; font-style: italic; }
     </style>
 </head>
 <body>
 
-    <div id="loginOverlay">
-        <div style="background: var(--bg-panel); padding: 40px; border-radius: 20px; text-align: center;">
-            <h2 style="color:var(--accent); margin-bottom: 20px;">BrimChat Pro</h2>
-            <input type="text" id="userName" placeholder="Nome do usuário..." 
-                   style="padding: 10px; width: 250px; border-radius: 5px; border: none; margin-bottom: 20px;">
-            <br>
-            <button onclick="login()" style="background: var(--accent); border: none; padding: 10px 40px; border-radius: 5px; font-weight: bold; cursor: pointer;">ENTRAR</button>
+    <header class="chat-header">
+        <div class="ai-avatar">AI</div>
+        <div>
+            <b style="font-size: 16px;">Brim Assistente</b><br>
+            <small style="color: var(--accent);">Online - Motor LLM Ativo</small>
         </div>
+    </header>
+
+    <div id="chatWindow"></div>
+    <div id="aiTyping">Brim AI está processando...</div>
+
+    <div class="input-area">
+        <input type="text" id="msgInput" placeholder="Pergunte ou peça código..." onkeypress="if(event.key==='Enter') handleUserMessage()">
+        <button class="btn-send" onclick="handleUserMessage()">➤</button>
     </div>
 
-    <aside class="sidebar">
-        <div class="contact-item active">
-            <div style="width: 40px; height: 40px; background: #6a7175; border-radius: 50%; display: grid; place-items: center;">G</div>
-            <span class="contact-name">Grupo Geral</span>
-        </div>
-        </aside>
-
-    <main class="main-chat">
-        <header class="chat-header">
-            <div>
-                <b id="headerName">Grupo Geral</b><br>
-                <small id="statusHeader" style="color: var(--accent);">online</small>
-            </div>
-            <div style="opacity: 0.6;">🔍 ⋮</div>
-        </header>
-
-        <div id="chatWindow"></div>
-        
-        <div id="typing">Alguém está digitando...</div>
-
-        <div class="input-area">
-            <label class="btn-icon">
-                📎 <input type="file" id="fileInput" style="display: none;" onchange="uploadFile(this)">
-            </label>
-            <input type="text" id="msgInput" placeholder="Mensagem" 
-                   oninput="notifyTyping()" onkeypress="if(event.key==='Enter') sendMsg()">
-            <button class="btn-icon" onclick="sendMsg()" style="color: var(--accent);">➤</button>
-        </div>
-    </main>
-
     <script>
+        // 1. SUA CHAVE DA API AQUI (Pegue gratuitamente no Google AI Studio)
+        const API_KEY = "COLOQUE_SUA_CHAVE_AQUI"; 
+        
+        // 2. CONFIG DO FIREBASE (A sua original)
         const firebaseConfig = {
             apiKey: "AIzaSyBGKDP5V75gMI7uO4gpZL6IpV3teP6J4ao",
             authDomain: "appfamilia-5ebe4.firebaseapp.com",
@@ -121,93 +80,96 @@
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-        const storage = firebase.storage();
 
-        let currentUser = "";
-        let typingTimeout;
+        const currentUser = "Pablo"; 
 
-        function login() {
-            const name = document.getElementById('userName').value.trim();
-            if(!name) return;
-            currentUser = name;
-            document.getElementById('loginOverlay').style.display = 'none';
-            initChat();
-        }
-
-        // --- ENVIAR TEXTO ---
-        function sendMsg() {
+        async function handleUserMessage() {
             const input = document.getElementById('msgInput');
-            if(!input.value.trim()) return;
+            const userText = input.value.trim();
+            if(!userText) return;
 
-            db.ref("mensagens").push({
-                user: currentUser,
-                text: input.value,
-                type: 'text',
-                time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
-                timestamp: firebase.database.ServerValue.TIMESTAMP
-            });
+            // Limpa o input
             input.value = "";
-            db.ref("status/typing").child(currentUser).remove();
+
+            // Salva a pergunta do usuário no Firebase
+            await saveMessageToDB(currentUser, userText);
+
+            // Mostra que a IA está "pensando"
+            document.getElementById('aiTyping').style.display = 'block';
+
+            try {
+                // Chama a API de Inteligência Artificial
+                const aiResponse = await chamarInteligenciaArtificial(userText);
+                
+                // Salva a resposta da IA no Firebase
+                await saveMessageToDB("Brim AI", aiResponse);
+            } catch (error) {
+                await saveMessageToDB("Brim AI", "⚠️ Erro de conexão com a API. Verifique o console.");
+                console.error(error);
+            } finally {
+                // Esconde o "digitando..."
+                document.getElementById('aiTyping').style.display = 'none';
+            }
         }
 
-        // --- ENVIAR MÍDIA (FOTO) ---
-        async function uploadFile(input) {
-            const file = input.files[0];
-            if(!file) return;
+        // FUNÇÃO QUE SE COMUNICA COM O LLM (Neste caso, Gemini REST API)
+        async function chamarInteligenciaArtificial(prompt) {
+            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`;
+            
+            // Payload de configuração da IA (Você pode mudar o "system prompt" aqui)
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }]
+            };
 
-            const ref = storage.ref(`chats/${Date.now()}_${file.name}`);
-            const uploadTask = await ref.put(file);
-            const url = await uploadTask.ref.getDownloadURL();
+            const resposta = await fetch(endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
 
-            db.ref("mensagens").push({
-                user: currentUser,
-                fileUrl: url,
-                type: 'image',
+            if (!resposta.ok) throw new Error("Falha na API");
+            
+            const dados = await resposta.json();
+            return dados.candidates[0].content.parts[0].text;
+        }
+
+        async function saveMessageToDB(user, text) {
+            await db.ref("chat_inteligente").push({
+                user: user,
+                text: text,
                 time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
                 timestamp: firebase.database.ServerValue.TIMESTAMP
             });
         }
 
-        // --- STATUS DIGITANDO ---
-        function notifyTyping() {
-            db.ref("status/typing").child(currentUser).set(true);
-            clearTimeout(typingTimeout);
-            typingTimeout = setTimeout(() => {
-                db.ref("status/typing").child(currentUser).remove();
-            }, 2000);
-        }
-
+        // CARREGA E RENDERIZA AS MENSAGENS EM TEMPO REAL
         function initChat() {
             const chat = document.getElementById('chatWindow');
-            const typingDiv = document.getElementById('typing');
 
-            // Ouvir Mensagens
-            db.ref("mensagens").orderByChild("timestamp").on('value', snap => {
+            db.ref("chat_inteligente").orderByChild("timestamp").on('value', snap => {
                 chat.innerHTML = "";
                 snap.forEach(child => {
                     const m = child.val();
                     const isMe = m.user === currentUser;
                     
-                    let content = m.type === 'text' ? m.text : `<img src="${m.fileUrl}" onclick="window.open('${m.fileUrl}')">`;
+                    // Tratamento básico para exibir blocos de código (Markdown) no chat
+                    let formattedText = m.text
+                        .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>') // Formata blocos de código
+                        .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>') // Formata negrito
+                        .replace(/\n/g, '<br>'); // Formata quebras de linha
 
                     chat.innerHTML += `
-                        <div class="msg ${isMe ? 'me' : 'other'}">
-                            <b style="font-size:10px; color:var(--accent);">${isMe ? '' : m.user}</b><br>
-                            ${content}
-                            <div style="font-size:9px; text-align:right; opacity:0.5; margin-top:4px;">${m.time}</div>
+                        <div class="msg ${isMe ? 'me' : 'ai'}">
+                            ${formattedText}
+                            <div style="font-size:9px; text-align:right; opacity:0.5; margin-top:6px;">${m.time}</div>
                         </div>
                     `;
                 });
-                chat.scrollTop = chat.scrollHeight;
-            });
-
-            // Ouvir quem está digitando
-            db.ref("status/typing").on('value', snap => {
-                const typers = snap.val() ? Object.keys(snap.val()).filter(u => u !== currentUser) : [];
-                typingDiv.style.display = typers.length > 0 ? 'block' : 'none';
-                typingDiv.innerText = typers.length === 1 ? `${typers[0]} está digitando...` : 'Várias pessoas digitando...';
+                chat.scrollTop = chat.scrollHeight; // Rola pra baixo
             });
         }
+
+        window.onload = initChat;
     </script>
 </body>
 </html>
