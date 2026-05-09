@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BrimChat AI - Debug Mode</title>
+    <title>BrimChat AI - Versão Final</title>
     
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -14,7 +14,7 @@
             --bubble-me: #005c4b; --bubble-ai: #1e2a30; --text: #e9edef;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, sans-serif; }
         body { background: var(--bg-dark); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
         .chat-header { background: var(--bg-panel); padding: 15px 20px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid #222; }
@@ -26,9 +26,13 @@
         .msg.me { align-self: flex-end; background: var(--bubble-me); border-top-right-radius: 2px; }
         .msg.ai { align-self: flex-start; background: var(--bubble-ai); border-top-left-radius: 2px; border: 1px solid #333; }
         
-        .input-area { background: var(--bg-panel); padding: 10px; display: flex; align-items: center; gap: 10px; }
+        /* Estilo para blocos de código gerados pela IA */
+        .msg pre { background: #000; padding: 12px; border-radius: 8px; overflow-x: auto; margin-top: 10px; font-family: monospace; font-size: 13px; border: 1px solid #333; }
+        .msg code { font-family: monospace; color: var(--accent); }
+
+        .input-area { background: var(--bg-panel); padding: 10px; display: flex; align-items: center; gap: 10px; padding-bottom: calc(10px + env(safe-area-inset-bottom)); }
         #msgInput { flex: 1; background: #2a3942; border: none; padding: 15px; border-radius: 25px; color: white; outline: none; font-size: 15px; }
-        .btn-send { background: var(--accent); width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; border: none; cursor: pointer; font-size: 20px; }
+        .btn-send { background: var(--accent); width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; border: none; cursor: pointer; font-size: 20px; color: black; }
 
         #aiTyping { font-size: 12px; color: var(--accent); padding: 0 20px 10px 20px; display: none; font-style: italic; }
     </style>
@@ -38,25 +42,26 @@
     <header class="chat-header">
         <div class="ai-avatar">AI</div>
         <div>
-            <b style="font-size: 16px;">Brim Assistente (Debug)</b><br>
-            <small style="color: var(--accent);">Sala: chat_teste_api</small>
+            <b style="font-size: 16px;">Brim Assistente</b><br>
+            <small style="color: var(--accent);">Online - Gemini Pro Ativo</small>
         </div>
     </header>
 
     <div id="chatWindow"></div>
-    <div id="aiTyping">Processando na nuvem...</div>
+    <div id="aiTyping">Brim AI está processando...</div>
 
     <div class="input-area">
-        <input type="text" id="msgInput" placeholder="Digite 'Oi' para testar..." onkeypress="if(event.key==='Enter') handleUserMessage()">
+        <input type="text" id="msgInput" placeholder="Faça uma pergunta..." onkeypress="if(event.key==='Enter') handleUserMessage()">
         <button class="btn-send" onclick="handleUserMessage()">➤</button>
     </div>
 
     <script>
-        console.log("🚀 Javascript carregado com sucesso!");
+        console.log("🚀 Sistema inicializado.");
 
-        // 1. CHAVE E FIREBASE
+        // 1. CHAVE DA API
         const API_KEY = "AIzaSyBIBCta_wFjw1dPMs-ZZSGB4D0JA4k2PzM"; 
         
+        // 2. CONFIG DO FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyBGKDP5V75gMI7uO4gpZL6IpV3teP6J4ao",
             authDomain: "appfamilia-5ebe4.firebaseapp.com",
@@ -70,13 +75,12 @@
         const db = firebase.database();
         const currentUser = "Pablo"; 
 
-        // 2. ENVIO DE MENSAGEM
+        // 3. FLUXO DE MENSAGEM
         async function handleUserMessage() {
             const input = document.getElementById('msgInput');
             const userText = input.value.trim();
             if(!userText) return;
 
-            console.log("Mensagem do usuário:", userText);
             input.value = "";
             await saveMessageToDB(currentUser, userText);
 
@@ -84,7 +88,6 @@
 
             try {
                 const aiResponse = await chamarInteligenciaArtificial(userText);
-                console.log("Resposta da IA recebida!");
                 await saveMessageToDB("Brim AI", aiResponse);
             } catch (error) {
                 console.error("❌ ERRO NA API:", error);
@@ -94,9 +97,9 @@
             }
         }
 
-        // 3. COMUNICAÇÃO COM O GOOGLE
+        // 4. CHAMADA AO GEMINI PRO
         async function chamarInteligenciaArtificial(prompt) {
-            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`;
             const payload = { contents: [{ parts: [{ text: prompt }] }] };
 
             const resposta = await fetch(endpoint, {
@@ -114,9 +117,8 @@
             return dados.candidates[0].content.parts[0].text;
         }
 
-        // 4. SALVAR NO FIREBASE
+        // 5. SALVAR NO FIREBASE
         async function saveMessageToDB(user, text) {
-            // MUDANÇA AQUI: Criamos um nó novo para evitar o erro antigo salvo!
             await db.ref("chat_teste_api").push({
                 user: user,
                 text: text,
@@ -125,21 +127,29 @@
             });
         }
 
-        // 5. CARREGAR MENSAGENS
+        // 6. RENDERIZAR CHAT COM FORMATAÇÃO
         function initChat() {
             const chat = document.getElementById('chatWindow');
 
-            // MUDANÇA AQUI: Escutando o nó novo!
             db.ref("chat_teste_api").orderByChild("timestamp").on('value', snap => {
                 chat.innerHTML = "";
                 snap.forEach(child => {
                     const m = child.val();
                     const isMe = m.user === currentUser;
                     
+                    // Formatação simples para negrito, blocos de código e quebras de linha
+                    let formattedText = m.text;
+                    if (!isMe) {
+                        formattedText = formattedText
+                            .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
+                            .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
+                            .replace(/\n/g, '<br>');
+                    }
+
                     chat.innerHTML += `
                         <div class="msg ${isMe ? 'me' : 'ai'}">
                             <b>${m.user}</b><br>
-                            ${m.text.replace(/\n/g, '<br>')}
+                            ${formattedText}
                             <div style="font-size:9px; text-align:right; opacity:0.5; margin-top:6px;">${m.time}</div>
                         </div>
                     `;
