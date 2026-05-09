@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Brim Dev - AppFamilia Pro v4.2</title>
+    <title>Brim Dev - AppFamilia Pro v4.3</title>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -19,39 +19,33 @@
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         body { font-family: -apple-system, system-ui, sans-serif; background-color: var(--bg-dark); color: var(--text-main); padding: 20px; padding-bottom: 120px; }
 
-        /* HEADER */
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
         .header h1 { font-size: 24px; font-weight: 600; }
 
-        /* WIDGET DASHBOARD */
+        /* DASHBOARD */
         .main-widget { background: radial-gradient(circle at center, #1c1c1e 0%, #000 100%); border-radius: 35px; padding: 30px 20px; text-align: center; margin-bottom: 20px; border: 1px solid #2c2c2e; }
-        
-        /* Container fixo para o Canvas não colapsar */
         .ring-container { width: 220px; height: 220px; margin: 0 auto; position: relative; }
-        #balanceRing { width: 100% !important; height: 100% !important; }
-
         .balance-info { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 100%; pointer-events: none; }
         .balance-info h2 { font-size: 22px; font-weight: 700; }
         .balance-info p { font-size: 11px; color: var(--text-secondary); margin-top: 5px; }
 
-        /* INSIGHTS */
-        .insights-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
-        .insight-card { background: var(--card-bg); border-radius: 24px; padding: 20px; height: 140px; display: flex; flex-direction: column; justify-content: space-between; }
-        .insight-value { font-size: 20px; font-weight: 700; }
+        .stats-row { display: flex; justify-content: space-around; margin-top: 30px; border-top: 1px solid #2c2c2e; padding-top: 20px; }
+        .stat-item p { font-size: 11px; color: var(--text-secondary); margin-bottom: 5px; }
+        .stat-item span { font-weight: 600; font-size: 13px; }
 
-        /* PLANEJAMENTO */
+        /* LISTAS */
         .meta-card { background: var(--card-bg); border-radius: 20px; padding: 18px; margin-bottom: 12px; }
         .progress-bar { width: 100%; height: 6px; background: #333; border-radius: 3px; overflow: hidden; margin: 10px 0; }
         .progress-fill { height: 100%; background: var(--accent-purple); transition: 1s ease-in-out; }
-
         .transaction-item { background: #1c1c1e; padding: 15px; border-radius: 20px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; border: 1px solid #222; }
 
-        /* NAV BAR */
+        /* NAV */
         .nav-bar { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); width: 92%; background: rgba(28, 28, 30, 0.95); backdrop-filter: blur(20px); border-radius: 30px; padding: 15px; display: flex; justify-content: space-around; align-items: center; border: 1px solid rgba(255,255,255,0.1); z-index: 1000; }
         .nav-btn { color: var(--text-secondary); font-size: 24px; cursor: pointer; }
         .nav-btn.active { color: var(--text-main); }
         .add-btn { background: white; color: black; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; margin-top: -50px; }
 
+        /* MODAIS */
         #modalGeneric { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 2000; padding: 40px 20px; }
         .modal-content { background: #1c1c1e; border-radius: 30px; padding: 30px; border: 1px solid #333; }
         input, select { width: 100%; padding: 16px; border-radius: 14px; border: none; background: #2c2c2e; color: white; margin-bottom: 15px; font-size: 16px; outline: none; }
@@ -64,8 +58,8 @@
 <body>
 
     <header class="header">
-        <h1>Maio 2026</h1>
-        <div style="font-size: 20px; opacity: 0.3;">⚙️</div>
+        <h1 id="headerTitle">Dashboard</h1>
+        <div onclick="configOrcamento()" style="font-size: 20px; cursor: pointer;">⚙️</div>
     </header>
 
     <div id="viewHome" class="view active">
@@ -74,32 +68,23 @@
                 <canvas id="balanceRing"></canvas>
                 <div class="balance-info">
                     <h2 id="totalSaldo">R$ 0</h2>
-                    <p>restante no mês</p>
+                    <p>disponível</p>
                 </div>
             </div>
-        </div>
-
-        <div class="insights-grid">
-            <div class="insight-card">
-                <h3>Tendência</h3>
-                <div class="insight-value" id="trendVal">R$ 0</div>
-                <small style="color:var(--accent-green)">Gasto Total</small>
-            </div>
-            <div class="insight-card">
-                <h3>Poupança</h3>
-                <div class="insight-value" id="saveRate">0%</div>
-                <div class="progress-bar"><div id="saveFill" class="progress-fill" style="width: 0%; background: var(--accent-blue);"></div></div>
+            <div class="stats-row">
+                <div class="stat-item" onclick="configOrcamento()"><p>Orçamento ></p><span id="budgetVal">R$ 0</span></div>
+                <div class="stat-item"><p>Gasto ></p><span id="allocatedVal">R$ 0</span></div>
             </div>
         </div>
 
-        <div style="margin-bottom:15px; font-weight:600;">Atividades Recentes</div>
+        <div style="margin-bottom:15px; font-weight:600;">Atividades</div>
         <div id="recentList"></div>
     </div>
 
     <div id="viewPlanejamento" class="view">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
             <h2>Metas</h2>
-            <span onclick="openModal('meta')" style="color:var(--accent-blue); font-weight:600;">+ Adicionar</span>
+            <span onclick="openModal('meta')" style="color:var(--accent-blue); font-weight:600;">+ Nova</span>
         </div>
         <div id="metaList"></div>
     </div>
@@ -117,11 +102,11 @@
             <h2 id="modalTitle" style="margin-bottom:20px;">Adicionar</h2>
             <div id="formFinance">
                 <select id="finType"><option value="gasto">🔴 Saída</option><option value="ganho">🟢 Entrada</option></select>
-                <input type="text" id="finDesc" placeholder="Ex: Mercado"><input type="number" id="finValue" placeholder="R$" inputmode="decimal">
+                <input type="text" id="finDesc" placeholder="Descrição"><input type="number" id="finValue" placeholder="Valor R$" inputmode="decimal">
                 <button class="btn-save" onclick="saveFinance()">Confirmar</button>
             </div>
             <div id="formMeta" style="display:none;">
-                <input type="text" id="metaName" placeholder="Título (ex: BMW GS)"><input type="number" id="metaTarget" placeholder="Meta R$"><input type="number" id="metaCurrent" placeholder="Já tenho R$">
+                <input type="text" id="metaName" placeholder="Meta"><input type="number" id="metaTarget" placeholder="Alvo R$"><input type="number" id="metaCurrent" placeholder="Já tenho R$">
                 <button class="btn-save" onclick="saveMeta()">Criar Meta</button>
             </div>
             <button onclick="closeModal()" style="background:none;border:none;color:var(--text-secondary);width:100%;margin-top:20px;">Fechar</button>
@@ -142,37 +127,76 @@
         const db = firebase.database();
 
         let myChart = null;
+        let globalOrcamento = 0;
 
-        // INICIALIZA O GRÁFICO UMA ÚNICA VEZ
         function initChart() {
-            const ctx = document.getElementById('balanceRing').getContext('2d');
+            const canvas = document.getElementById('balanceRing');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
             myChart = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
                     datasets: [{
                         data: [0, 100],
                         backgroundColor: ['#0a84ff', '#1c1c1e'],
-                        borderWidth: 0,
-                        borderRadius: 20
+                        borderWidth: 0, borderRadius: 20
                     }]
                 },
                 options: {
-                    cutout: '85%',
-                    responsive: true,
-                    maintainAspectRatio: false,
+                    cutout: '85%', responsive: true, maintainAspectRatio: false,
                     plugins: { legend: { display: false }, tooltip: { enabled: false } }
                 }
             });
         }
 
-        // ATUALIZA OS DADOS DO GRÁFICO (SEM DESTRUIR)
-        function updateChart(gas, total) {
-            if(!myChart) return;
-            const remaining = Math.max(0, total - gas);
-            myChart.data.datasets[0].data = [gas, remaining];
-            myChart.update(); // Método nativo para atualizar visualmente
+        // NOVO: Configura o orçamento no banco de dados
+        async function configOrcamento() {
+            const novo = prompt("Qual o seu orçamento mensal (R$)?", globalOrcamento);
+            if (novo !== null) {
+                const valor = parseFloat(novo);
+                if (!isNaN(valor)) {
+                    await db.ref("config/orcamento").set(valor);
+                }
+            }
         }
 
+        function syncData() {
+            // Escuta o orçamento
+            db.ref("config/orcamento").on('value', snap => {
+                globalOrcamento = snap.val() || 0;
+                document.getElementById('budgetVal').innerText = `R$ ${globalOrcamento.toLocaleString()}`;
+                // Força atualização do dashboard após ler o orçamento
+                db.ref("financas").once('value', snapFin => updateDashboard(snapFin));
+            });
+
+            // Escuta as finanças
+            db.ref("financas").on('value', snap => updateDashboard(snap));
+        }
+
+        function updateDashboard(snap) {
+            let gas = 0;
+            const list = document.getElementById('recentList');
+            if (list) list.innerHTML = '';
+            
+            snap.forEach(c => {
+                const f = c.val();
+                if (f.tipo === 'gasto') gas += f.valor;
+                if (list) {
+                    list.innerHTML = `<div class="transaction-item"><b>${f.descricao}</b><span>R$ ${f.valor.toLocaleString()}</span></div>` + list.innerHTML;
+                }
+            });
+
+            const disponivel = globalOrcamento - gas;
+            document.getElementById('totalSaldo').innerText = `R$ ${disponivel.toLocaleString()}`;
+            document.getElementById('allocatedVal').innerText = `R$ ${gas.toLocaleString()}`;
+
+            if (myChart && globalOrcamento > 0) {
+                myChart.data.datasets[0].data = [gas, Math.max(0, globalOrcamento - gas)];
+                myChart.update();
+            }
+        }
+
+        // Funções de UI
         function navTab(viewId, element) {
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -224,26 +248,8 @@
         }
 
         window.onload = () => {
-            initChart(); // Cria o objeto gráfico ao carregar a página
-            
-            db.ref("financas").on('value', snap => {
-                let gan = 0, gas = 0;
-                const list = document.getElementById('recentList'); list.innerHTML = '';
-                snap.forEach(c => {
-                    const f = c.val();
-                    if(f.tipo === 'ganho') gan += f.valor; else gas += f.valor;
-                    list.innerHTML = `<div class="transaction-item"><b>${f.descricao}</b><span>R$ ${f.valor}</span></div>` + list.innerHTML;
-                });
-                
-                const orcamentoTotal = 5000;
-                document.getElementById('totalSaldo').innerText = `R$ ${orcamentoTotal - gas}`;
-                document.getElementById('trendVal').innerText = `R$ ${gas}`;
-                const savePct = gan > 0 ? Math.min(100, ((gan - gas) / gan) * 100).toFixed(0) : 0;
-                document.getElementById('saveRate').innerText = `${savePct}%`;
-                document.getElementById('saveFill').style.width = `${savePct}%`;
-                
-                updateChart(gas, orcamentoTotal); // Apenas atualiza os valores
-            });
+            initChart();
+            syncData();
         };
     </script>
 </body>
