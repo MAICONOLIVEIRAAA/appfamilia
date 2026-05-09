@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BrimChat AI - Versão Final</title>
+    <title>BrimChat AI - Teste Limpo</title>
     
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -26,7 +26,6 @@
         .msg.me { align-self: flex-end; background: var(--bubble-me); border-top-right-radius: 2px; }
         .msg.ai { align-self: flex-start; background: var(--bubble-ai); border-top-left-radius: 2px; border: 1px solid #333; }
         
-        /* Estilo para blocos de código gerados pela IA */
         .msg pre { background: #000; padding: 12px; border-radius: 8px; overflow-x: auto; margin-top: 10px; font-family: monospace; font-size: 13px; border: 1px solid #333; }
         .msg code { font-family: monospace; color: var(--accent); }
 
@@ -43,7 +42,7 @@
         <div class="ai-avatar">AI</div>
         <div>
             <b style="font-size: 16px;">Brim Assistente</b><br>
-            <small style="color: var(--accent);">Online - Gemini Pro Ativo</small>
+            <small style="color: #ff375f; font-weight: bold;">⚠️ SALA ZERADA - Gemini Pro</small>
         </div>
     </header>
 
@@ -51,13 +50,11 @@
     <div id="aiTyping">Brim AI está processando...</div>
 
     <div class="input-area">
-        <input type="text" id="msgInput" placeholder="Faça uma pergunta..." onkeypress="if(event.key==='Enter') handleUserMessage()">
+        <input type="text" id="msgInput" placeholder="Faça uma nova pergunta..." onkeypress="if(event.key==='Enter') handleUserMessage()">
         <button class="btn-send" onclick="handleUserMessage()">➤</button>
     </div>
 
     <script>
-        console.log("🚀 Sistema inicializado.");
-
         // 1. CHAVE DA API
         const API_KEY = "AIzaSyBIBCta_wFjw1dPMs-ZZSGB4D0JA4k2PzM"; 
         
@@ -75,7 +72,6 @@
         const db = firebase.database();
         const currentUser = "Pablo"; 
 
-        // 3. FLUXO DE MENSAGEM
         async function handleUserMessage() {
             const input = document.getElementById('msgInput');
             const userText = input.value.trim();
@@ -91,13 +87,12 @@
                 await saveMessageToDB("Brim AI", aiResponse);
             } catch (error) {
                 console.error("❌ ERRO NA API:", error);
-                await saveMessageToDB("Brim AI", `⚠️ Erro Técnico: ${error.message}`);
+                await saveMessageToDB("Brim AI", `⚠️ NOVO ERRO: ${error.message}`);
             } finally {
                 document.getElementById('aiTyping').style.display = 'none';
             }
         }
 
-        // 4. CHAMADA AO GEMINI PRO
         async function chamarInteligenciaArtificial(prompt) {
             const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`;
             const payload = { contents: [{ parts: [{ text: prompt }] }] };
@@ -117,9 +112,9 @@
             return dados.candidates[0].content.parts[0].text;
         }
 
-        // 5. SALVAR NO FIREBASE
         async function saveMessageToDB(user, text) {
-            await db.ref("chat_teste_api").push({
+            // MUDANÇA: Nó completamente novo no Firebase!
+            await db.ref("chat_brim_zerado").push({
                 user: user,
                 text: text,
                 time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
@@ -127,17 +122,16 @@
             });
         }
 
-        // 6. RENDERIZAR CHAT COM FORMATAÇÃO
         function initChat() {
             const chat = document.getElementById('chatWindow');
 
-            db.ref("chat_teste_api").orderByChild("timestamp").on('value', snap => {
+            // MUDANÇA: Lendo do nó novo!
+            db.ref("chat_brim_zerado").orderByChild("timestamp").on('value', snap => {
                 chat.innerHTML = "";
                 snap.forEach(child => {
                     const m = child.val();
                     const isMe = m.user === currentUser;
                     
-                    // Formatação simples para negrito, blocos de código e quebras de linha
                     let formattedText = m.text;
                     if (!isMe) {
                         formattedText = formattedText
