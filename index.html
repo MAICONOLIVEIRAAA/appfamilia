@@ -3,9 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
     <title>BrimBot IA</title>
-
     <style>
         :root {
             --bg-main: #000;
@@ -144,16 +142,14 @@
 
     <div class="header">
         <h1>BrimBot</h1>
-        <span>🟢 Gemini 1.5 Flash</span>
+        <span>🟢 Gemini Pro Ativo</span>
     </div>
 
     <div id="chat-container">
-
         <div class="bubble ai-bubble">
             Sistema iniciado com sucesso 🚀<br>
             Pode mandar sua pergunta.
         </div>
-
     </div>
 
     <div id="loadingIndicator" class="loading">
@@ -167,28 +163,21 @@
             placeholder="Digite sua pergunta..."
             onkeypress="if(event.key==='Enter') sendPrompt()"
         >
-
-        <button id="sendBtn" onclick="sendPrompt()">
-            ➤
-        </button>
+        <button id="sendBtn" onclick="sendPrompt()">➤</button>
     </div>
 
 <script>
-
     /*
     ==========================================
     IMPORTANTE
     ==========================================
-
     NÃO deixe sua chave pública em produção.
-
-    O ideal é:
-    Frontend -> Backend -> Gemini API
-
+    O ideal é: Frontend -> Backend -> Gemini API
     ==========================================
     */
 
-    const API_KEY = "SUA_API_KEY_AQUI";
+    // Chave de API atualizada
+    const API_KEY = "AIzaSyDnNMxi15-nSjHbJIUB0AgHXU9LDv4wZPA";
 
     const chatContainer = document.getElementById('chat-container');
     const userInput = document.getElementById('userInput');
@@ -199,9 +188,7 @@
     let history = [];
 
     async function sendPrompt(){
-
         const text = userInput.value.trim();
-
         if(!text) return;
 
         appendMessage(text, 'user-bubble');
@@ -212,45 +199,31 @@
         });
 
         userInput.value = '';
-
         sendBtn.disabled = true;
-
         loadingIndicator.style.display = 'block';
-
         chatContainer.scrollTop = chatContainer.scrollHeight;
 
         try{
-
-            // MODELO NOVO
-            const url =
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+            // Motor alterado para gemini-pro para evitar o erro v1beta
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`;
 
             const response = await fetch(url, {
-
                 method: 'POST',
-
                 headers:{
                     'Content-Type':'application/json'
                 },
-
                 body: JSON.stringify({
-
                     contents: history,
-
                     generationConfig:{
                         temperature:0.8,
                         maxOutputTokens:800
                     }
-
                 })
-
             });
 
             // erro API
             if(!response.ok){
-
                 const errorData = await response.json();
-
                 throw new Error(
                     errorData.error?.message ||
                     'Erro desconhecido da API'
@@ -258,7 +231,6 @@
             }
 
             const data = await response.json();
-
             console.log(data);
 
             // proteção contra respostas vazias
@@ -276,40 +248,29 @@
 
         }
         catch(error){
-
             console.error(error);
-
             appendMessage(
                 `❌ Erro: ${escapeHtml(error.message)}`,
                 'ai-bubble'
             );
         }
         finally{
-
             sendBtn.disabled = false;
-
             loadingIndicator.style.display = 'none';
-
             userInput.focus();
-
             chatContainer.scrollTop = chatContainer.scrollHeight;
         }
     }
 
     // ESCAPE XSS
     function escapeHtml(text){
-
         const div = document.createElement('div');
-
         div.innerText = text;
-
         return div.innerHTML;
     }
 
     function appendMessage(text, className){
-
         const div = document.createElement('div');
-
         div.className = `bubble ${className}`;
 
         // segurança anti XSS
@@ -317,30 +278,23 @@
 
         // markdown básico
         safeText = safeText
-
             // bloco código
             .replace(
                 /```([\s\S]*?)```/g,
                 '<pre><code>$1</code></pre>'
             )
-
             // negrito
             .replace(
                 /\*\*(.*?)\*\*/g,
                 '<b>$1</b>'
             )
-
             // quebra linha
             .replace(/\n/g, '<br>');
 
         div.innerHTML = safeText;
-
         chatContainer.appendChild(div);
-
         chatContainer.scrollTop = chatContainer.scrollHeight;
     }
-
 </script>
-
 </body>
 </html>
