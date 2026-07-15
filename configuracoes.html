@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel PRO - MeuPad</title>
+    <style>
+        body, html { 
+            margin: 0; padding: 0; font-family: sans-serif; 
+            background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%); 
+            color: #333;
+            min-height: 100vh;
+        }
+        
+        /* Barra Superior - Estilo Liquid Glass */
+        .topbar {
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(255, 255, 255, 0.35);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px); 
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+            border-radius: 50px;
+            height: 60px; 
+            padding: 0 30px;
+            margin: 20px; 
+        }
+
+        .logo { font-size: 20px; font-weight: bold; }
+        .menu { display: flex; gap: 15px; align-items: center; }
+        .user-info { font-size: 14px; color: #444; font-weight: bold; }
+        
+        .btn-logout { 
+            background: rgba(255, 255, 255, 0.5); 
+            border: 1px solid rgba(255, 255, 255, 0.6); 
+            padding: 6px 15px; 
+            border-radius: 20px; 
+            cursor: pointer; 
+            font-weight: bold;
+            color: #333;
+            transition: all 0.2s ease;
+        }
+        .btn-logout:hover { background: rgba(255, 255, 255, 0.8); color: #dc3545; }
+
+        /* Container Principal */
+        .dashboard-container {
+            max-width: 1000px; margin: 10px auto 30px auto; padding: 25px; 
+            background: rgba(255, 255, 255, 0.9); 
+            border-radius: 16px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+        }
+
+        /* Navegação do Calendário */
+        .calendar-header {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #eee;
+        }
+        .calendar-nav {
+            display: flex; align-items: center; gap: 15px; background: #f8f9fa; padding: 8px 15px; border-radius: 30px; border: 1px solid #ddd;
+        }
+        .nav-arrow {
+            background: none; border: none; font-size: 18px; cursor: pointer; color: #555; font-weight: bold; padding: 0 5px;
+        }
+        .nav-arrow:hover { color: #28a745; }
+        .current-date { font-weight: bold; font-size: 16px; min-width: 150px; text-align: center; }
+
+        /* Caixa de Vincular Link */
+        .vincular-box {
+            display: flex; gap: 10px; margin-bottom: 20px; background: #fdfdfd; padding: 15px; border-radius: 12px; border: 1px solid #eee;
+        }
+        .vincular-box input {
+            flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 8px; outline: none;
+        }
+        .vincular-box input:focus { border-color: #28a745; }
+
+        /* Tabelas */
+        table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background-color: rgba(248, 249, 250, 0.5); color: #555; font-size: 14px; border-radius: 8px; }
+        td { font-size: 14px; }
+        
+        .status-badge {
+            padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: bold;
+        }
+        .badge-locked { background: #ffeeba; color: #856404; }
+        .badge-open { background: #d4edda; color: #155724; }
+
+        /* Botões de Ação */
+        .btn-small {
+            padding: 6px 12px; font-size: 12px; border: none; border-radius: 20px; cursor: pointer; color: white; font-weight: bold;
+        }
+        .btn-edit { background: #007bff; }
+        .btn-delete { background: #dc3545; }
+        .btn-acao { background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 30px; cursor: pointer; font-weight: bold; }
+
+        /* Modal de Senha */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); justify-content: center; align-items: center; z-index: 999;
+        }
+        .modal-content {
+            background: white; padding: 30px; border-radius: 16px; text-align: center; width: 90%; max-width: 400px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        .close-btn { float: right; font-size: 20px; font-weight: bold; cursor: pointer; color: #888; }
+        .form-group { margin-bottom: 15px; text-align: left; margin-top: 20px;}
+        .form-group label { display: block; margin-bottom: 5px; color: #333; font-weight: bold; }
+        .form-group input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; outline: none; }
+    </style>
+</head>
+<body>
+
+    <div class="topbar">
+        <div class="logo">MeuPad <span style="color: #ffaa00; font-size: 14px;">PRO</span></div>
+        <div class="menu">
+            <span class="user-info" id="email-usuario">Carregando...</span>
+            <button class="btn-logout" onclick="fazerLogout()">Sair</button>
+        </div>
+    </div>
+
+    <div class="dashboard-container">
+        
+        <div class="calendar-header">
+            <h2>Meus Links e Arquivos</h2>
+            <div class="calendar-nav">
+                <button class="nav-arrow" onclick="mudarDia(-1)">&#9664;</button>
+                <span class="current-date" id="display-data"></span>
+                <button class="nav-arrow" onclick="mudarDia(1)">&#9654;</button>
+            </div>
+        </div>
+
+        <div class="vincular-box">
+            <input type="text" id="input-vincular" placeholder="Qual link você quer proteger? Ex: projeto-secreto">
+            <button class="btn-acao" onclick="vincularLink()">Adicionar ao Painel</button>
+        </div>
+
+        <h3>Links Protegidos</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>URL do Pad</th>
+                    <th>Status</th>
+                    <th>Última Atualização</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="tabela-pads-body">
+                <tr><td colspan="4" style="text-align: center;">Carregando seus links...</td></tr>
+            </tbody>
+        </table>
+
+        <h3>Arquivos Hospedados (Max 500MB)</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nome do Arquivo</th>
+                    <th>Tamanho</th>
+                    <th>Link Associado</th>
+                    <th>Expira em</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td colspan="5" style="text-align: center; color: #888;">Nenhum arquivo enviado ainda.</td></tr>
+            </tbody>
+        </table>
+
+    </div>
+
+    <div class="modal-overlay" id="modalSenha">
+        <div class="modal-content">
+            <span class="close-btn" onclick="fecharModalSenha()">&times;</span>
+            <h2>Proteger Link</h2>
+            <p style="font-size: 14px; color: #666;">Defina uma senha para <strong id="nome-link-modal">...</strong></p>
+            
+            <form onsubmit="salvarSenha(event)">
+                <div class="form-group">
+                    <label>Nova Senha</label>
+                    <input type="password" id="input-nova-senha" required placeholder="Digite a senha">
+                </div>
+                <button type="submit" class="btn-acao" style="width: 100%; margin-top: 10px;">Salvar Senha</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script>
+        /* --- Configuração Supabase --- */
+        const supabaseUrl = 'https://fcrgbdkiqnqtgmzevarh.supabase.co';
+        const supabaseKey = 'sb_publishable_epnSTe_H_mCleZdgyl_AYw_8xGgRueS'; 
+        const clienteSupabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        let usuarioAtual = null;
+
+        /* --- Lógica de Sessão e Auth --- */
+        async function verificarSessao() {
+            const { data: { session } } = await clienteSupabase.auth.getSession();
+            
+            // Se não tiver sessão (não estiver logado), expulsa para a home
+            if (!session) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            usuarioAtual = session.user;
+            document.getElementById('email-usuario').innerText = usuarioAtual.email;
+            
+            // Agora que sabemos quem é, carregamos os links dele
+            carregarMeusPads();
+        }
+
+        async function fazerLogout() {
+            await clienteSupabase.auth.signOut();
+            window.location.href = 'index.html';
+        }
+
+        /* --- Lógica de Banco de Dados (Pads) --- */
+        async function carregarMeusPads() {
+            const tbody = document.getElementById('tabela-pads-body');
+            
+            // Busca os pads onde o dono é o usuário logado
+            const { data, error } = await clienteSupabase
+                .from('pads')
+                .select('*')
+                .eq('owner_id', usuarioAtual.id)
+                .order('updated_at', { ascending: false });
+
+            if (error) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: red;">Erro ao carregar dados.</td></tr>';
+                return;
+            }
+
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">Você ainda não tem links protegidos. Use a barra acima para adicionar.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = ''; // Limpa a tabela
+            
+            data.forEach(pad => {
+                const tr = document.createElement('tr');
+                
+                const statusHtml = pad.password_hash 
+                    ? '<span class="status-badge badge-locked">Com Senha</span>'
+                    : '<span class="status-badge badge-open">Sem Senha</span>';
+
+                const dataAtualizacao = new Date(pad.updated_at).toLocaleString('pt-BR');
+                const btnTexto = pad.password_hash ? 'Mudar Senha' : 'Adicionar Senha';
+
+                tr.innerHTML = `
+                    <td>/${pad.slug}</td>
+                    <td>${statusHtml}</td>
+                    <td>${dataAtualizacao}</td>
+                    <td>
+                        <button class="btn-small btn-edit" onclick="abrirModalSenha('${pad.slug}')">${btnTexto}</button>
+                        <button class="btn-small btn-delete" onclick="desvincularPad('${pad.id}')">Remover</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function vincularLink() {
+            let slug = document.getElementById('input-vincular').value.trim();
+            // Tira barras ou espaços que o usuário possa digitar errado
+            slug = slug.replace('/', '').replace(' ', '-'); 
+
+            if(!slug) return alert('Digite o nome do link primeiro!');
+
+            // Salva ou atualiza o Pad colocando o ID do usuário como dono
+            const { error } = await clienteSupabase
+                .from('pads')
+                .upsert({ slug: slug, owner_id: usuarioAtual.id }, { onConflict: 'slug' });
+
+            if(error) {
+                alert('Erro ao vincular link: ' + error.message);
+            } else {
+                document.getElementById('input-vincular').value = ''; // limpa o input
+                carregarMeusPads(); // recarrega a tabela
+            }
+        }
+
+        async function desvincularPad(padId) {
+            if(confirm("Tem certeza? O texto não será apagado da internet, ele apenas deixará de pertencer a você.")){
+                const { error } = await clienteSupabase
+                    .from('pads')
+                    .update({ owner_id: null, password_hash: null })
+                    .eq('id', padId);
+                
+                if(!error) carregarMeusPads();
+            }
+        }
+
+        /* --- Lógica do Modal de Senha (Visual) --- */
+        let linkSelecionado = '';
+
+        function abrirModalSenha(nomeDoLink) {
+            linkSelecionado = nomeDoLink;
+            document.getElementById('nome-link-modal').innerText = '/' + linkSelecionado;
+            document.getElementById('modalSenha').style.display = 'flex';
+        }
+
+        function fecharModalSenha() {
+            document.getElementById('modalSenha').style.display = 'none';
+            document.getElementById('input-nova-senha').value = ''; 
+        }
+
+        function salvarSenha(event) {
+            event.preventDefault();
+            // Por enquanto é só um alerta, no futuro enviaremos a senha pro banco
+            alert(`Senha capturada para o link /${linkSelecionado}! Em breve conectaremos ao banco.`);
+            fecharModalSenha();
+        }
+
+        /* --- Lógica do Calendário (Estático) --- */
+        let dataAtual = new Date(); 
+        function atualizarDisplayData() {
+            document.getElementById('display-data').innerText = dataAtual.toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' });
+        }
+        function mudarDia(dias) {
+            dataAtual.setDate(dataAtual.getDate() + dias);
+            atualizarDisplayData();
+        }
+        atualizarDisplayData();
+
+        // Inicia a checagem principal quando a página carrega
+        verificarSessao();
+    </script>
+
+</body>
+</html>
