@@ -9,10 +9,13 @@
             margin: 0; padding: 0; font-family: sans-serif; 
             background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%); 
             color: #333; height: 100vh; overflow: hidden; 
+            display: flex;
+            flex-direction: column;
         }
         
         /* Barra Superior - Estilo Liquid Glass */
         .topbar {
+            flex-shrink: 0;
             display: flex; justify-content: space-between; align-items: center;
             background: rgba(255, 255, 255, 0.35);
             backdrop-filter: blur(12px);
@@ -52,9 +55,63 @@
         }
         .btn-pro:hover { background: #e69900; transform: translateY(-2px); }
 
+        /* Barra de Upload PRO (Aparece apenas para usuários logados) */
+        .upload-pro-container {
+            display: none; /* Controlado via JavaScript */
+            margin: 0 20px 15px 20px;
+            flex-shrink: 0;
+        }
+        .upload-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
+            border-radius: 30px;
+            padding: 8px 25px;
+        }
+        .upload-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: bold;
+            color: #444;
+        }
+        .upload-card input[type="file"] {
+            flex: 1;
+            padding: 6px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.4);
+            outline: none;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .btn-upload-home {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(40, 167, 绿, 0.2);
+        }
+        .btn-upload-home:hover {
+            background: #218838;
+            transform: translateY(-1px);
+        }
+
         /* Área do Texto */
         .pad-area { 
-            height: calc(100vh - 120px); 
+            flex-grow: 1;
             padding: 0 20px 20px 20px; 
             box-sizing: border-box; 
         }
@@ -131,6 +188,17 @@
         <div class="menu">
             <button class="btn-login" onclick="abrirModalLogin()">Login</button>
             <button class="btn-pro" onclick="abrirModalPro()">Seja PRO</button>
+        </div>
+    </div>
+
+    <div class="upload-pro-container" id="upload-pro-container">
+        <div class="upload-card">
+            <div class="upload-info">
+                <span>📁</span>
+                <span id="status-upload-home" style="color: #444;">Upload PRO:</span>
+            </div>
+            <input type="file" id="input-arquivo-home">
+            <button class="btn-upload-home" onclick="fazerUploadHome()" id="btn-upload-home">Enviar e Linkar</button>
         </div>
     </div>
 
@@ -214,9 +282,104 @@
         const textarea = document.getElementById('texto-pad');
         let padSlug = window.location.hash.substring(1) || 'padrao'; 
         let timeout;
+        let usuarioAtual = null;
 
         /* ==========================================
-           LÓGICA DO BLOCO DE NOTAS (AUTO-SAVE & CARREGAMENTO)
+           SESSÃO E CONTROLE DE ACESSO (VERIFICA SE É PRO)
+           ========================================== */
+        async function verificarSessaoHome() {
+            const { data: { session } } = await clienteSupabase.auth.getSession();
+            const btnLogin = document.querySelector('.btn-login');
+            const uploadContainer = document.getElementById('upload-pro-container');
+
+            if (session) {
+                usuarioAtual = session.user;
+                // Transforma o botão "Login" em um atalho para o Painel Administrativo
+                btnLogin.innerText = 'Meu Painel';
+                btnLogin.onclick = () => { window.location.href = 'configuracoes.html'; };
+                
+                // Mostra a barra de upload PRO
+                uploadContainer.style.display = 'block';
+            } else {
+                usuarioAtual = null;
+                btnLogin.innerText = 'Login';
+                btnLogin.onclick = abrirModalLogin;
+                
+                // Oculta a barra de upload para usuários anônimos
+                uploadContainer.style.display = 'none';
+            }
+        }
+
+        /* ==========================================
+           LÓGICA DE UPLOAD EM HOME (EXCLUSIVO PRO)
+           ========================================== */
+        async function fazerUploadHome() {
+            const input = document.getElementById('input-arquivo-home');
+            const statusLabel = document.getElementById('status-upload-home');
+            const botaoUpload = document.getElementById('btn-upload-home');
+
+            if (!usuarioAtual) return alert('Você precisa estar logado para enviar arquivos!');
+            if (input.files.length === 0) return alert('Selecione um arquivo primeiro!');
+            
+            const arquivo = input.files[0];
+
+            if (arquivo.size > 50 * 1024 * 1024) {
+                return alert('O limite no plano gratuito é de 50MB por arquivo.');
+            }
+
+            statusLabel.innerText = "Enviando... ⏳";
+            statusLabel.style.color = "#ffaa00";
+            botaoUpload.disabled = true;
+
+            // Limpa acentos, espaços e caracteres especiais
+            const nomeLimpo = arquivo.name
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "")
+                .replace(/[^a-zA-Z0-9.]/g, "_");
+
+            const caminhoArquivo = `${usuarioAtual.id}/${Date.now()}_${nomeLimpo}`;
+
+            const { data, error } = await clienteSupabase.storage
+                .from('arquivos-pro')
+                .upload(caminhoArquivo, arquivo);
+
+            if (error) {
+                statusLabel.innerText = "Erro ❌";
+                statusLabel.style.color = "red";
+                alert('Erro: ' + error.message);
+            } else {
+                statusLabel.innerText = "Sucesso! ✅";
+                statusLabel.style.color = "#28a745";
+                
+                // Descobre a URL pública do arquivo
+                const { data: publicUrlData } = clienteSupabase.storage
+                    .from('arquivos-pro')
+                    .getPublicUrl(caminhoArquivo);
+                
+                const urlPublica = publicUrlData.publicUrl;
+                
+                // Insere o link na posição do cursor do bloco de notas
+                const posicaoCursor = textarea.selectionStart;
+                const textoAnterior = textarea.value;
+                const linkTexto = `\n[Download: ${nomeLimpo} - ${urlPublica}]\n`;
+                
+                textarea.value = textoAnterior.substring(0, posicaoCursor) + linkTexto + textoAnterior.substring(posicaoCursor);
+                
+                // Dispara o salvamento do bloco de notas com o novo link colado
+                salvarPad();
+                input.value = ''; 
+
+                setTimeout(() => {
+                    statusLabel.innerText = "Upload PRO:";
+                    statusLabel.style.color = "#444";
+                }, 3000);
+            }
+            
+            botaoUpload.disabled = false;
+        }
+
+        /* ==========================================
+           AUTO-SAVE & CARREGAMENTO DO TEXTO
            ========================================== */
         async function carregarPad() {
             textarea.placeholder = "Carregando...";
@@ -300,9 +463,6 @@
             }
         }
 
-        /* ==========================================
-           AUTENTICAÇÃO REAL COM SUPABASE
-           ========================================== */
         async function fazerLogin(event) {
             event.preventDefault(); 
             const email = document.getElementById('email').value;
@@ -334,8 +494,9 @@
             btnSubmit.disabled = false;
         }
 
-        // Inicializa o Pad correspondente ao hash da URL
+        // Inicialização dupla: Carrega o Pad correspondente e checa se o usuário é PRO
         carregarPad();
+        verificarSessaoHome();
     </script>
 </body>
 </html>
