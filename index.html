@@ -6,23 +6,55 @@
     <title>Painel PRO - MeuPad</title>
     <style>
         body, html { 
-            margin: 0; padding: 0; font-family: sans-serif; background-color: #f4f4f9; color: #333;
+            margin: 0; padding: 0; font-family: sans-serif; 
+            /* Fundo com leve gradiente para destacar o efeito de vidro */
+            background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%); 
+            color: #333;
+            min-height: 100vh;
         }
         
-        /* Barra Superior */
+        /* Barra Superior - Estilo Liquid Glass */
         .topbar {
             display: flex; justify-content: space-between; align-items: center;
-            background-color: #ffffff; height: 60px; padding: 0 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            
+            /* Efeito Glassmorphism */
+            background: rgba(255, 255, 255, 0.35);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px); /* Suporte para Safari */
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+            
+            /* Bordas bem arredondadas e formato flutuante */
+            border-radius: 50px;
+            height: 60px; 
+            padding: 0 30px;
+            margin: 20px; /* Espaço ao redor para flutuar */
         }
+
         .logo { font-size: 20px; font-weight: bold; }
         .menu { display: flex; gap: 15px; align-items: center; }
-        .user-info { font-size: 14px; color: #555; }
-        .btn-logout { background: transparent; border: 1px solid #ddd; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
+        .user-info { font-size: 14px; color: #444; font-weight: 500; }
+        
+        /* Botão Sair adaptado para combinar com o vidro */
+        .btn-logout { 
+            background: rgba(255, 255, 255, 0.5); 
+            border: 1px solid rgba(255, 255, 255, 0.6); 
+            padding: 6px 15px; 
+            border-radius: 20px; 
+            cursor: pointer; 
+            font-weight: bold;
+            color: #333;
+            transition: all 0.2s ease;
+        }
+        .btn-logout:hover { background: rgba(255, 255, 255, 0.8); }
 
         /* Container Principal */
         .dashboard-container {
-            max-width: 1000px; margin: 30px auto; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            max-width: 1000px; margin: 10px auto 30px auto; padding: 25px; 
+            background: rgba(255, 255, 255, 0.9); /* Leve transparência no painel também */
+            border-radius: 16px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            border: 1px solid rgba(255, 255, 255, 0.6);
         }
 
         /* Navegação do Calendário */
@@ -30,7 +62,7 @@
             display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #eee;
         }
         .calendar-nav {
-            display: flex; align-items: center; gap: 15px; background: #f8f9fa; padding: 8px 15px; border-radius: 20px; border: 1px solid #ddd;
+            display: flex; align-items: center; gap: 15px; background: #f8f9fa; padding: 8px 15px; border-radius: 30px; border: 1px solid #ddd;
         }
         .nav-arrow {
             background: none; border: none; font-size: 18px; cursor: pointer; color: #555; font-weight: bold; padding: 0 5px;
@@ -41,7 +73,7 @@
         /* Tabelas */
         table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
         th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #eee; }
-        th { background-color: #f8f9fa; color: #555; font-size: 14px; }
+        th { background-color: rgba(248, 249, 250, 0.5); color: #555; font-size: 14px; border-radius: 8px; }
         td { font-size: 14px; }
         
         .status-badge {
@@ -52,7 +84,7 @@
 
         /* Botões de Ação */
         .btn-small {
-            padding: 5px 10px; font-size: 12px; border: none; border-radius: 4px; cursor: pointer; color: white;
+            padding: 5px 12px; font-size: 12px; border: none; border-radius: 20px; cursor: pointer; color: white; font-weight: bold;
         }
         .btn-edit { background: #007bff; }
         .btn-delete { background: #dc3545; }
@@ -60,18 +92,20 @@
         /* Modal de Senha */
         .modal-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); justify-content: center; align-items: center;
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); justify-content: center; align-items: center; z-index: 999;
         }
         .modal-content {
-            background: white; padding: 30px; border-radius: 8px; text-align: center; width: 90%; max-width: 400px;
+            background: white; padding: 30px; border-radius: 16px; text-align: center; width: 90%; max-width: 400px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
         }
         .close-btn { float: right; font-size: 20px; font-weight: bold; cursor: pointer; color: #888; }
         .btn-acao {
-            background: #28a745; color: white; border: none; padding: 10px; width: 100%; border-radius: 4px; cursor: pointer; font-size: 16px; font-weight: bold; margin-top: 15px;
+            background: #28a745; color: white; border: none; padding: 12px; width: 100%; border-radius: 30px; cursor: pointer; font-size: 16px; font-weight: bold; margin-top: 15px;
         }
         .form-group { margin-bottom: 15px; text-align: left; }
-        .form-group label { display: block; margin-bottom: 5px; color: #333; }
-        .form-group input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        .form-group label { display: block; margin-bottom: 5px; color: #333; font-weight: bold; }
+        .form-group input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; outline: none; }
+        .form-group input:focus { border-color: #28a745; }
     </style>
 </head>
 <body>
@@ -172,7 +206,7 @@
 
     <script>
         /* --- Lógica do Calendário --- */
-        let dataAtual = new Date(); // Inicia com a data de hoje
+        let dataAtual = new Date(); 
 
         function formatarData(data) {
             const opcoes = { day: 'numeric', month: 'long', year: 'numeric' };
@@ -184,17 +218,11 @@
         }
 
         function mudarDia(dias) {
-            // Adiciona ou subtrai os dias na data atual
             dataAtual.setDate(dataAtual.getDate() + dias);
             atualizarDisplayData();
-            
-            // Aqui futuramente você pode colocar uma função para filtrar a tabela baseado na nova data
-            console.log("Data alterada para:", formatarData(dataAtual));
         }
 
-        // Inicializa a data assim que a página carrega
         atualizarDisplayData();
-
 
         /* --- Lógica do Modal de Senha --- */
         let linkSelecionado = '';
@@ -207,14 +235,12 @@
 
         function fecharModalSenha() {
             document.getElementById('modalSenha').style.display = 'none';
-            document.getElementById('input-nova-senha').value = ''; // Limpa o campo
+            document.getElementById('input-nova-senha').value = ''; 
         }
 
         function salvarSenha(event) {
             event.preventDefault();
             const senha = document.getElementById('input-nova-senha').value;
-            
-            // Simulação da ação de salvar
             alert(`Senha salva com sucesso para o link: ${linkSelecionado}`);
             fecharModalSenha();
         }
