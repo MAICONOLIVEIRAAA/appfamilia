@@ -3,246 +3,262 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel PRO - MeuPad</title>
+    <title>Pad - Compartilhamento</title>
     <style>
         body, html { 
             margin: 0; padding: 0; font-family: sans-serif; 
-            /* Fundo com leve gradiente para destacar o efeito de vidro */
+            /* Mesmo fundo degradê do painel */
             background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%); 
             color: #333;
-            min-height: 100vh;
+            height: 100vh;
+            overflow: hidden; /* Evita barra de rolagem dupla */
         }
         
-        /* Barra Superior - Estilo Liquid Glass */
+        /* Barra Superior - Estilo Liquid Glass (Idêntico ao painel) */
         .topbar {
             display: flex; justify-content: space-between; align-items: center;
-            
-            /* Efeito Glassmorphism */
             background: rgba(255, 255, 255, 0.35);
             backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px); /* Suporte para Safari */
+            -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.5);
             box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
-            
-            /* Bordas bem arredondadas e formato flutuante */
             border-radius: 50px;
             height: 60px; 
             padding: 0 30px;
-            margin: 20px; /* Espaço ao redor para flutuar */
+            margin: 20px;
         }
 
         .logo { font-size: 20px; font-weight: bold; }
         .menu { display: flex; gap: 15px; align-items: center; }
-        .user-info { font-size: 14px; color: #444; font-weight: 500; }
         
-        /* Botão Sair adaptado para combinar com o vidro */
-        .btn-logout { 
-            background: rgba(255, 255, 255, 0.5); 
-            border: 1px solid rgba(255, 255, 255, 0.6); 
-            padding: 6px 15px; 
-            border-radius: 20px; 
-            cursor: pointer; 
-            font-weight: bold;
+        /* Botões da Barra Superior adaptados */
+        .btn-login {
+            background: rgba(255, 255, 255, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.6);
             color: #333;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
             transition: all 0.2s ease;
         }
-        .btn-logout:hover { background: rgba(255, 255, 255, 0.8); }
+        .btn-login:hover { background: rgba(255, 255, 255, 0.8); }
 
-        /* Container Principal */
-        .dashboard-container {
-            max-width: 1000px; margin: 10px auto 30px auto; padding: 25px; 
-            background: rgba(255, 255, 255, 0.9); /* Leve transparência no painel também */
-            border-radius: 16px; 
+        .btn-pro {
+            background: #ffaa00;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 170, 0, 0.3);
+            transition: all 0.2s ease;
+        }
+        .btn-pro:hover { background: #e69900; transform: translateY(-2px); }
+
+        /* Área do Texto com leve efeito Glass */
+        .pad-area { 
+            height: calc(100vh - 120px); /* Ajuste para o tamanho da barra flutuante */
+            padding: 0 20px 20px 20px;
+            box-sizing: border-box;
+        }
+        textarea { 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(255, 255, 255, 0.7); /* Leve transparência */
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.6); 
+            border-radius: 16px;
+            padding: 25px;
+            resize: none; 
+            font-size: 18px; 
+            outline: none;
+            box-sizing: border-box;
             box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-            border: 1px solid rgba(255, 255, 255, 0.6);
+            transition: border-color 0.3s;
         }
+        textarea:focus { border-color: rgba(255, 170, 0, 0.5); }
 
-        /* Navegação do Calendário */
-        .calendar-header {
-            display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #eee;
-        }
-        .calendar-nav {
-            display: flex; align-items: center; gap: 15px; background: #f8f9fa; padding: 8px 15px; border-radius: 30px; border: 1px solid #ddd;
-        }
-        .nav-arrow {
-            background: none; border: none; font-size: 18px; cursor: pointer; color: #555; font-weight: bold; padding: 0 5px;
-        }
-        .nav-arrow:hover { color: #28a745; }
-        .current-date { font-weight: bold; font-size: 16px; min-width: 150px; text-align: center; }
-
-        /* Tabelas */
-        table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
-        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #eee; }
-        th { background-color: rgba(248, 249, 250, 0.5); color: #555; font-size: 14px; border-radius: 8px; }
-        td { font-size: 14px; }
-        
-        .status-badge {
-            padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: bold;
-        }
-        .badge-locked { background: #ffeeba; color: #856404; }
-        .badge-open { background: #d4edda; color: #155724; }
-
-        /* Botões de Ação */
-        .btn-small {
-            padding: 5px 12px; font-size: 12px; border: none; border-radius: 20px; cursor: pointer; color: white; font-weight: bold;
-        }
-        .btn-edit { background: #007bff; }
-        .btn-delete { background: #dc3545; }
-
-        /* Modal de Senha */
+        /* Estilo Geral dos Modais */
         .modal-overlay {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); justify-content: center; align-items: center; z-index: 999;
+            display: none; 
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(5px);
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
         }
         .modal-content {
-            background: white; padding: 30px; border-radius: 16px; text-align: center; width: 90%; max-width: 400px;
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            text-align: center;
+            width: 90%;
             box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.6);
         }
-        .close-btn { float: right; font-size: 20px; font-weight: bold; cursor: pointer; color: #888; }
+        .close-btn {
+            float: right; font-size: 20px; font-weight: bold; cursor: pointer; color: #888;
+        }
+        
+        /* Elementos do Modal PRO */
+        .pricing-cards {
+            display: flex; gap: 15px; margin-top: 20px; justify-content: center;
+        }
+        .card {
+            border: 1px solid #eee; padding: 20px; border-radius: 12px; width: 30%;
+            background: #fdfdfd; transition: transform 0.2s;
+        }
+        .card.destaque {
+            border: 2px solid #ffaa00;
+            background: #fffdf5;
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(255,170,0,0.15);
+        }
+        .card h3 { margin: 0 0 10px 0; color: #333; }
+        .price { font-size: 24px; font-weight: bold; color: #28a745; margin-bottom: 5px; }
+        .details { font-size: 12px; color: #666; margin-bottom: 15px; }
+        
+        /* Botões Genéricos de Ação */
         .btn-acao {
-            background: #28a745; color: white; border: none; padding: 12px; width: 100%; border-radius: 30px; cursor: pointer; font-size: 16px; font-weight: bold; margin-top: 15px;
+            background: #28a745; color: white; border: none; padding: 12px; width: 100%; border-radius: 30px; cursor: pointer; font-size: 16px; font-weight: bold;
+            transition: background 0.2s;
         }
-        .form-group { margin-bottom: 15px; text-align: left; }
-        .form-group label { display: block; margin-bottom: 5px; color: #333; font-weight: bold; }
-        .form-group input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; outline: none; }
+        .btn-acao:hover { background: #218838; }
+        
+        /* Formulários de Auth */
+        .form-group {
+            margin-bottom: 15px; text-align: left;
+        }
+        .form-group label {
+            display: block; margin-bottom: 5px; color: #333; font-weight: bold;
+        }
+        .form-group input {
+            width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; outline: none;
+        }
         .form-group input:focus { border-color: #28a745; }
     </style>
 </head>
 <body>
 
     <div class="topbar">
-        <div class="logo">MeuPad <span style="color: #ffaa00; font-size: 14px;">PRO</span></div>
+        <div class="logo">MeuPad</div>
         <div class="menu">
-            <span class="user-info">admin@meupad.com</span>
-            <button class="btn-logout" onclick="window.location.href='index.html'">Sair</button>
+            <button class="btn-login" onclick="abrirModalLogin()">Login</button>
+            <button class="btn-pro" onclick="abrirModalPro()">Seja PRO</button>
         </div>
     </div>
 
-    <div class="dashboard-container">
-        
-        <div class="calendar-header">
-            <h2>Meus Links e Arquivos</h2>
+    <div class="pad-area">
+        <textarea id="texto-pad" placeholder="Comece a digitar aqui..."></textarea>
+    </div>
+
+    <div class="modal-overlay" id="modalPro">
+        <div class="modal-content" style="max-width: 600px;">
+            <span class="close-btn" onclick="fecharModalPro()">&times;</span>
+            <h2>Faça o upgrade para o PRO</h2>
+            <p>Faça upload de arquivos de até 500 MB e proteja seus links com senha.</p>
             
-            <div class="calendar-nav">
-                <button class="nav-arrow" onclick="mudarDia(-1)" title="Dia anterior">&#9664;</button>
-                <span class="current-date" id="display-data">Carregando data...</span>
-                <button class="nav-arrow" onclick="mudarDia(1)" title="Próximo dia">&#9654;</button>
+            <div class="pricing-cards">
+                <div class="card">
+                    <h3>Mensal</h3>
+                    <div class="price">R$ 9,99</div>
+                    <div class="details">Cobrado mensalmente</div>
+                    <button class="btn-acao">Assinar</button>
+                </div>
+                <div class="card destaque">
+                    <h3>12 Meses</h3>
+                    <div class="price">R$ 4,99<span style="font-size:14px">/mês</span></div>
+                    <div class="details">Pagamento único de R$ 59,88</div>
+                    <button class="btn-acao">Assinar</button>
+                </div>
+                <div class="card">
+                    <h3>6 Meses</h3>
+                    <div class="price">R$ 6,99<span style="font-size:14px">/mês</span></div>
+                    <div class="details">Pagamento único de R$ 41,94</div>
+                    <button class="btn-acao">Assinar</button>
+                </div>
             </div>
         </div>
-
-        <h3>Links Protegidos</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>URL do Pad</th>
-                    <th>Status</th>
-                    <th>Última Edição</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td id="link-1">/projeto-secreto</td>
-                    <td><span class="status-badge badge-locked">Com Senha</span></td>
-                    <td>Hoje, 14:30</td>
-                    <td>
-                        <button class="btn-small btn-edit" onclick="abrirModalSenha('/projeto-secreto')">Mudar Senha</button>
-                        <button class="btn-small btn-delete">Remover</button>
-                    </td>
-                </tr>
-                <tr>
-                    <td id="link-2">/notas-reuniao</td>
-                    <td><span class="status-badge badge-open">Sem Senha</span></td>
-                    <td>Ontem, 09:15</td>
-                    <td>
-                        <button class="btn-small btn-edit" onclick="abrirModalSenha('/notas-reuniao')">Adicionar Senha</button>
-                        <button class="btn-small btn-delete">Remover</button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-
-        <h3>Arquivos Hospedados (Max 500MB)</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Nome do Arquivo</th>
-                    <th>Tamanho</th>
-                    <th>Link Associado</th>
-                    <th>Expira em</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>apresentacao-final.pdf</td>
-                    <td>45 MB</td>
-                    <td>/projeto-secreto</td>
-                    <td>15 de Julho, 2026</td>
-                    <td>
-                        <button class="btn-small btn-delete">Deletar Agora</button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-
     </div>
 
-    <div class="modal-overlay" id="modalSenha">
-        <div class="modal-content">
-            <span class="close-btn" onclick="fecharModalSenha()">&times;</span>
-            <h2>Proteger Link</h2>
-            <p style="font-size: 14px; color: #666; margin-bottom: 20px;">Defina uma senha para <strong id="nome-link-modal">...</strong></p>
+    <div class="modal-overlay" id="modalLogin">
+        <div class="modal-content" style="max-width: 400px;">
+            <span class="close-btn" onclick="fecharModalLogin()">&times;</span>
             
-            <form onsubmit="salvarSenha(event)">
+            <h2 id="titulo-auth">Acesse sua conta</h2>
+            
+            <form id="form-auth" onsubmit="fazerLogin(event)">
                 <div class="form-group">
-                    <label>Nova Senha</label>
-                    <input type="password" id="input-nova-senha" required placeholder="Digite a senha">
+                    <label>E-mail</label>
+                    <input type="email" id="email" required placeholder="seu@email.com">
                 </div>
-                <button type="submit" class="btn-acao">Salvar Senha</button>
+                
+                <div class="form-group">
+                    <label>Senha</label>
+                    <input type="password" id="senha" required placeholder="Sua senha">
+                </div>
+                
+                <button type="submit" class="btn-acao" id="btn-submit-auth">Entrar</button>
             </form>
+
+            <p style="margin-top: 20px; font-size: 14px; color: #666;">
+                <span id="texto-alternar">Não tem uma conta?</span> 
+                <a href="#" onclick="alternarModoAuth()" style="color: #28a745; text-decoration: none; font-weight: bold;" id="link-alternar">Cadastre-se</a>
+            </p>
         </div>
     </div>
 
     <script>
-        /* --- Lógica do Calendário --- */
-        let dataAtual = new Date(); 
-
-        function formatarData(data) {
-            const opcoes = { day: 'numeric', month: 'long', year: 'numeric' };
-            return data.toLocaleDateString('pt-BR', opcoes);
+        // Funções do Modal PRO
+        function abrirModalPro() {
+            document.getElementById('modalPro').style.display = 'flex';
+        }
+        function fecharModalPro() {
+            document.getElementById('modalPro').style.display = 'none';
         }
 
-        function atualizarDisplayData() {
-            document.getElementById('display-data').innerText = formatarData(dataAtual);
+        // Funções do Modal de Login
+        let modoLogin = true;
+
+        function abrirModalLogin() {
+            document.getElementById('modalLogin').style.display = 'flex';
+        }
+        function fecharModalLogin() {
+            document.getElementById('modalLogin').style.display = 'none';
+            if (!modoLogin) alternarModoAuth();
         }
 
-        function mudarDia(dias) {
-            dataAtual.setDate(dataAtual.getDate() + dias);
-            atualizarDisplayData();
+        function alternarModoAuth() {
+            modoLogin = !modoLogin;
+            const titulo = document.getElementById('titulo-auth');
+            const btnSubmit = document.getElementById('btn-submit-auth');
+            const textoAlternar = document.getElementById('texto-alternar');
+            const linkAlternar = document.getElementById('link-alternar');
+
+            if (modoLogin) {
+                titulo.innerText = 'Acesse sua conta';
+                btnSubmit.innerText = 'Entrar';
+                textoAlternar.innerText = 'Não tem uma conta?';
+                linkAlternar.innerText = 'Cadastre-se';
+            } else {
+                titulo.innerText = 'Crie sua conta PRO';
+                btnSubmit.innerText = 'Cadastrar';
+                textoAlternar.innerText = 'Já tem uma conta?';
+                linkAlternar.innerText = 'Faça Login';
+            }
         }
 
-        atualizarDisplayData();
-
-        /* --- Lógica do Modal de Senha --- */
-        let linkSelecionado = '';
-
-        function abrirModalSenha(nomeDoLink) {
-            linkSelecionado = nomeDoLink;
-            document.getElementById('nome-link-modal').innerText = linkSelecionado;
-            document.getElementById('modalSenha').style.display = 'flex';
-        }
-
-        function fecharModalSenha() {
-            document.getElementById('modalSenha').style.display = 'none';
-            document.getElementById('input-nova-senha').value = ''; 
-        }
-
-        function salvarSenha(event) {
-            event.preventDefault();
-            const senha = document.getElementById('input-nova-senha').value;
-            alert(`Senha salva com sucesso para o link: ${linkSelecionado}`);
-            fecharModalSenha();
+        function fazerLogin(event) {
+            event.preventDefault(); 
+            // Redirecionamento para o painel atualizado com o nome do arquivo correto
+            alert("Sucesso! Redirecionando para o painel administrativo...");
+            window.location.href = 'configuracoes.html';
         }
     </script>
 
