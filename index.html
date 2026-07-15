@@ -26,25 +26,106 @@
         .logo { font-size: 20px; font-weight: bold; }
         .menu { display: flex; gap: 15px; align-items: center; }
         
-        .btn-login { background: rgba(255, 255, 255, 0.5); border: 1px solid rgba(255, 255, 255, 0.6); padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: bold; cursor: pointer; }
-        .btn-pro { background: #ffaa00; color: white; border: none; padding: 8px 20px; border-radius: 20px; font-size: 14px; font-weight: bold; cursor: pointer; }
+        .btn-login { 
+            background: rgba(255, 255, 255, 0.5); 
+            border: 1px solid rgba(255, 255, 255, 0.6); 
+            padding: 8px 16px; 
+            border-radius: 20px; 
+            font-size: 14px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            transition: all 0.2s ease; 
+        }
+        .btn-login:hover { background: rgba(255, 255, 255, 0.8); }
+        
+        .btn-pro { 
+            background: #ffaa00; 
+            color: white; 
+            border: none; 
+            padding: 8px 20px; 
+            border-radius: 20px; 
+            font-size: 14px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            box-shadow: 0 4px 15px rgba(255, 170, 0, 0.3); 
+            transition: all 0.2s ease; 
+        }
+        .btn-pro:hover { background: #e69900; transform: translateY(-2px); }
 
         /* Área do Texto */
-        .pad-area { height: calc(100vh - 120px); padding: 0 20px 20px 20px; box-sizing: border-box; }
-        textarea { width: 100%; height: 100%; background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.6); border-radius: 16px; padding: 25px; resize: none; font-size: 18px; outline: none; box-sizing: border-box; }
+        .pad-area { 
+            height: calc(100vh - 120px); 
+            padding: 0 20px 20px 20px; 
+            box-sizing: border-box; 
+        }
+        textarea { 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(255, 255, 255, 0.7); 
+            backdrop-filter: blur(10px); 
+            border: 1px solid rgba(255, 255, 255, 0.6); 
+            border-radius: 16px; 
+            padding: 25px; 
+            resize: none; 
+            font-size: 18px; 
+            outline: none; 
+            box-sizing: border-box; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05); 
+        }
 
         /* Modais */
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); backdrop-filter: blur(5px); justify-content: center; align-items: center; z-index: 999; }
-        .modal-content { background: white; padding: 30px; border-radius: 16px; text-align: center; width: 90%; max-width: 400px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
-        .btn-acao { background: #28a745; color: white; border: none; padding: 12px; width: 100%; border-radius: 30px; cursor: pointer; font-size: 16px; font-weight: bold; }
+        .modal-overlay { 
+            display: none; 
+            position: fixed; 
+            top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.4); 
+            backdrop-filter: blur(5px); 
+            justify-content: center; 
+            align-items: center; 
+            z-index: 999; 
+        }
+        .modal-content { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 16px; 
+            text-align: center; 
+            width: 90%; 
+            max-width: 400px; 
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2); 
+            border: 1px solid rgba(255,255,255,0.6); 
+        }
+        .btn-acao { 
+            background: #28a745; 
+            color: white; 
+            border: none; 
+            padding: 12px; 
+            width: 100%; 
+            border-radius: 30px; 
+            cursor: pointer; 
+            font-size: 16px; 
+            font-weight: bold; 
+            transition: background 0.2s; 
+            margin-top: 10px; 
+        }
+        .btn-acao:hover { background: #218838; }
+        
         .form-group { margin-bottom: 15px; text-align: left; }
-        .form-group input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        .form-group label { display: block; margin-bottom: 5px; color: #333; font-weight: bold; }
+        .form-group input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; outline: none; }
+        .form-group input:focus { border-color: #28a745; }
         .close-btn { float: right; font-size: 20px; font-weight: bold; cursor: pointer; color: #888; }
+        
+        /* Elementos do Modal PRO */
+        .pricing-cards { display: flex; gap: 15px; margin-top: 20px; justify-content: center; }
+        .card { border: 1px solid #eee; padding: 20px; border-radius: 12px; width: 30%; background: #fdfdfd; transition: transform 0.2s; }
+        .card.destaque { border: 2px solid #ffaa00; background: #fffdf5; transform: scale(1.05); box-shadow: 0 8px 20px rgba(255,170,0,0.15); }
+        .card h3 { margin: 0 0 10px 0; color: #333; }
+        .price { font-size: 24px; font-weight: bold; color: #28a745; margin-bottom: 5px; }
+        .details { font-size: 12px; color: #666; margin-bottom: 15px; }
     </style>
 </head>
 <body>
 
-    <!-- Barra Superior -->
     <div class="topbar">
         <div class="logo">MeuPad</div>
         <div class="menu">
@@ -53,12 +134,10 @@
         </div>
     </div>
 
-    <!-- Área de Texto -->
     <div class="pad-area">
         <textarea id="texto-pad" placeholder="Carregando..."></textarea>
     </div>
 
-    <!-- Modal de Bloqueio por Senha -->
     <div class="modal-overlay" id="modalBloqueio">
         <div class="modal-content">
             <h2>Link Protegido 🔒</h2>
@@ -68,23 +147,65 @@
         </div>
     </div>
 
-    <!-- Modal Login -->
     <div class="modal-overlay" id="modalLogin">
         <div class="modal-content">
             <span class="close-btn" onclick="fecharModalLogin()">&times;</span>
             <h2 id="titulo-auth">Acesse sua conta</h2>
-            <form onsubmit="fazerLogin(event)">
-                <div class="form-group"><input type="email" id="email" required placeholder="E-mail"></div>
-                <div class="form-group"><input type="password" id="senha" required placeholder="Senha"></div>
+            
+            <form id="form-auth" onsubmit="fazerLogin(event)">
+                <div class="form-group">
+                    <label>E-mail</label>
+                    <input type="email" id="email" required placeholder="seu@email.com">
+                </div>
+                <div class="form-group">
+                    <label>Senha</label>
+                    <input type="password" id="senha" required placeholder="Sua senha">
+                </div>
                 <button type="submit" class="btn-acao" id="btn-submit-auth">Entrar</button>
             </form>
+
+            <p style="margin-top: 20px; font-size: 14px; color: #666;">
+                <span id="texto-alternar">Não tem uma conta?</span> 
+                <a href="#" onclick="alternarModoAuth()" style="color: #28a745; text-decoration: none; font-weight: bold;" id="link-alternar">Cadastre-se</a>
+            </p>
         </div>
     </div>
 
-    <!-- [Modal PRO omitido por espaço, mas você pode manter o que já tinha] -->
+    <div class="modal-overlay" id="modalPro">
+        <div class="modal-content" style="max-width: 600px;">
+            <span class="close-btn" onclick="fecharModalPro()">&times;</span>
+            <h2>Faça o upgrade para o PRO</h2>
+            <p>Faça upload de arquivos de até 500 MB e proteja seus links com senha.</p>
+            
+            <div class="pricing-cards">
+                <div class="card">
+                    <h3>Mensal</h3>
+                    <div class="price">R$ 9,99</div>
+                    <div class="details">Cobrado mensalmente</div>
+                    <button class="btn-acao">Assinar</button>
+                </div>
+                <div class="card destaque">
+                    <h3>12 Meses</h3>
+                    <div class="price">R$ 4,99<span style="font-size:14px">/mês</span></div>
+                    <div class="details">Pagamento único de R$ 59,88</div>
+                    <button class="btn-acao">Assinar</button>
+                </div>
+                <div class="card">
+                    <h3>6 Meses</h3>
+                    <div class="price">R$ 6,99<span style="font-size:14px">/mês</span></div>
+                    <div class="details">Pagamento único de R$ 41,94</div>
+                    <button class="btn-acao">Assinar</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <script>
+        /* ==========================================
+           CONFIGURAÇÃO DO SUPABASE
+           ========================================== */
         const clienteSupabase = window.supabase.createClient(
             'https://fcrgbdkiqnqtgmzevarh.supabase.co', 
             'sb_publishable_epnSTe_H_mCleZdgyl_AYw_8xGgRueS'
@@ -94,7 +215,11 @@
         let padSlug = window.location.hash.substring(1) || 'padrao'; 
         let timeout;
 
+        /* ==========================================
+           LÓGICA DO BLOCO DE NOTAS (AUTO-SAVE & CARREGAMENTO)
+           ========================================== */
         async function carregarPad() {
+            textarea.placeholder = "Carregando...";
             const { data, error } = await clienteSupabase
                 .from('pads')
                 .select('text_content, password_hash, password_salt')
@@ -107,6 +232,9 @@
                 textarea.placeholder = "Conteúdo protegido por senha.";
             } else if (data) {
                 textarea.value = data.text_content;
+                textarea.placeholder = "Comece a digitar aqui...";
+            } else {
+                textarea.value = '';
                 textarea.placeholder = "Comece a digitar aqui...";
             }
         }
@@ -127,18 +255,86 @@
             }
         }
 
-        // Auto-save
         async function salvarPad() {
             const texto = textarea.value;
             await clienteSupabase.from('pads').upsert({ slug: padSlug, text_content: texto }, { onConflict: 'slug' });
         }
         textarea.addEventListener('input', () => { clearTimeout(timeout); timeout = setTimeout(salvarPad, 1000); });
 
-        // Funções dos modais (mantidas)
-        function abrirModalLogin() { document.getElementById('modalLogin').style.display = 'flex'; }
-        function fecharModalLogin() { document.getElementById('modalLogin').style.display = 'none'; }
-        function abrirModalPro() { /* sua lógica pro */ }
+        window.addEventListener('hashchange', () => {
+            padSlug = window.location.hash.substring(1) || 'padrao';
+            carregarPad();
+        });
 
+        /* ==========================================
+           LÓGICA DOS MODAIS (LOGIN & PRO)
+           ========================================== */
+        function abrirModalLogin() { document.getElementById('modalLogin').style.display = 'flex'; }
+        function fecharModalLogin() {
+            document.getElementById('modalLogin').style.display = 'none';
+            if (!modoLogin) alternarModoAuth();
+        }
+
+        function abrirModalPro() { document.getElementById('modalPro').style.display = 'flex'; }
+        function fecharModalPro() { document.getElementById('modalPro').style.display = 'none'; }
+
+        let modoLogin = true;
+
+        function alternarModoAuth() {
+            modoLogin = !modoLogin;
+            const titulo = document.getElementById('titulo-auth');
+            const btnSubmit = document.getElementById('btn-submit-auth');
+            const textoAlternar = document.getElementById('texto-alternar');
+            const linkAlternar = document.getElementById('link-alternar');
+
+            if (modoLogin) {
+                titulo.innerText = 'Acesse sua conta';
+                btnSubmit.innerText = 'Entrar';
+                textoAlternar.innerText = 'Não tem uma conta?';
+                linkAlternar.innerText = 'Cadastre-se';
+            } else {
+                titulo.innerText = 'Crie sua conta PRO';
+                btnSubmit.innerText = 'Cadastrar';
+                textoAlternar.innerText = 'Já tem uma conta?';
+                linkAlternar.innerText = 'Faça Login';
+            }
+        }
+
+        /* ==========================================
+           AUTENTICAÇÃO REAL COM SUPABASE
+           ========================================== */
+        async function fazerLogin(event) {
+            event.preventDefault(); 
+            const email = document.getElementById('email').value;
+            const senha = document.getElementById('senha').value;
+            const btnSubmit = document.getElementById('btn-submit-auth');
+            
+            const textoOriginal = btnSubmit.innerText;
+            btnSubmit.innerText = 'Aguarde...';
+            btnSubmit.disabled = true;
+
+            if (modoLogin) {
+                const { data, error } = await clienteSupabase.auth.signInWithPassword({ email, password: senha });
+                if (error) {
+                    alert("Erro ao entrar: " + error.message);
+                } else {
+                    alert("Sucesso! Redirecionando para o painel administrativo...");
+                    window.location.href = 'configuracoes.html';
+                }
+            } else {
+                const { data, error } = await clienteSupabase.auth.signUp({ email, password: senha });
+                if (error) {
+                    alert("Erro ao cadastrar: " + error.message);
+                } else {
+                    alert("Cadastro realizado com sucesso! Agora pode fazer o login.");
+                    alternarModoAuth(); 
+                }
+            }
+            btnSubmit.innerText = textoOriginal;
+            btnSubmit.disabled = false;
+        }
+
+        // Inicializa o Pad correspondente ao hash da URL
         carregarPad();
     </script>
 </body>
