@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pad - Compartilhamento</title>
+    <title>MeuPad - Compartilhamento</title>
     <style>
         body, html { 
             margin: 0; padding: 0; font-family: sans-serif; 
@@ -153,7 +153,7 @@
     </div>
 
     <div class="pad-area">
-        <textarea id="texto-pad" placeholder="Comece a digitar aqui..."></textarea>
+        <textarea id="texto-pad" placeholder="Carregando texto..."></textarea>
     </div>
 
     <div class="modal-overlay" id="modalPro">
@@ -215,25 +215,22 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <script>
-        // Configuração do Supabase
+        /* ==========================================
+           CONFIGURAÇÃO DO SUPABASE
+           ========================================== */
         const supabaseUrl = 'https://fcrgbdkiqnqtgmzevarh.supabase.co';
-        const supabaseKey = 'fcrgbdkiqnqtgmzevarh'; // <--- COLE SUA CHAVE API AQUI
+        const supabaseKey = 'COLE_SUA_CHAVE_ANON_AQUI'; // <--- COLE SUA CHAVE AQUI
         const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-        // Funções do Modal PRO
-        function abrirModalPro() {
-            document.getElementById('modalPro').style.display = 'flex';
-        }
-        function fecharModalPro() {
-            document.getElementById('modalPro').style.display = 'none';
-        }
+        /* ==========================================
+           LÓGICA DOS MODAIS (LOGIN E PRO)
+           ========================================== */
+        function abrirModalPro() { document.getElementById('modalPro').style.display = 'flex'; }
+        function fecharModalPro() { document.getElementById('modalPro').style.display = 'none'; }
 
-        // Funções do Modal de Login
         let modoLogin = true;
 
-        function abrirModalLogin() {
-            document.getElementById('modalLogin').style.display = 'flex';
-        }
+        function abrirModalLogin() { document.getElementById('modalLogin').style.display = 'flex'; }
         function fecharModalLogin() {
             document.getElementById('modalLogin').style.display = 'none';
             if (!modoLogin) alternarModoAuth();
@@ -259,26 +256,18 @@
             }
         }
 
-        // Lógica REAL de Autenticação com Supabase
         async function fazerLogin(event) {
             event.preventDefault(); 
-            
             const email = document.getElementById('email').value;
             const senha = document.getElementById('senha').value;
             const btnSubmit = document.getElementById('btn-submit-auth');
             
-            // Muda o texto do botão enquanto carrega
             const textoOriginal = btnSubmit.innerText;
             btnSubmit.innerText = 'Aguarde...';
             btnSubmit.disabled = true;
 
             if (modoLogin) {
-                // TENTATIVA DE LOGIN
-                const { data, error } = await supabase.auth.signInWithPassword({
-                    email: email,
-                    password: senha,
-                });
-
+                const { data, error } = await supabase.auth.signInWithPassword({ email, password: senha });
                 if (error) {
                     alert("Erro ao entrar: " + error.message);
                 } else {
@@ -286,12 +275,7 @@
                     window.location.href = 'configuracoes.html';
                 }
             } else {
-                // TENTATIVA DE CADASTRO
-                const { data, error } = await supabase.auth.signUp({
-                    email: email,
-                    password: senha,
-                });
-
+                const { data, error } = await supabase.auth.signUp({ email, password: senha });
                 if (error) {
                     alert("Erro ao cadastrar: " + error.message);
                 } else {
@@ -299,11 +283,66 @@
                     alternarModoAuth(); 
                 }
             }
-
-            // Restaura o botão
             btnSubmit.innerText = textoOriginal;
             btnSubmit.disabled = false;
         }
+
+        /* ==========================================
+           LÓGICA DO BLOCO DE NOTAS (AUTO-SAVE)
+           ========================================== */
+        const textarea = document.getElementById('texto-pad');
+        let padSlug = window.location.hash.substring(1) || 'padrao'; 
+        let timeoutDigitacao;
+
+        // 1. Carregar o texto do banco de dados ao abrir a página
+        async function carregarPad() {
+            textarea.placeholder = "Carregando texto...";
+            
+            const { data, error } = await supabase
+                .from('pads')
+                .select('text_content')
+                .eq('slug', padSlug)
+                .single(); 
+
+            if (data) {
+                textarea.value = data.text_content;
+            } else {
+                textarea.value = ''; 
+            }
+            textarea.placeholder = "Comece a digitar aqui...";
+        }
+
+        // 2. Salvar o texto no banco de dados
+        async function salvarPad() {
+            const texto = textarea.value;
+            const { error } = await supabase
+                .from('pads')
+                .upsert(
+                    { slug: padSlug, text_content: texto }, 
+                    { onConflict: 'slug' }
+                );
+
+            if (error) {
+                console.error("Erro ao salvar:", error);
+            } else {
+                console.log("Texto salvo na nuvem com sucesso!");
+            }
+        }
+
+        // 3. Monitorar a digitação (Salva automaticamente após 1 segundo)
+        textarea.addEventListener('input', () => {
+            clearTimeout(timeoutDigitacao);
+            timeoutDigitacao = setTimeout(salvarPad, 1000);
+        });
+
+        // 4. Detectar mudança na URL (se o usuário alterar o #nome lá em cima)
+        window.addEventListener('hashchange', () => {
+            padSlug = window.location.hash.substring(1) || 'padrao';
+            carregarPad();
+        });
+
+        // Inicia carregando o texto da URL atual
+        carregarPad();
     </script>
 
 </body>
