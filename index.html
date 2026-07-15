@@ -226,7 +226,9 @@
            ========================================== */
         const supabaseUrl = 'https://fcrgbdkiqnqtgmzevarh.supabase.co';
         const supabaseKey = 'sb_publishable_epnSTe_H_mCleZdgyl_AYw_8xGgRueS';
-        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+        
+        // MUDANÇA AQUI: Criamos a variável "clienteSupabase" para não dar conflito com a biblioteca
+        const clienteSupabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
         /* ==========================================
            LÓGICA DOS MODAIS (LOGIN E PRO)
@@ -273,7 +275,8 @@
             btnSubmit.disabled = true;
 
             if (modoLogin) {
-                const { data, error } = await supabase.auth.signInWithPassword({ email, password: senha });
+                // MUDANÇA AQUI: Usando clienteSupabase
+                const { data, error } = await clienteSupabase.auth.signInWithPassword({ email, password: senha });
                 if (error) {
                     alert("Erro ao entrar: " + error.message);
                 } else {
@@ -281,7 +284,8 @@
                     window.location.href = 'configuracoes.html';
                 }
             } else {
-                const { data, error } = await supabase.auth.signUp({ email, password: senha });
+                // MUDANÇA AQUI: Usando clienteSupabase
+                const { data, error } = await clienteSupabase.auth.signUp({ email, password: senha });
                 if (error) {
                     alert("Erro ao cadastrar: " + error.message);
                 } else {
@@ -304,7 +308,8 @@
         async function carregarPad() {
             textarea.placeholder = "Carregando texto...";
             
-            const { data, error } = await supabase
+            // MUDANÇA AQUI: Usando clienteSupabase
+            const { data, error } = await clienteSupabase
                 .from('pads')
                 .select('text_content')
                 .eq('slug', padSlug)
@@ -321,7 +326,9 @@
         // 2. Salvar o texto no banco de dados
         async function salvarPad() {
             const texto = textarea.value;
-            const { error } = await supabase
+            
+            // MUDANÇA AQUI: Usando clienteSupabase
+            const { error } = await clienteSupabase
                 .from('pads')
                 .upsert(
                     { slug: padSlug, text_content: texto }, 
