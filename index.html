@@ -5,14 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MeuPad - Compartilhamento</title>
     <style>
-        /* [Manter todo o seu CSS anterior aqui] */
         body, html { margin: 0; padding: 0; font-family: sans-serif; background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%); color: #333; height: 100vh; overflow: hidden; }
-        .topbar { display: flex; justify-content: space-between; align-items: center; background: rgba(255, 255, 255, 0.35); backdrop-filter: blur(12px); border-radius: 50px; height: 60px; padding: 0 30px; margin: 20px; }
+        
+        /* Barra Superior - Liquid Glass */
+        .topbar { display: flex; justify-content: space-between; align-items: center; background: rgba(255, 255, 255, 0.35); backdrop-filter: blur(12px); border-radius: 50px; height: 60px; padding: 0 30px; margin: 20px; border: 1px solid rgba(255, 255, 255, 0.5); box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1); }
+        .logo { font-size: 20px; font-weight: bold; }
+        .menu { display: flex; gap: 15px; align-items: center; }
+        .btn-login, .btn-pro { background: rgba(255, 255, 255, 0.5); border: 1px solid rgba(255, 255, 255, 0.6); padding: 8px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; }
+        .btn-pro { background: #ffaa00; color: white; border: none; }
+
+        /* Área de Texto */
         .pad-area { height: calc(100vh - 120px); padding: 0 20px 20px 20px; }
-        textarea { width: 100%; height: 100%; background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); border-radius: 16px; padding: 25px; resize: none; font-size: 18px; outline: none; }
+        textarea { width: 100%; height: 100%; background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.6); border-radius: 16px; padding: 25px; resize: none; font-size: 18px; outline: none; }
+        
+        /* Modais */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); backdrop-filter: blur(5px); justify-content: center; align-items: center; z-index: 999; }
-        .modal-content { background: white; padding: 30px; border-radius: 16px; text-align: center; width: 90%; max-width: 400px; }
-        .btn-acao { background: #28a745; color: white; border: none; padding: 12px; width: 100%; border-radius: 30px; cursor: pointer; }
+        .modal-content { background: white; padding: 30px; border-radius: 16px; text-align: center; width: 90%; max-width: 400px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
+        .btn-acao { background: #28a745; color: white; border: none; padding: 12px; width: 100%; border-radius: 30px; cursor: pointer; font-weight: bold; margin-top: 15px; }
+        .form-group input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; margin-bottom: 15px; }
     </style>
 </head>
 <body>
@@ -29,6 +39,7 @@
         <textarea id="texto-pad" placeholder="Carregando..."></textarea>
     </div>
 
+    <!-- Modal de Bloqueio (Segurança) -->
     <div class="modal-overlay" id="modalBloqueio">
         <div class="modal-content">
             <h2>Link Protegido 🔒</h2>
@@ -38,6 +49,8 @@
         </div>
     </div>
 
+    <!-- [AQUI VOCÊ MANTÉM OS MODAIS DE LOGIN E PRO QUE JÁ TINHAMOS] -->
+    
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         const clienteSupabase = window.supabase.createClient(
@@ -47,6 +60,7 @@
 
         const textarea = document.getElementById('texto-pad');
         let padSlug = window.location.hash.substring(1) || 'padrao'; 
+        let timeout;
 
         // 1. Carregar com verificação de segurança
         async function carregarPad() {
@@ -56,7 +70,6 @@
                 .eq('slug', padSlug)
                 .single(); 
 
-            // Se existe senha no banco, bloqueia a entrada
             if (data && data.password_hash) {
                 document.getElementById('modalBloqueio').style.display = 'flex';
                 textarea.value = '';
@@ -67,17 +80,15 @@
             }
         }
 
-        // 2. Verificação profissional (Simulando hash simples)
+        // 2. Verificação de senha
         async function verificarSenhaAcesso() {
             const senhaDigitada = document.getElementById('input-senha-acesso').value;
-            
             const { data } = await clienteSupabase
                 .from('pads')
                 .select('text_content, password_hash, password_salt')
                 .eq('slug', padSlug)
                 .single();
 
-            // Compara o hash gerado pela mesma lógica que criamos no painel
             if (data && btoa(senhaDigitada + data.password_salt) === data.password_hash) {
                 document.getElementById('modalBloqueio').style.display = 'none';
                 textarea.value = data.text_content;
@@ -86,13 +97,12 @@
             }
         }
 
-        // Auto-save permanece igual...
+        // Auto-save
         async function salvarPad() {
             const texto = textarea.value;
             await clienteSupabase.from('pads').upsert({ slug: padSlug, text_content: texto }, { onConflict: 'slug' });
         }
         textarea.addEventListener('input', () => { clearTimeout(timeout); timeout = setTimeout(salvarPad, 1000); });
-        let timeout;
 
         carregarPad();
     </script>
